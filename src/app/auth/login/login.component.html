@@ -1,0 +1,108 @@
+<!-- start auth-fluid-->
+
+<div class="auth-fluid">
+    <!--Auth fluid left content -->
+    <div class="auth-fluid-form-box">
+        <div class="align-items-center d-flex h-100">
+            <div class="card-body">
+
+                <!-- Logo -->
+                <div class="auth-brand text-center text-lg-start">
+                    <a href="index.html" class="logo-dark">
+                        <span><img src="assets/images/logo-dark.png" alt="" height="100"></span>
+                    </a>
+                </div>
+<br>
+<br>
+                <!-- title-->
+                <h4 class="mt-0">Inicio de Sesión</h4>
+                <p class="text-muted mb-4">Ingrese su dirección de correo electrónico y contraseña para acceder a la cuenta.</p>
+
+                <!-- form -->
+                <form [formGroup]="loginForm" autocomplete="off" (ngSubmit)="login()">
+                    <div class="mb-3">
+                        <!-- <label for="emailaddress" class="form-label">Usuario</label> -->
+                        <input class="form-control" type="email" id="emailaddress" placeholder="Introduce tu correo"
+                            formControlName="correo" [class.is-invalid]="correoNoValido">
+                        <small *ngIf="correoNoValido" class="form-text
+                            text-danger">Ingrese un correo valido</small>
+                    </div>
+                    <div class="mb-3">
+                        <div class="input-group mb-3">
+                            <input [type]='passwordtype' name="contrasenia" required="true" class="form-control"
+                                placeholder="Ingresa tu contraseña" formControlName="clave"
+                                [class.is-invalid]="claveNoValida">
+                            <div class="input-group-append">
+                                <div class="input-group-text">
+                                    <a (click)="visibilitiPassword()"><i [class]="classhow"></i></a>
+                                    <!--<span class="fas fa-lock"></span> eye-slash-->
+                                </div>
+                            </div>
+
+                        </div>
+                        <small *ngIf="claveNoValida" class="form-text
+                        text-danger">La contraseña es requerida</small>
+                    </div>
+                    <div class="mb-3">
+                        <div class="form-check">
+                            <input type="checkbox" class="form-check-input" formControlName="recordarme"
+                                id="checkbox-signin">
+                            <label class="form-check-label" for="checkbox-signin">Recordarme</label>
+                        </div>
+                    </div>
+                    <div class="d-grid mb-0 text-center">
+                        <button class="btn btn-primary" [disabled]=loginForm.invalid type="submit"><i
+                                class="mdi mdi-login"></i> Ingresar </button>
+                    </div>
+                    <!-- social-->
+                    <!-- <div class="text-center mt-4">
+                        <p class="text-muted font-16">Sign in with</p>
+                        <ul class="social-list list-inline mt-3">
+                            <li class="list-inline-item">
+                                <a href="javascript: void(0);" class="social-list-item border-primary text-primary"><i
+                                        class="mdi mdi-facebook"></i></a>
+                            </li>
+                            <li class="list-inline-item">
+                                <a href="javascript: void(0);" class="social-list-item border-danger text-danger"><i
+                                        class="mdi mdi-google"></i></a>
+                            </li>
+                            <li class="list-inline-item">
+                                <a href="javascript: void(0);" class="social-list-item border-info text-info"><i
+                                        class="mdi mdi-twitter"></i></a>
+                            </li>
+                            <li class="list-inline-item">
+                                <a href="javascript: void(0);"
+                                    class="social-list-item border-secondary text-secondary"><i
+                                        class="mdi mdi-github"></i></a>
+                            </li>
+                        </ul>
+                    </div> -->
+                </form>
+                <!-- end form-->
+
+                <!-- Footer-->
+                <!-- <footer class="footer footer-alt">
+                    <p class="text-muted">Don't have an account? <a href="pages-register-2.html"
+                            class="text-muted ms-1"><b>Sign Up</b></a></p>
+                </footer> -->
+
+            </div> <!-- end .card-body -->
+        </div> <!-- end .align-items-center.d-flex.h-100-->
+    </div>
+    <!-- end auth-fluid-form-box-->
+
+    <!-- Auth fluid right content -->
+    <div class="auth-fluid-right text-center">
+        <div class="auth-user-testimonial">
+            <h2 class="mb-3">I love the color!</h2>
+            <p class="lead"><i class="mdi mdi-format-quote-open"></i> It's a elegent templete. I love it very much! . <i
+                    class="mdi mdi-format-quote-close"></i>
+            </p>
+            <p>
+                - Hyper Admin User
+            </p>
+        </div> <!-- end auth-user-testimonial-->
+    </div>
+    <!-- end Auth fluid right content -->
+</div>
+<!-- end auth-fluid-->

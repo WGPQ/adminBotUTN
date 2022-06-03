@@ -1,0 +1,4 @@
+{
+    "appService.defaultWebAppToDeploy": "/subscriptions/c6c4b2b9-9307-463e-8d9a-d9f96e56af0a/microsoft.web/sites/subscriptions/c6c4b2b9-9307-463e-8d9a-d9f96e56af0a/resourceGroups/test-bliblioteca-group/providers/Microsoft.Web/sites/bibliochat-utn",
+    "appService.deploySubpath": "."
+}

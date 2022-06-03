@@ -1,0 +1,122 @@
+<div class="row">
+
+    <!-- start chat users-->
+    <div class="col-xxl-3 col-xl-4 order-xl-1">
+        <div *ngIf="!loading && interactions.length>0" class="card">
+            <div class="card-body p-0">
+
+                <h4 class="page-title  m-2">Conversaciones</h4>
+                <div class="tab-content">
+                    <div class="tab-pane show active p-3" id="newpost">
+
+                        <!-- start search box -->
+                        <div class="app-search">
+                            <form>
+                                <div class="mb-2 position-relative">
+                                    <input type="text" class="form-control" placeholder="People, groups & messages...">
+                                    <span class="mdi mdi-magnify search-icon"></span>
+                                </div>
+                            </form>
+                        </div>
+                        <!-- end search box -->
+
+                        <!-- users -->
+                        <div class="row">
+                            <div class="col">
+                                <div class="container-scroll" (scroll)="doSomethingOnScroll($event)" #scrollMessages
+                                    style="height:450px">
+
+                                    <a *ngFor="let interaction of interactions"
+                                        (click)="cargarHistorial(interaction.chat.chat)" class="text-body">
+                                        <div class="d-flex align-items-start mt-1 p-2">
+                                            <img [src]="'https://avatars.dicebear.com/api/initials/'+interaction.usuario_created.nombres+'_'+interaction.usuario_created.apellidos+'.svg'"
+                                                class="me-2 rounded-circle" height="48" alt="Brandon Smith">
+                                            <div class="w-100 overflow-hidden">
+                                                <h5 class="mt-0 mb-0 font-14">
+                                                    <span
+                                                        class="float-end text-muted font-12">{{interaction.chat.createdAt!.split('T')[1].substring(0,5)}}</span>
+                                                    {{interaction.usuario_created.nombres+'
+                                                    '+interaction.usuario_created.apellidos}}
+                                                </h5>
+                                                <p class="mt-1 mb-0 text-muted font-14">
+                                                    <span class="w-25 float-end text-end"><span
+                                                            class="badge badge-danger-lighten">{{interaction.chat.nuevos}}</span></span>
+                                                    <span class="w-75">{{interaction.chat.contenido}}</span>
+                                                </p>
+                                            </div>
+                                        </div>
+                                    </a>
+
+
+
+
+
+                                </div> <!-- end slimscroll-->
+                            </div> <!-- End col -->
+                        </div>
+                        <!-- end users -->
+                    </div> <!-- end Tab Pane-->
+                </div> <!-- end tab content-->
+            </div> <!-- end card-body-->
+        </div> <!-- end card-->
+    </div>
+    <!-- end chat users-->
+    <!-- chat area -->
+    <div class="col-xxl-6 col-xl-8 order-xl-2">
+        <div class="card">
+            <div class="card-body">
+                <div class="container-scroll" #scrollChat style="height:450px">
+                    <a (click)="cargarMas()">Cargar mas</a>
+                    <div class="conversation-list">
+                        <div *ngFor="let item of messages"
+                            [ngClass]="item.usuario!.id!= idBot ?  'clearfix' : 'clearfix odd'">
+                            <br>
+                            <div class="chat-avatar">
+                                <img src=""
+                                    [src]="item.usuario!.id!= idBot ? 'https://avatars.dicebear.com/api/initials/'+item.usuario!.nombres+'_'+item.usuario!.apellidos+'.svg' :'assets/images/users/robot.jpg'"
+                                    alt="Female">
+                                <i>{{item.createdAt!.split('T')[1].substring(0,5)}}</i>
+                            </div>
+                            <div class="conversation-text">
+                                <div [ngClass]="item.usuario!.id!= idBot ? 'ctext-wrap' : 'ctext-wrap chat-widgets-cn'">
+                                    <i>{{item.usuario!.nombres+' '+item.usuario!.apellidos}}</i>
+                                    <p>
+                                        {{item.contenido}}
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col">
+                        <div class="mt-2 bg-light p-3 rounded">
+                            <form [formGroup]="mensageForm" (ngSubmit)="guardarMessage()" class="needs-validation"
+                                novalidate="" name="chat-form" id="chat-form">
+                                <div class="row">
+                                    <div class="col mb-2 mb-sm-0">
+                                        <input type="text" #txtmessage class="form-control border-0"
+                                            placeholder="Mensaje ..." formControlName="message">
+                                    </div>
+                                    <div class="col-sm-auto">
+                                        <div class="btn-group">
+                                            <div class="d-grid">
+                                                <button type="submit" [disabled]="mensageForm.invalid"
+                                                    class="btn btn-success chat-send"><i
+                                                        class='uil uil-message'></i></button>
+                                            </div>
+                                        </div>
+                                    </div> <!-- end col -->
+                                </div> <!-- end row-->
+                            </form>
+                        </div>
+                    </div> <!-- end col-->
+                </div>
+                <!-- end row -->
+            </div> <!-- end card-body -->
+        </div> <!-- end card -->
+    </div>
+    <!-- end chat area-->
+
+</div>

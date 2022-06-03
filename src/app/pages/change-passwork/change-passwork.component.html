@@ -1,0 +1,59 @@
+<div class="account-pages pt-2 pt-sm-5 pb-4 pb-sm-5">
+    <div class="container">
+        <div class="row justify-content-center">
+            <div class="col-xxl-4 col-lg-5">
+                <div class="card">
+                    <!-- Logo -->
+                    <div class="card-header pt-2 pb-2 text-center ">
+                        <a href="index.html">
+                            <span><img src="assets/images/logo_change_password.png" alt="" height="80"></span>
+                        </a>
+                    </div>
+
+                    <div class="card-body p-4">
+
+                        <div class="text-center w-75 m-auto">
+                            <!-- <img src="assets/images/users/avatar-1.jpg" height="64" alt="user-image"
+                                class="rounded-circle shadow"> -->
+                            <img [src]="'https://avatars.dicebear.com/api/initials/'+usuario!.nombres+'_'+usuario!.apellidos+'.svg'"
+                                class="me-2 rounded-circle" height="64" alt="Brandon Smith">
+                            <h4 class="text-dark-50 text-center mt-3 fw-bold">Hola! {{usuario!.nombres}} {{usuario!.apellidos}}</h4>
+                            <!-- <p class="text-muted mb-4">Ingresa tu nueva contraseña.</p> -->
+                        </div>
+                        <form [formGroup]="actualizarForm" autocomplete="off" (ngSubmit)="actualizarPassword()">
+                            <div class="mb-3">
+                                <label for="password" class="form-label">Nueva Contraseña</label>
+                                <input class="form-control" type="password" formControlName="clave" maxlength="50"
+                                    [class.is-invalid]="clave1NoValido">
+                                <small *ngIf="clave1NoValido" class="form-text text-danger">La contraseña es
+                                    requerida</small>
+                            </div>
+
+                            <div class="mb-3">
+                                <label for="password" class="form-label">Confirmar nueva contraseña</label>
+                                <input class="form-control" type="password" formControlName="rclave" maxlength="50"
+                                    [class.is-invalid]="clave2NoValido">
+                                <small *ngIf="clave2NoValido" class="form-text text-danger">Las contraseñas no
+                                    coinciden</small>
+                            </div>
+
+                            <div class="mb-0 text-center">
+                                <button class="btn btn-primary" [disabled]=actualizarForm.invalid
+                                    type="submit">Actualizar</button>
+                            </div>
+                        </form>
+
+                    </div> <!-- end card-body-->
+                </div>
+
+            </div> <!-- end col -->
+        </div>
+        <!-- end row -->
+    </div>
+    <!-- end container -->
+</div>
+<!-- end page -->
+
+<footer class="footer footer-alt">
+    2018 - 2021 © Hyper - Coderthemes.com
+</footer>
