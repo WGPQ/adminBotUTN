@@ -27,6 +27,7 @@ export class IntentsComponent implements OnInit {
     private alertService: AlertService,
     private formService: FormsService
   ) {
+    this.cargando = true;
     this.intencionForm = formService.crearFormularioIntencion();
     this.listarForm = formService.crearFormularioListar();
   }
@@ -50,7 +51,7 @@ export class IntentsComponent implements OnInit {
     }
     this.intencionService.obtenerIntenciones(listar).subscribe(response => {
       this.intenciones = response;
-
+      this.cargando = false;
     });
   }
 
@@ -73,7 +74,6 @@ export class IntentsComponent implements OnInit {
   guardarIntencion() {
     const intencion: Intencion = {
       id: this.idIntencion ?? '',
-      codigo: this.intencionForm.value.codigo,
       nombre: this.intencionForm.value.nombre,
       descripcion: this.intencionForm.value.descripcion,
     };
@@ -118,7 +118,6 @@ export class IntentsComponent implements OnInit {
     this.intencionService.obtenerIntencion(id).subscribe((resp) => {
       this.intencionForm.patchValue({
         nombre: resp.nombre,
-        codigo: resp.codigo,
         descripcion: resp.descripcion
       });
     });

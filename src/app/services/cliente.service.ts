@@ -33,7 +33,7 @@ export class ClienteService {
     const params = new HttpParams()
       .set("columna", listar.columna)
       .set("nombre", listar.search)
-      .set("offset", listar.offset)
+      .set("offset", listar.offset??null)
       .set("limit", listar.limit)
       .set("sort", listar.sort)
     return this.http.get(this.appUrl + this.apiCliente + '/Listar', { params: params, headers: this.headers }).pipe(

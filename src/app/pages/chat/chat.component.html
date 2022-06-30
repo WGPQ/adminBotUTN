@@ -4,7 +4,6 @@
     <div class="col-xxl-3 col-xl-4 order-xl-1">
         <div *ngIf="!loading && interactions.length>0" class="card">
             <div class="card-body p-0">
-
                 <h4 class="page-title  m-2">Conversaciones</h4>
                 <div class="tab-content">
                     <div class="tab-pane show active p-3" id="newpost">
@@ -65,7 +64,7 @@
     <div class="col-xxl-6 col-xl-8 order-xl-2">
         <div class="card">
             <div class="card-body">
-                <div class="container-scroll" #scrollChat style="height:450px">
+                <!-- <div class="container-scroll" #scrollChat style="height:450px">
                     <a (click)="cargarMas()">Cargar mas</a>
                     <div class="conversation-list">
                         <div *ngFor="let item of messages"
@@ -87,8 +86,10 @@
                             </div>
                         </div>
                     </div>
-                </div>
-
+                </div> -->
+                <iframe
+                    src='https://webchat.botframework.com/embed/boprueba?s=p61JrISeBu4.aYnkBZXV2nnXFheb9e4gzIsym9mxh_AFHmxh-kVOAO4'
+                    style='min-width: 400px; width: 100%; min-height: 500px;'></iframe>
                 <div class="row">
                     <div class="col">
                         <div class="mt-2 bg-light p-3 rounded">

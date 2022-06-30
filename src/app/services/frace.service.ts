@@ -72,14 +72,13 @@ export class FraceService {
   }
 
 
-  exportarExcel(codigo: string, listar: Listar): Observable<any> {
+  exportarExcel(listar: Listar): Observable<any> {
     var headers = new HttpHeaders({
       'Content-Type': "application/blob",
       'Authorization': 'Bearer ' + this.authservices.leerToken()
     })
 
     const params = new HttpParams()
-      .set("codigo", codigo)
       .set("columna", listar.columna)
       .set("nombre", listar.search)
       .set("offset", listar.offset)

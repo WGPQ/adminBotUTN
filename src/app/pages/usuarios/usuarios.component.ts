@@ -138,7 +138,7 @@ export class UsuariosComponent implements OnInit {
       columna: "",
       search: "",
       offset: 0,
-      limit: 100,
+      limit: 0,
       sort: ""
     }
     this.loading = true;

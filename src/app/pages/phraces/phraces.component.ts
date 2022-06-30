@@ -36,6 +36,7 @@ export class PhracesComponent implements OnInit {
     private intencionService: IntencionService,
     private alertService: AlertService,
     private formService: FormsService) {
+      this.cargando = true;
     this.listarIntenciones();
     this.fraceForm = formService.crearFormularioFrace();
     this.listarForm = formService.crearFormularioListar();
@@ -100,6 +101,7 @@ export class PhracesComponent implements OnInit {
     }
     this.fraceaService.obtenerFraces(listar).subscribe(response => {
       this.fraces = response;
+      this.cargando=false;
       this.numeroPaginas = new Array(Math.ceil(this.fraces.length / 10));
     });
   }
@@ -206,7 +208,7 @@ export class PhracesComponent implements OnInit {
       limit: 1000,
       sort: ""
     }
-    this.fraceaService.exportarExcel('', listar).subscribe(blob => {
+    this.fraceaService.exportarExcel(listar).subscribe(blob => {
       let fileUrl = window.URL.createObjectURL(blob);
       window.open(fileUrl);
     });

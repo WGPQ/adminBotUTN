@@ -1,10 +1,8 @@
 export const environment = {
-  production: true,
+  production: false,
   secret: "BIBLIOBOTUNIVERSIDADTENICADELNORTEIBARRA",
-  baseUrl: "https://bibliochatservices.azurewebsites.net/",
+  baseUrl: "https://bibliochatservices.azurewebsites.net",
   hubConnectionURL: 'https://bibliochatservices.azurewebsites.net/session',
-  // baseUrl: "https://localhost:44399",
-  // hubConnectionURL: 'https://localhost:38906/session',
   apiRol: "/api/rol",
   apiUsuario: "/api/usuario",
   apiCliente: "/api/cliente",

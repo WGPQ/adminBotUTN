@@ -68,7 +68,6 @@ export class ClientesComponent implements OnInit {
       id: this.idCliente,
       nombre: this.clienteForm.value.nombre,
       correo: this.clienteForm.value.correo,
-      rol: "5"
     };
     if (this.action == 'Agregar') {
       this.clienteService.ingresarCliente(cliente).subscribe(resp => {

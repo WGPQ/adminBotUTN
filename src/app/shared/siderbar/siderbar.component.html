@@ -26,159 +26,38 @@
         <!--- Sidemenu -->
         <ul class="side-nav">
 
-            <li class="side-nav-title side-nav-item">Navigación</li>
-
-            <li class="side-nav-item">
-                <a data-bs-toggle="collapse" routerLink="/dashboard" aria-expanded="false"
-                    aria-controls="sidebarDashboards" class="side-nav-link">
-                    <i class="uil-home-alt"></i>
-                    <!-- <span class="badge bg-success float-end">4</span> -->
-                    <span> Inicio </span>
-                </a>
-                <!-- <div class="collapse" id="sidebarDashboards">
-                    <ul class="side-nav-second-level">
-                        <li>
-                            <a href="dashboard-analytics.html">Analytics</a>
-                        </li>
-                        <li>
-                            <a href="dashboard-crm.html">CRM</a>
-                        </li>
-                        <li>
-                            <a href="index.html">Ecommerce</a>
-                        </li>
-                        <li>
-                            <a href="dashboard-projects.html">Projects</a>
-                        </li>
-                    </ul>
-                </div> -->
-            </li>
-
             <li class="side-nav-title side-nav-item">Módulos</li>
 
-            <li class="side-nav-item">
-                <a data-bs-toggle="collapse" href="#sidebarUsuarios" aria-expanded="false"
-                    aria-controls="sidebarMultiLevel" class="side-nav-link">
-                    <i class="uil-users-alt"></i>
-                    <span> Usuarios </span>
+
+            <li class="side-nav-item" *ngFor="let modulo of modulos">
+
+                <a *ngIf="modulo.submenu.length>0" data-bs-toggle="collapse" [href]="'#'+modulo.nombre"
+                    aria-expanded="false" aria-controls="sidebarMultiLevel" class="side-nav-link">
+                    <i [class]="modulo.icon"></i>
+                    <span> {{modulo.nombre}} </span>
                     <span class="menu-arrow"></span>
                 </a>
-                <div class="collapse" id="sidebarUsuarios">
+                <div *ngIf="modulo.submenu.length>0" class="collapse" [id]="modulo.nombre">
                     <ul class="side-nav-second-level">
-
-                        <li *ngFor="let rol of roles" class="side-nav-item">
-                            <a data-bs-toggle="collapse" (click)="getUsers(rol.nombre)" aria-expanded="false"
+                        <li *ngFor="let submenu of modulo.submenu" class="side-nav-item">
+                            <a (click)="getUsers(submenu.ruta)" data-bs-toggle="collapse" aria-expanded="false"
                                 aria-controls="sidebarSecondLevel">
-                                <span> {{rol.nombre}} </span>
-                                <span class="menu-arrow"></span>
+                                <span> {{submenu.nombre}} </span>
                             </a>
                         </li>
 
                     </ul>
                 </div>
-            </li>
 
+                <a *ngIf="modulo.submenu.length==0" [routerLink]="[modulo.ruta]" class="side-nav-link">
+                    <i [class]="modulo.icon"></i>
+                    <span> {{modulo.nombre}} </span>
 
-
-
-
-
-
-
-
-
-            <li class="side-nav-item">
-                <a routerLink="/dashboard/clientes" class="side-nav-link">
-                    <i class="uil-users-alt"></i>
-                    <span> Clientes </span>
                 </a>
+
             </li>
 
-            <li class="side-nav-item">
-                <a routerLink="/dashboard/roles" class="side-nav-link">
-                    <i class="uil-users-alt"></i>
-                    <span> Roles </span>
-                </a>
-            </li>
 
-            <li class="side-nav-item">
-                <a routerLink="/dashboard/chat" class="side-nav-link">
-                    <i class="uil-comments-alt"></i>
-                    <span> Chat </span>
-                </a>
-            </li>
-            <li class="side-nav-item">
-                <a routerLink="/dashboard/intenciones" class="side-nav-link">
-                    <i class="uil-right-indent-alt"></i>
-                    <span> Intenciones </span>
-                </a>
-            </li>
-            <li class="side-nav-item">
-                <a routerLink="/dashboard/fraces" class="side-nav-link">
-                    <i class="uil-align-center-justify"></i>
-                    <span> Fraces </span>
-                </a>
-            </li>
-
-            <li class="side-nav-item">
-                <a data-bs-toggle="collapse" href="#sidebarMultiLevel" aria-expanded="false"
-                    aria-controls="sidebarMultiLevel" class="side-nav-link">
-                    <i class="uil-folder-plus"></i>
-                    <span> Multi Level </span>
-                    <span class="menu-arrow"></span>
-                </a>
-                <div class="collapse" id="sidebarMultiLevel">
-                    <ul class="side-nav-second-level">
-                        <li class="side-nav-item">
-                            <a data-bs-toggle="collapse" href="#sidebarSecondLevel" aria-expanded="false"
-                                aria-controls="sidebarSecondLevel">
-                                <span> Second Level </span>
-                                <span class="menu-arrow"></span>
-                            </a>
-                            <div class="collapse" id="sidebarSecondLevel">
-                                <ul class="side-nav-third-level">
-                                    <li>
-                                        <a href="javascript: void(0);">Item 1</a>
-                                    </li>
-                                    <li>
-                                        <a href="javascript: void(0);">Item 2</a>
-                                    </li>
-                                </ul>
-                            </div>
-                        </li>
-                        <li class="side-nav-item">
-                            <a data-bs-toggle="collapse" href="#sidebarThirdLevel" aria-expanded="false"
-                                aria-controls="sidebarThirdLevel">
-                                <span> Third Level </span>
-                                <span class="menu-arrow"></span>
-                            </a>
-                            <div class="collapse" id="sidebarThirdLevel">
-                                <ul class="side-nav-third-level">
-                                    <li>
-                                        <a href="javascript: void(0);">Item 1</a>
-                                    </li>
-                                    <li class="side-nav-item">
-                                        <a data-bs-toggle="collapse" href="#sidebarFourthLevel" aria-expanded="false"
-                                            aria-controls="sidebarFourthLevel">
-                                            <span> Item 2 </span>
-                                            <span class="menu-arrow"></span>
-                                        </a>
-                                        <div class="collapse" id="sidebarFourthLevel">
-                                            <ul class="side-nav-forth-level">
-                                                <li>
-                                                    <a href="javascript: void(0);">Item 2.1</a>
-                                                </li>
-                                                <li>
-                                                    <a href="javascript: void(0);">Item 2.2</a>
-                                                </li>
-                                            </ul>
-                                        </div>
-                                    </li>
-                                </ul>
-                            </div>
-                        </li>
-                    </ul>
-                </div>
-            </li>
         </ul>
 
         <!-- End Sidebar -->

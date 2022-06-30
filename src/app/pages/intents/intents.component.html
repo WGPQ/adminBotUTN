@@ -42,7 +42,6 @@
                         <thead class="table-light">
                             <tr>
                                 <th style="width: 20px;">#</th>
-                                <th>Código</th>
                                 <th>Nombre</th>
                                 <th>Descripcion</th>
                                 <th style="width: 125px;">Accion</th>
@@ -53,7 +52,6 @@
                             <tr *ngFor="let intencion of intenciones; let i =index">
                                 <td><a class="text-body fw-bold">{{i+1}}</a>
                                 </td>
-                                <td>{{intencion.codigo}}</td>
                                 <td>{{intencion.nombre|textElipsis:20}}</td>
                                 <td>{{intencion.descripcion|textElipsis:60}}</td>
                                 <td>
@@ -117,13 +115,6 @@
             <div class="modal-body">
                 <form [formGroup]="intencionForm" autocomplete="off">
                     <div class="ps-3 pe-3">
-                        <div class="mb-3">
-                            <label for="codigo" class="form-label">Código</label>
-                            <input class="form-control" type="text" formControlName="codigo" maxlength="10"
-                                mask="0000000000" [class.is-invalid]="codigoNoValido">
-                            <small *ngIf="codigoNoValido" class="form-text text-danger">El código es
-                                requerido</small>
-                        </div>
                         <div class="mb-3">
                             <label for="nombre" class="form-label">Nombre</label>
                             <input class="form-control" type="text" formControlName="nombre" maxlength="50"

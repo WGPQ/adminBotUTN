@@ -41,16 +41,18 @@ export class HeaderComponent implements OnInit {
 
   ngOnInit(): void {
     this.starConnection();
-    this.getConectados(2);
+    this.getConectados(3);
     this._hubConnection?.on('ContadorSession', (resp) => {
       const audio = new Audio('assets/tonos/nuevo_usuario.mp3');
       if (resp == "enter" && this.roles.find(r => r.id == this.authservices.usuario.rol)?.nombre == "Administrador") {
         audio.play();
       }
-      this.getConectados(2);
+      this.getConectados(3);
     });
   }
-
+  refrescar(){
+    this.getConectados(3);
+  }
 
   logout() {
     this.authservices.cerrarSesion();
@@ -78,7 +80,7 @@ export class HeaderComponent implements OnInit {
   }
   starConnection() {
     this._hubConnection = new signalR.HubConnectionBuilder()
-      .withUrl('https://bibliochatservices.azurewebsites.net/prueba',
+      .withUrl('https://bibliochatservice02.azurewebsites.net/prueba',
         {
           skipNegotiation: true,
           transport: signalR.HttpTransportType.WebSockets

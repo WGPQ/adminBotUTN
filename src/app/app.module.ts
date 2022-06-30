@@ -29,6 +29,7 @@ import { FiltroPipe } from './pipes/filtro.pipe';
 import { AuthenticateComponent } from './auth/authenticate/authenticate.component';
 import { TextElipsisPipe } from './pipes/text-elipsis.pipe';
 import { ClientesComponent } from './pages/clientes/clientes.component';
+import { BibliochatComponent } from './pages/bibliochat/bibliochat.component';
 const maskConfigFunction: () => Partial<IConfig> = () => {
   return {
     validation: false,
@@ -58,7 +59,8 @@ const maskConfigFunction: () => Partial<IConfig> = () => {
     FiltroPipe,
     AuthenticateComponent,
     TextElipsisPipe,
-    ClientesComponent
+    ClientesComponent,
+    BibliochatComponent
   ],
   imports: [
     BrowserModule,

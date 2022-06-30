@@ -57,7 +57,6 @@ export class FormsService {
     }
     crearFormularioIntencion(): FormGroup {
         return new FormBuilder().group({
-            codigo: new NombreValidador,
             nombre: new NombreValidador,
             descripcion: new DescripcionValidador,
         });
