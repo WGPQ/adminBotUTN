@@ -41,13 +41,15 @@ export class HeaderComponent implements OnInit {
 
   ngOnInit(): void {
     this.starConnection();
-    this.getConectados(3);
+    this.getConectados(2);
     this._hubConnection?.on('ContadorSession', (resp) => {
+      console.log('Holas');
+      
       const audio = new Audio('assets/tonos/nuevo_usuario.mp3');
       if (resp == "enter" && this.roles.find(r => r.id == this.authservices.usuario.rol)?.nombre == "Administrador") {
         audio.play();
       }
-      this.getConectados(3);
+      this.getConectados(2);
     });
   }
   refrescar(){

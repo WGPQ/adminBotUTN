@@ -26,7 +26,7 @@ export class BotService {
     //   }
     // });
     this.directLine = new DirectLine({
-      secret: '6PAU52FQpx4.OgspOHu4cqkVO_TDKTMQ2yu6DGyopXfhEb2Z76h-DJQ',
+      secret: 'uAHdkr7-FgE.TcFDWSEnAmojDkpaDum1Zy7K1V0rusIecg2mKq3kuFg',
     });
   }
   statusConnectionBot() {
@@ -59,7 +59,8 @@ export class BotService {
     this.directLine!.postActivity({
       from: { id: '344444444444', name: 'William' }, // required (from.name is optional)
       type: 'message',
-      text: message
+      text: message,
+      // value:{},
     }).subscribe(
       id => console.log("Posted activity, assigned ID ", id),
       error => console.log("Error posting activity", error)

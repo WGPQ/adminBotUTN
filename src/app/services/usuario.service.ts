@@ -34,8 +34,13 @@ export class UsuarioService {
       .set("offset", listar.offset)
       .set("limit", listar.limit)
       .set("sort", listar.sort)
+      console.log(rol);
+      console.log(listar);
+      
     return this.http.get(this.appUrl + this.apiUsuario + '/Listar', { params: params, headers: this.headers }).pipe(
       map((resp: any) => {
+        console.log(resp);
+        
         if (resp.exito) {
           return resp.data;
         } else {

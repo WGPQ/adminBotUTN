@@ -62,6 +62,8 @@ export class FraceService {
     );
   }
   ingresarFrace(frace: Frace): Observable<any> {
+    console.log(frace);
+    
     return this.http.post(this.appUrl + this.apiFrace + '/Insertar', frace, { headers: this.headers });
   }
   eliminarFrace(id?: string): Observable<any> {
