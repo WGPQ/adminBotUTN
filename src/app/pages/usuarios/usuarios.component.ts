@@ -69,11 +69,11 @@ export class UsuariosComponent implements OnInit {
 
   exportarReporte() {
     const listar: Listar = {
-      columna: "",
-      search: "",
-      offset: 0,
-      limit: 1000,
-      sort: ""
+      columna: this.liatarForm.value.columna,
+      search: this.liatarForm.value.search,
+      offset: this.liatarForm.value.offset,
+      limit: this.liatarForm.value.limit,
+      sort: this.liatarForm.value.sort,
     }
     this.usuarioService.exportarExcel(this.rol!, listar).subscribe(blob => {
       let fileUrl = window.URL.createObjectURL(blob);

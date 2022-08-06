@@ -12,7 +12,7 @@ export const environment = {
   apiRol: "/api/rol",
   apiUsuario: "/api/usuario",
   apiCliente: "/api/cliente",
-  apiLogin: "/api/login",
+  apiLogin: "/api/auth",
   apiIntencion: "/api/intencion",
   apiFrace: "/api/frace",
   apiChat: "/api/chat",

@@ -60,7 +60,7 @@ export class ModulosService {
           ruta: "Bot",
           icon: "",
           submenu: []
-        },
+        }
       ]
     },
     {

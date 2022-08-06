@@ -14,7 +14,7 @@ import { Cliente } from '../interfaces/cliente.interface';
 export class ClienteService {
 
   appUrl = environment.baseUrl;
-  apiCliente = environment.apiCliente;
+  apiCliente = environment.apiUsuario;
   constructor(
     private http: HttpClient,
     private authservices: AuthenticationService,
@@ -29,15 +29,20 @@ export class ClienteService {
 
 
   //SERVICIOS CLIENTE
-  obtenerClientes(listar: Listar): Observable<Cliente[]> {
+  obtenerClientes(rol: string, listar: Listar): Observable<Cliente[]> {
     const params = new HttpParams()
+      .set("rol", rol)
       .set("columna", listar.columna)
       .set("nombre", listar.search)
-      .set("offset", listar.offset??null)
+      .set("offset", listar.offset ?? null)
       .set("limit", listar.limit)
       .set("sort", listar.sort)
+    console.log(rol);
+
     return this.http.get(this.appUrl + this.apiCliente + '/Listar', { params: params, headers: this.headers }).pipe(
       map((resp: any) => {
+        // console.log(resp);
+
         if (resp.exito) {
           return resp.data;
         } else {
@@ -59,8 +64,10 @@ export class ClienteService {
       })
     )
   }
-  ingresarCliente(rol: Cliente): Observable<any> {
-    return this.http.post(this.appUrl + this.apiCliente + '/Insertar', rol, { headers: this.headers });
+  ingresarCliente(cliente: Cliente): Observable<any> {
+    console.log(cliente);
+
+    return this.http.post(this.appUrl + this.apiCliente + '/Insertar', cliente, { headers: this.headers });
   }
   eliminarCliente(id?: string): Observable<any> {
     return this.http.delete(this.appUrl + this.apiCliente + '/Eliminar/' + id, { headers: this.headers })
@@ -70,13 +77,14 @@ export class ClienteService {
   }
 
 
-  exportarExcel(listar: Listar): Observable<any> {
+  exportarExcel(rol: string, listar: Listar): Observable<any> {
     var headers = new HttpHeaders({
       'Content-Type': "application/blob",
       'Authorization': 'Bearer ' + this.authservices.leerToken()
     })
 
     const params = new HttpParams()
+      .set("rol", rol)
       .set("columna", listar.columna)
       .set("nombre", listar.search)
       .set("offset", listar.offset)

@@ -51,7 +51,8 @@ export class FormsService {
     }
     crearFormularioCliente(): FormGroup {
         return new FormBuilder().group({
-            nombre: new NombreValidador,
+            nombres: new NombreValidador,
+            apellidos: new ApellidoValidador,
             correo: new CorreoValidador,
         });
     }

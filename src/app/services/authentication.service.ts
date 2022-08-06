@@ -92,7 +92,7 @@ export class AuthenticationService {
   //   } 
   // }
   acceso(login: Login): Observable<boolean> {
-    return this.http.post(this.appUrl + this.apiUrl, login).pipe(
+    return this.http.post(this.appUrl + this.apiUrl+"/login/portal", login).pipe(
       map((resp: any) => {
         if (resp.exito) {
           this.guardarToken(resp.token);
@@ -193,9 +193,9 @@ export class AuthenticationService {
       map((resp: any) => {
         if (resp.exito) {
           this.guardarToken(resp.data.token);
-          const { id, nombres, apellidos, telefono, correo, rol, activo, verificado } = resp.data.usuario;
+          const { id, nombres, apellidos, nombre_completo, telefono, correo, rol, activo, verificado } = resp.data.usuario;
           this.guardarIdUserRol(id)
-          this.usuario = new Usuario(id, nombres, apellidos, correo, telefono, '', rol, activo, verificado);
+          this.usuario = new Usuario(id, nombres, apellidos, nombre_completo, correo, telefono, '', rol, activo, verificado);
         } else {
           this.alertService.error('', resp.message);
         }

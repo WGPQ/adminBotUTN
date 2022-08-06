@@ -17,7 +17,8 @@
                                     <label for="status-select" class="me-2">por:</label>
                                     <select class="form-select" id="status-select" formControlName="columna">
                                         <option disabled selected value="">Elegir... </option>
-                                        <option value="nombre">Nombre</option>
+                                        <option value="nombres">Nombre</option>
+                                        <option value="apellidos">Apellido</option>
                                         <option value="correo">Correo</option>
                                     </select>
                                 </div>
@@ -42,7 +43,8 @@
                             <tr>
                                 <th style="width: 20px;">#</th>
                                 <th>Nombre</th>
-                                <th>Descripcion</th>
+                                <th>Apellido</th>
+                                <th>Correo</th>
                                 <th style="width: 125px;">Accion</th>
                             </tr>
                         </thead>
@@ -51,7 +53,8 @@
                             <tr *ngFor="let cliente of clientes; let i =index">
                                 <td><a class="text-body fw-bold">{{i+1}}</a>
                                 </td>
-                                <td>{{cliente.nombre}}</td>
+                                <td>{{cliente.nombres}}</td>
+                                <td>{{cliente.apellidos}}</td>
                                 <td>{{cliente.correo}}</td>
                                 <td>
 
@@ -109,11 +112,18 @@
                 <form [formGroup]="clienteForm" autocomplete="off">
                     <div class="ps-3 pe-3">
                         <div class="mb-3">
-                            <label for="nombre" class="form-label">Nombre</label>
-                            <input class="form-control" type="text" formControlName="nombre" maxlength="50"
-                                [class.is-invalid]="nombreNoValido">
-                            <small *ngIf="nombreNoValido" class="form-text text-danger">El nombre es
-                                requerido</small>
+                            <label for="nombres" class="form-label">Nombres</label>
+                            <input class="form-control" type="text" formControlName="nombres" maxlength="50"
+                                [class.is-invalid]="nombresNoValido">
+                            <small *ngIf="nombresNoValido" class="form-text text-danger">Los nombres son
+                                requeridos</small>
+                        </div>
+                        <div class="mb-3">
+                            <label for="apellidos" class="form-label">Apellidos</label>
+                            <input class="form-control" type="text" formControlName="apellidos" maxlength="50"
+                                [class.is-invalid]="apellidosNoValido">
+                            <small *ngIf="apellidosNoValido" class="form-text text-danger">Los apellidos son
+                                requeridos</small>
                         </div>
                         <div class="mb-3">
                             <label for="username" class="form-label">Correo</label>

@@ -32,8 +32,8 @@ export class SiderbarComponent implements OnInit {
   getUsers(rol?: string) {
 
     if (rol != null) {
+      
       this.router.navigate(['dashboard/usuarios/' + rol]);
-
     }
   }
   listarModulos(rol: string) {

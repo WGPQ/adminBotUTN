@@ -114,7 +114,7 @@ export class LoginComponent implements OnInit {
         }
     
         Swal.showLoading();
-        setTimeout(() => {
+        setTimeout(() => {          
           if (this.authservices.usuario.verificado) {
             this.router.navigate(['/dashboard']);
             this.alertService.correcto('', 'Acceso Correcto')

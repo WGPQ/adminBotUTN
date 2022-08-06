@@ -2,9 +2,11 @@ import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { Cliente } from 'src/app/interfaces/cliente.interface';
 import { Listar } from 'src/app/interfaces/listar.interface';
+import { Rol } from 'src/app/interfaces/rol.interface';
 import { AlertService } from 'src/app/services/alert.service';
 import { ClienteService } from 'src/app/services/cliente.service';
 import { FormsService } from 'src/app/services/forms.service';
+import { RolService } from 'src/app/services/rol.service';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -23,11 +25,13 @@ export class ClientesComponent implements OnInit {
   idCliente?: string;
   cliente!: Cliente;
   cargando = false;
+  rol!: string;
   @ViewChild('closebutton') closebutton: any;
   constructor(
     private clienteService: ClienteService,
     private alertService: AlertService,
     private formService: FormsService,
+    private rolService: RolService,
 
   ) {
     this.cargando = true;
@@ -36,16 +40,35 @@ export class ClientesComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.listarClientes();
+    this.listarRoles();
   }
   agregarRol() {
     this.clienteForm.reset();
     this.action = "Agregar"
     this.submitType = "Guardar";
   }
+  listarRoles() {
+    const listar: Listar = {
+      columna: "",
+      search: "",
+      offset: 0,
+      limit: 0,
+      sort: ""
+    }
+    this.rolService.obtenerRoles(listar).subscribe((resp) => {
+      resp.map((r) => r.nombre == "Cliente" ? this.rol = r.id! : "");
+      if (this.rol != undefined) {
 
-  get nombreNoValido() {
-    return this.clienteForm.get('nombre')?.invalid && this.clienteForm.get('nombre')?.touched;
+        this.listarClientes();
+      }
+    });
+  }
+
+  get nombresNoValido() {
+    return this.clienteForm.get('nombres')?.invalid && this.clienteForm.get('nombres')?.touched;
+  }
+  get apellidosNoValido() {
+    return this.clienteForm.get('apellidos')?.invalid && this.clienteForm.get('apellidos')?.touched;
   }
   get correoNoValido() {
     return this.clienteForm.get('correo')?.invalid && this.clienteForm.get('correo')?.touched;
@@ -66,8 +89,10 @@ export class ClientesComponent implements OnInit {
 
     const cliente: Cliente = {
       id: this.idCliente,
-      nombre: this.clienteForm.value.nombre,
+      nombres: this.clienteForm.value.nombres,
+      apellidos: this.clienteForm.value.apellidos,
       correo: this.clienteForm.value.correo,
+      rol:this.rol,
     };
     if (this.action == 'Agregar') {
       this.clienteService.ingresarCliente(cliente).subscribe(resp => {
@@ -111,7 +136,7 @@ export class ClientesComponent implements OnInit {
       limit: this.liatarForm.value.limit,
       sort: this.liatarForm.value.sort,
     }
-    this.clienteService.obtenerClientes(listar).subscribe((resp) => {
+    this.clienteService.obtenerClientes(this.rol, listar).subscribe((resp) => {
       this.clientes = resp;
       this.cargando = false;
     });
@@ -124,8 +149,9 @@ export class ClientesComponent implements OnInit {
     this.clienteService.obtenerCliente(id).subscribe(resp => {
       this.cliente = resp;
       this.clienteForm.patchValue({
-        nombre: resp.nombre,
-        descripcion: resp.correo
+        nombres: resp.nombres,
+        apellidos: resp.apellidos,
+        correo: resp.correo
       });
     });
   }
@@ -136,7 +162,7 @@ export class ClientesComponent implements OnInit {
         position: 'center',
         icon: 'question',
         title: 'Esta seguro que desea borrar a',
-        text: `${cliente.nombre}`,
+        text: `${cliente.nombre_completo}`,
         showConfirmButton: true,
         showCancelButton: true,
       }).then(resp => {
@@ -159,13 +185,13 @@ export class ClientesComponent implements OnInit {
 
   exportarReporte() {
     const listar: Listar = {
-      columna: "",
-      search: "",
-      offset: 0,
-      limit: 1000,
-      sort: ""
+      columna: this.liatarForm.value.columna,
+      search: this.liatarForm.value.search,
+      offset: this.liatarForm.value.offset,
+      limit: this.liatarForm.value.limit,
+      sort: this.liatarForm.value.sort,
     }
-    this.clienteService.exportarExcel(listar).subscribe(blob => {
+    this.clienteService.exportarExcel(this.rol,listar).subscribe(blob => {
       let fileUrl = window.URL.createObjectURL(blob);
       window.open(fileUrl);
     });

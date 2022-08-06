@@ -28,11 +28,8 @@ export class HeaderComponent implements OnInit {
     private rolService: RolService,
   ) {
     if (authservices.usuario != null) {
-      this.nombreUsuario = this.authservices.usuario.nombres + ' ' + this.authservices.usuario.apellidos;
-      let user = this.nombreUsuario.split(' ');
-      if (user.length > 2) {
-        this.nombreUsuario = user[0] + ' ' + user[2];
-      }
+      this.nombreUsuario = this.authservices.usuario.nombre_completo!;
+
       this.getRol(this.authservices.usuario.rol);
     }
 

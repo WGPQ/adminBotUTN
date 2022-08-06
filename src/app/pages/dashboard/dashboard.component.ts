@@ -38,9 +38,9 @@ export class DashboardComponent implements OnInit {
       limit: 0,
       sort: '',
     }
-    this.clienteService.obtenerClientes(listar).subscribe((resp) => {
-      this.clientes = resp;
-    });
+    // this.clienteService.obtenerClientes(listar).subscribe((resp) => {
+    //   this.clientes = resp;
+    // });
   }
 
 
