@@ -43,7 +43,6 @@ export class UsuariosComponent implements OnInit {
   ) {
     this.loading = true;
     this.listarRoles();
-    // this.crearFormulario();
     this.usuarioForm = formService.crearFormularioUsuario();
     this.liatarForm = formService.crearFormularioListar();
 
@@ -52,6 +51,8 @@ export class UsuariosComponent implements OnInit {
 
 
   ngOnInit(): void {
+    console.log('JAJAJAJAJAJAS');
+    
     this.router.paramMap.subscribe((params: ParamMap) => {
       var nombreRol = params.get('rol');
       if (nombreRol != null) {
@@ -162,7 +163,7 @@ export class UsuariosComponent implements OnInit {
       apellidos: this.usuarioForm.value.apellidos,
       telefono: this.usuarioForm.value.telefono,
       correo: this.usuarioForm.value.correo,
-      rol: this.usuarioForm.value.rol,
+      id_rol: this.usuarioForm.value.id_rol,
       activo: this.usuarioForm.value.activo ?? true,
     };
 
@@ -238,16 +239,14 @@ export class UsuariosComponent implements OnInit {
         apellidos: resp.apellidos,
         telefono: resp.telefono,
         correo: resp.correo,
-        rol: resp.rol,
+        id_rol: resp.id_rol,
         activo: resp.activo
       });
     });
   }
 
 
-  byRol(rol1: Rol, rol2: Rol) {
-    return rol1 && rol2 ? rol1.id === rol2.id : rol1 === rol2;
-  }
+  
 
   resetearContrasenia() {
     if (this.idUsuario != null) {

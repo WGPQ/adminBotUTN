@@ -1,33 +1,27 @@
 import { Injectable } from '@angular/core';
-import { DirectLine } from 'botframework-directlinejs';
-import { ConnectionStatus } from 'botframework-directlinejs';
+import { DirectLine,ConnectionStatus } from 'botframework-directlinejs';
+import { AuthenticationService } from './authentication.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class BotService {
   directLine?: DirectLine;
-  constructor() {
+  constructor(
+    private authtService: AuthenticationService,
+  ) {
     this.initBotConfig();
     this.statusConnectionBot();
-    this.directLine!.activity$.subscribe(activity => console.log(activity));
-
   }
   initBotConfig() {
-    // this.directLine = new DirectLine({
-    //   secret: '6PAU52FQpx4.OgspOHu4cqkVO_TDKTMQ2yu6DGyopXfhEb2Z76h-DJQ' /* put your Direct Line secret here */,
-    //   token: ''/* or put your Direct Line token here (supply secret OR token, not both) */,
-    //   domain: /*'https://webapp-bot-library.azurewebsites.net/api/messages'/* optional: if you are not using the default Direct Line endpoint, e.g. if you are using a region-specific endpoint, put its full URL here */,
-    //   webSocket: true/* optional: false if you want to use polling GET to receive messages. Defaults to true (use WebSocket). */,
-    //   pollingInterval: 1000/* optional: set polling interval in milliseconds. Defaults to 1000 */,
-    //   timeout: 20000/* optional: a timeout in milliseconds for requests to the bot. Defaults to 20000 */,
-    //   conversationStartProperties: { /* optional: properties to send to the bot on conversation start */
-    //     locale: 'en-US'
-    //   }
-    // });
     this.directLine = new DirectLine({
-      secret: 'uAHdkr7-FgE.TcFDWSEnAmojDkpaDum1Zy7K1V0rusIecg2mKq3kuFg',
+      secret: '2mQOcWjJgOc.Cu3pkgFaQporkiX2YzFMUYzuMRS5rPM6rJbOE8C9Igo',
+      conversationStartProperties: { /* optional: properties to send to the bot on conversation start */
+      locale: 'en-US'
+
+  }
     });
+    this.directLine.activity$
   }
   statusConnectionBot() {
     this.directLine!.connectionStatus$
@@ -56,14 +50,18 @@ export class BotService {
   }
 
   sendMessage(message: string) {
-    this.directLine!.postActivity({
-      from: { id: '344444444444', name: 'William' }, // required (from.name is optional)
+    return this.directLine!.postActivity({
+      from: {
+        id: this.authtService.usuario.id!,
+        name: this.authtService.usuario.nombre_completo,
+        role: "channel"
+      },
       type: 'message',
       text: message,
-      // value:{},
-    }).subscribe(
-      id => console.log("Posted activity, assigned ID ", id),
-      error => console.log("Error posting activity", error)
-    );
+    });
+    // .subscribe(
+    //   id => console.log("Posted activity, assigned ID ", id),
+    //   error => console.log("Error posting activity", error)
+    // );
   }
 }

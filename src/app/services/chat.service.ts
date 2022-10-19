@@ -1,4 +1,4 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient, HttpHeaders, HttpParams } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { environment } from 'src/environments/environment';
 import { Observable } from 'rxjs';
@@ -22,22 +22,26 @@ export class ChatService {
     private authservices: AuthenticationService,
     private alertService: AlertService
   ) { }
-  httpOptions = {
-    headers: new HttpHeaders({
-      'Content-Type': 'application/json',
-      'Authorization': 'Bearer ' + this.authservices.leerToken()
-    })
-  }   
+  headers = new HttpHeaders({
+    'Content-Type': 'application/json',
+    'Authorization': 'Bearer ' + this.authservices.leerToken()
+  });
 
   //Listar interacciones
-  getInteractios(listar: Listar): Observable<any> {   
-    return this.http.post(this.appUrl + this.apiChat + '/interaccion' + "/Listar", listar, this.httpOptions).pipe(
+  getInteractios(listar: Listar): Observable<any> {
+    const params = new HttpParams()
+      .set("columna", listar.columna)
+      .set("nombre", listar.search)
+      .set("offset", listar.offset)
+      .set("limit", listar.limit)
+      .set("sort", listar.sort)
+    return this.http.get(this.appUrl + this.apiChat + '/interaccion' + "/Listar", { headers: this.headers, params: params }).pipe(
       map((resp: any) => this.crearArregloInteracciones(resp.data))
     );
   }
 
   private crearArregloInteracciones(interactionsObj: any) {
-    console.log(interactionsObj);
+
     const interactions: Interaction[] = [];
 
     if (interactionsObj === null) { return []; }
@@ -45,7 +49,7 @@ export class ChatService {
     Object.keys(interactionsObj).forEach((key) => {
       const interaction: Interaction = interactionsObj[key]['result'];
 
-      if (Object.keys(interaction.chat).length > 0) {
+      if (Object.keys(interaction.lastMessage).length > 0) {
         interactions.push(interaction);
       }
     });
@@ -54,7 +58,7 @@ export class ChatService {
   }
 
   getMessages(idChat: string, listar: Listar): Observable<any> {
-    return this.http.post(this.appUrl + this.apiChat + '/mensaje/' + idChat + "/Listar", listar, this.httpOptions).pipe(
+    return this.http.post(this.appUrl + this.apiChat + '/mensaje/' + idChat + "/Listar", listar, { headers: this.headers }).pipe(
       map((resp: any) => this.crearArregloMensajes(resp.data))
     );
   }
@@ -79,7 +83,7 @@ export class ChatService {
       "contenido": mensaje.contenido,
       "createdAt": new Date().toISOString()
     }
-    return this.http.post(this.appUrl + this.apiChat + '/mensaje/crear', newMessage, this.httpOptions);
+    return this.http.post(this.appUrl + this.apiChat + '/mensaje/crear', newMessage, { headers: this.headers });
 
   }
 

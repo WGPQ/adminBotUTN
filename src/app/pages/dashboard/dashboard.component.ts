@@ -21,7 +21,7 @@ export class DashboardComponent implements OnInit {
 
 
   ngOnInit(): void {
-    this.getConectados(3);
+    this.getConectados(2);
     this.getClientes();
   }
 

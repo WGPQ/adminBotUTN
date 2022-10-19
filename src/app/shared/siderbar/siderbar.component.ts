@@ -22,7 +22,7 @@ export class SiderbarComponent implements OnInit {
     private modulosService: ModulosService,
     private authservices: AuthenticationService,
     private router: Router) {
-    this.listarModulos(this.authservices.usuario.rol);
+    this.listarModulos(this.authservices.usuario.id_rol);
   }
 
   ngOnInit(): void {

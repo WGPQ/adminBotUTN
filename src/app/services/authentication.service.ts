@@ -19,6 +19,7 @@ export class AuthenticationService {
   apiUrl = environment.apiLogin;
   secret = environment.secret;
   access_token!: string;
+  session!: string;
   idUserRol!: string;
   usuario!: Usuario;
 
@@ -96,6 +97,7 @@ export class AuthenticationService {
       map((resp: any) => {
         if (resp.exito) {
           this.guardarToken(resp.token);
+          this.guardarSession(resp.id_session);
         } else {
           this.alertService.error('', resp.message);
         }
@@ -105,11 +107,12 @@ export class AuthenticationService {
     );
   }
   cerrarSesion() {
-    this.logout().subscribe(resp=>{
+   var session_id=this.leerSession();
+    this.logout(session_id).subscribe(resp=>{
       if(resp.exito){
         this.access_token = '';
         sessionStorage.removeItem('acces-token');
-        sessionStorage.removeItem('session');
+        sessionStorage.removeItem('user-key');
         this.router.navigate(['/login']);
       }
     })
@@ -130,10 +133,14 @@ export class AuthenticationService {
     };
     return this.http.post(this.appUrl + this.apiUrl + '/actualizar', data, { headers: headers });
   }
-  logout(): Observable<any> {
-    return this.http.get(this.appUrl + this.apiUrl + '/exit', this.httpOptions);
+  logout(session?: string): Observable<any> {
+    return this.http.get(this.appUrl + this.apiUrl + '/logout/'+session, this.httpOptions);
   }
 
+  guardarSession(session: string) {
+    this.session=session;
+    sessionStorage.setItem('session', session);
+  }
   guardarToken(token: string) {
     this.access_token = token;
     sessionStorage.setItem('acces-token', token);
@@ -141,9 +148,17 @@ export class AuthenticationService {
 
   guardarIdUserRol(id: string) {
     this.idUserRol = crypto.AES.encrypt(id.toString(), this.secret).toString();
-    sessionStorage.setItem('session', this.idUserRol);
+    sessionStorage.setItem('user-key', this.idUserRol);
   }
 
+  leerSession() {
+    if (sessionStorage.getItem('session')) {
+      this.session = sessionStorage.getItem('session') as string;
+    } else {
+      this.session = '';
+    }
+    return this.session;
+  }
   leerToken() {
     if (sessionStorage.getItem('acces-token')) {
       this.access_token = sessionStorage.getItem('acces-token') as string;
@@ -154,8 +169,8 @@ export class AuthenticationService {
   }
 
   leerIdUserRol() {
-    if (sessionStorage.getItem('session')) {
-      this.idUserRol = sessionStorage.getItem('session') as string;
+    if (sessionStorage.getItem('user-key')) {
+      this.idUserRol = sessionStorage.getItem('user-key') as string;
     } else {
       this.idUserRol = '';
     }
@@ -193,9 +208,9 @@ export class AuthenticationService {
       map((resp: any) => {
         if (resp.exito) {
           this.guardarToken(resp.data.token);
-          const { id, nombres, apellidos, nombre_completo, telefono, correo, rol, activo, verificado } = resp.data.usuario;
+          const { id, nombres, apellidos, nombre_completo, telefono, correo, id_rol,rol, activo, verificado } = resp.data.usuario;
           this.guardarIdUserRol(id)
-          this.usuario = new Usuario(id, nombres, apellidos, nombre_completo, correo, telefono, '', rol, activo, verificado);
+          this.usuario = new Usuario(id, nombres, apellidos, nombre_completo, correo, telefono, '',id_rol, rol, activo, verificado);
         } else {
           this.alertService.error('', resp.message);
         }

@@ -84,7 +84,7 @@ export class FormsService {
             apellidos: new ApellidoValidador,
             telefono: new TelefonoValidador,
             correo: new CorreoValidador,
-            rol: new RolValidador,
+            id_rol: new RolValidador,
             activo: new ActivoValidador
         });
     }

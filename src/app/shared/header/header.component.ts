@@ -1,9 +1,6 @@
 import { Component, OnInit } from '@angular/core';
-import { Listar } from 'src/app/interfaces/listar.interface';
-import { Rol } from 'src/app/interfaces/rol.interface';
 import { Usuario } from 'src/app/interfaces/usuarios.interface';
 import { AuthenticationService } from 'src/app/services/authentication.service';
-import { RolService } from 'src/app/services/rol.service';
 import { UsuarioService } from 'src/app/services/usuario.service';
 import * as signalR from "@microsoft/signalr"
 
@@ -15,7 +12,6 @@ import * as signalR from "@microsoft/signalr"
 })
 export class HeaderComponent implements OnInit {
   cargando = false;
-  roles: Rol[] = [];
   nombreUsuario: string = '';
   rol: string = '';
   private _hubConnection: signalR.HubConnection | undefined
@@ -25,12 +21,10 @@ export class HeaderComponent implements OnInit {
   constructor(
     private usuarioService: UsuarioService,
     private authservices: AuthenticationService,
-    private rolService: RolService,
   ) {
     if (authservices.usuario != null) {
       this.nombreUsuario = this.authservices.usuario.nombre_completo!;
-
-      this.getRol(this.authservices.usuario.rol);
+      this.rol=this.authservices.usuario.rol!;
     }
 
     this.cargando = true;
@@ -40,37 +34,21 @@ export class HeaderComponent implements OnInit {
     this.starConnection();
     this.getConectados(2);
     this._hubConnection?.on('ContadorSession', (resp) => {
-      console.log('Holas');
-      
       const audio = new Audio('assets/tonos/nuevo_usuario.mp3');
-      if (resp == "enter" && this.roles.find(r => r.id == this.authservices.usuario.rol)?.nombre == "Administrador") {
+      if (resp == "enter" && this.authservices.usuario.rol== "Administrador") {
         audio.play();
       }
       this.getConectados(2);
     });
   }
   refrescar(){
-    this.getConectados(3);
+    this.getConectados(2);
   }
 
   logout() {
     this.authservices.cerrarSesion();
   }
 
-  getRol(idRol: string) {
-    const listar: Listar = {
-      columna: "",
-      search: "",
-      offset: 0,
-      limit: 100,
-      sort: ""
-    }
-    this.rolService.obtenerRoles(listar).subscribe((resp) => {
-      this.roles = resp;
-      this.rol = this.roles.find(r => r.id == idRol ? r.nombre : '')?.nombre ?? '';
-      this.cargando = false;
-    });
-  }
 
   getConectados(rol: number) {
     this.usuarioService.usuarioEnLinea(rol).subscribe(resp => {

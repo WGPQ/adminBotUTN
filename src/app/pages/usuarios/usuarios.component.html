@@ -65,7 +65,7 @@
                                 <!-- <td>{{usuario.apellidos}}</td> -->
                                 <td>{{usuario.correo}}</td>
                                 <td>{{usuario.telefono}}</td>
-                                <td>{{usuario.rol|rol:roles}}</td>
+                                <td>{{usuario.rol}}</td>
                                 <td><i
                                         [ngClass]="usuario.activo ? 'mdi mdi-circle text-success' : 'mdi mdi-circle text-danger'"></i>{{usuario.activo|activo}}
                                 </td>
@@ -159,7 +159,7 @@
 
                         <div class="mb-3">
                             <label for="example-select" class="form-label">Rol</label>
-                            <select class="form-select" id="example-select" formControlName="rol">
+                            <select class="form-select" id="example-select" formControlName="id_rol">
                                 <option value="" disabled selected>Selecciona un rol</option>
                                 <option *ngFor="let rol of roles" [ngValue]="rol.id">{{rol.nombre}}</option>
                             </select>

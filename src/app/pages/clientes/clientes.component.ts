@@ -136,6 +136,8 @@ export class ClientesComponent implements OnInit {
       limit: this.liatarForm.value.limit,
       sort: this.liatarForm.value.sort,
     }
+    console.log(this.rol);
+    
     this.clienteService.obtenerClientes(this.rol, listar).subscribe((resp) => {
       this.clientes = resp;
       this.cargando = false;

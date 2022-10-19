@@ -1,9 +1,13 @@
 import { Component, ElementRef, HostListener, OnInit, ViewChild } from '@angular/core';
 import { FormGroup } from '@angular/forms';
+import { Activity } from 'botframework-directlinejs';
 import { Interaction } from 'src/app/interfaces/interaction.interface';
 import { Listar } from 'src/app/interfaces/listar.interface';
 import { MensageModel } from 'src/app/interfaces/mensaje.interface';
+import { Usuario } from 'src/app/interfaces/usuarios.interface';
+import { AuthenticationService } from 'src/app/services/authentication.service';
 import { BibliotecaService } from 'src/app/services/biblioteca.service';
+import { BotService } from 'src/app/services/bot.service';
 import { ChatService } from 'src/app/services/chat.service';
 import { FormsService } from 'src/app/services/forms.service';
 import { environment } from 'src/environments/environment';
@@ -19,9 +23,12 @@ export class ChatComponent implements OnInit {
   @ViewChild('scrollChat') private scrollChat!: ElementRef;
   @ViewChild("txtmessage") private txtMessage!: ElementRef;
   messages: MensageModel[] = [];
+  activities: any[] = [];
   interactions: Interaction[] = [];
+  solicitud: any;
   idBot = "";
   idChat = "";
+  usuario?: Usuario;
   public mensageForm: FormGroup;
   loading = false;
 
@@ -33,14 +40,17 @@ export class ChatComponent implements OnInit {
   }
 
 
-  constructor(private formService: FormsService,
+  constructor(
+    private formService: FormsService,
+    private botService: BotService,
     private chatService: ChatService,
+    private authService: AuthenticationService,
     private bibliotecaService: BibliotecaService) {
+    this.usuario = authService.usuario;
     this.idBot = environment.id_bot
     this.loading = true;
     this.mensageForm = formService.crearFormularioMensaje();
   }
-
   ngAfterViewChecked() {
     this.scrollToBottom();
   }
@@ -57,6 +67,8 @@ export class ChatComponent implements OnInit {
     this.scrollToBottom();
     this.getInteractions();
   }
+
+
 
   cargarHistorial(idChat: string) {
     const listar: Listar = {
@@ -84,15 +96,30 @@ export class ChatComponent implements OnInit {
           chat: this.idChat,
           contenido: (message).trim(),
         };
-
-        this.chatService.newMessage(nuevoMensaje).subscribe(
-          (resp: any) => {
-            if (resp.exito) {
-              nuevoMensaje=resp.data;
-              this.messages = [...this.messages, nuevoMensaje];
-            }
+        this.botService.directLine!.activity$.subscribe((activity: any) => {
+          // if (activity.attachments) {
+          //   if (activity.attachments.length > 0) {
+          //     this.solicitud = activity;
+          //   }
+          // }
+          if (!this.activities.includes(activity)) {
+            console.log(activity);
+            this.activities = [...this.activities, activity];
           }
-        );
+        });
+        this.botService.sendMessage(message).subscribe(resp => {
+
+          console.log(resp);
+
+        })
+        // this.chatService.newMessage(nuevoMensaje).subscribe(
+        //   (resp: any) => {
+        //     if (resp.exito) {
+        //       nuevoMensaje = resp.data;
+        //       this.messages = [...this.messages, nuevoMensaje];
+        //     }
+        //   }
+        // );
         this.mensageForm.disable();
         // this.socketService.sendMessage(message);
 

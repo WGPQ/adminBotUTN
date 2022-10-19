@@ -34,6 +34,7 @@ export class UsuarioService {
       .set("offset", listar.offset)
       .set("limit", listar.limit)
       .set("sort", listar.sort);
+            console.log('PASO POR AQUI');
             
     return this.http.get(this.appUrl + this.apiUsuario + '/Listar', { params: params, headers: this.headers }).pipe(
       map((resp: any) => {
@@ -72,7 +73,6 @@ export class UsuarioService {
       .set("rol", rol)
     return this.http.get(this.appUrl + this.apiUsuario + '/Linea', { params: params, headers: this.headers }).pipe(
       map((resp: any) => {
-        console.log(resp);
         if (resp.exito) {
           return resp.data;
         } else {
