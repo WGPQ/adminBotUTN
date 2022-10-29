@@ -4,6 +4,7 @@ export const environment = {
   baseUrl: "https://bibliochatservice02.azurewebsites.net",
   hubConnectionURL: 'https://bibliochatservice02.azurewebsites.net/session',
   apiRol: "/api/rol",
+  apiConfig: "/api/disponibilidad",
   apiUsuario: "/api/usuario",
   apiCliente: "/api/cliente",
   apiLogin: "/api/login",
