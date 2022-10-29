@@ -6,7 +6,9 @@ import { ClaveValidador } from '../classes/validator/clave-validador';
 import { ColumnaValidador } from '../classes/validator/columna-validator';
 import { CorreoValidador } from '../classes/validator/correo-validador';
 import { DescripcionValidador } from '../classes/validator/descripcion.validador';
+import { DiaValidador } from '../classes/validator/dia-validator';
 import { FraceValidador } from '../classes/validator/frace-validador';
+import { HoraValidador } from '../classes/validator/hora-validator';
 import { IntencionValidador } from '../classes/validator/intencion-validador';
 import { LimitVlidador } from '../classes/validator/limit-validator';
 import { NombreValidador } from '../classes/validator/nombre-validador';
@@ -88,5 +90,18 @@ export class FormsService {
             activo: new ActivoValidador
         });
     }
+    crearFormularioChatBlog(): FormGroup {
+        return new FormBuilder().group({
+            correo: new CorreoValidador,
+        });
+    }
+    crearFormularioDisponibilidad(): FormGroup {
+      return new FormBuilder().group({
+          dia: new DiaValidador,
+          hora_inicio: new HoraValidador,
+          hora_fin: new HoraValidador,
+          activo: new ActivoValidador,
+      });
+  }
 
 }

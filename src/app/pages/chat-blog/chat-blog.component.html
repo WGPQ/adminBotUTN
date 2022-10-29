@@ -1,0 +1,167 @@
+<div *ngIf="chatId === null">
+  <div class="account-pages pt-2 pt-sm-5 pb-4 pb-sm-5 h-10">
+    <div class="container">
+      <div class="row justify-content-center">
+        <div class="col-xxl-4 col-lg-5">
+          <div class="card">
+            <!-- Logo -->
+            <div class="pt-2 text-center bg-white">
+              <img
+                src="assets/images/logo-chat-blog.webp"
+                alt=""
+                height="100"
+              />
+            </div>
+
+            <div class="card-body">
+              <h4 class="text-dark-50 text-center p-0 fw-bold">Soporte</h4>
+              <p class="text-muted mb-4">
+                Ingrese su dirección de correo electrónico para iniciar una
+                conversación.
+              </p>
+
+              <!-- form -->
+              <form
+                [formGroup]="chatForm"
+                autocomplete="off"
+                (ngSubmit)="iniciar()"
+              >
+                <div class="mb-3">
+                  <label for="emailaddress" class="form-label">Correo: </label>
+                  <input
+                    class="form-control"
+                    type="email"
+                    id="emailaddress"
+                    placeholder="Introduce tu correo"
+                    formControlName="correo"
+                    [class.is-invalid]="correoNoValido"
+                  />
+                  <small *ngIf="correoNoValido" class="form-text text-danger"
+                    >Ingrese un correo valido</small
+                  >
+                </div>
+                <!-- <div class="mb-3">
+                  <label for="emailaddress" class="form-label">Nombre: </label>
+                  <input
+                    class="form-control"
+                    type="text"
+                    id="emailaddress"
+                    placeholder="Introduce tu nombre"
+                    formControlName="nombre"
+                    [class.is-invalid]="correoNoValido"
+                  />
+                  <small *ngIf="correoNoValido" class="form-text text-danger"
+                    >Ingrese un correo valido</small
+                  >
+                </div> -->
+                <div class="d-grid mb-5 mt-5 text-center">
+                  <button
+                    class="btn btn-primary btn-lg"
+                    [disabled]="chatForm.invalid || loading"
+                    type="submit"
+                  >
+                  <i [class]=' loading?  "mdi mdi-refresh mdi-spin me-2":"mdi mdi-chat me-2 "'></i> <span>Iniciar chat</span>
+                  </button>
+                </div>
+              </form>
+            </div>
+            <!-- end card-body -->
+          </div>
+          <!-- end card -->
+
+          <!-- end row -->
+        </div>
+        <!-- end col -->
+      </div>
+      <!-- end row -->
+    </div>
+    <!-- end container -->
+  </div>
+</div>
+
+<!-- chat area -->
+<div *ngIf="chatId !== null">
+  <div class="card ">
+    <div class="card-header bg-danger">
+      <div class="dropdown float-end">
+        <button (click)="salir()" type="button" class="btn btn-link btn-lg p-0 text-white">
+          <i class="uil uil-multiply"></i>
+        </button>
+      </div>
+      <h2 class="header-title text-white pt-2">Chat</h2>
+    </div>
+    <div class="card-body ">
+      <div
+        class="container-scroll"
+        #scrollChat
+        style="max-height: 540px; height: 620px"
+      >
+        <div class="conversation-list ">
+          <div
+            *ngFor="let activity of activities"
+            [ngClass]="
+              activity.from.id === usuario!.id ? 'clearfix odd' : 'clearfix'
+            "
+          >
+            <br />
+            <div class="chat-avatar">
+              <img
+                src=""
+                [src]="
+                  activity.from.id === usuario!.id
+                    ? 'https://avatars.dicebear.com/api/initials/' +
+                      activity.from.name +
+                      '.svg'
+                    : 'assets/images/users/robot.jpg'
+                "
+                alt="Female"
+              />
+              <i>{{ activity.timestamp!.split("T")[1].substring(0, 5) }}</i>
+            </div>
+            <div class="conversation-text">
+              <div class="ctext-wrap chat-widgets-cn">
+                <i>{{ activity.from.name }}</i>
+                <p>{{ activity.text }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <form
+        [formGroup]="mensageForm"
+        (ngSubmit)="sendMessage()"
+        class="needs-validation"
+        novalidate=""
+        name="chat-form"
+        id="chat-form"
+      >
+        <div class="row">
+          <div class="col">
+            <input
+              type="text"
+              class="form-control chat-input"
+              #txtmessage
+              placeholder="Mensaje ..."
+              formControlName="message"
+            />
+          </div>
+          <div class="col-auto d-grid">
+            <button
+              type="submit"
+              [disabled]="mensageForm.invalid"
+              class="btn btn-primary chat-send waves-effect waves-light"
+            >
+              <i class="uil uil-message"></i>
+            </button>
+          </div>
+        </div>
+      </form>
+      <!-- end row -->
+    </div>
+    <!-- end card-body -->
+  </div>
+  <!-- end card -->
+</div>
+<!-- end chat area-->
+
+<!-- end user detail -->

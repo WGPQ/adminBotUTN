@@ -1,145 +1,209 @@
 <div class="row">
-    <div class="col-12">
-        <div class="card">
-            <div class="card-body">
-                <div class="row mb-2">
-                    <div class="col-xl-8">
-                        <form [formGroup]="listarForm" autocomplete="off"
-                            class="row gy-2 gx-2 align-items-center justify-content-xl-start justify-content-between">
-
-                            <div class="col-auto">
-
-                                <label for="inputPassword2" class="visually-hidden">Buscar</label>
-                                <input type="search" class="form-control" id="inputPassword2" placeholder="Buscar..."
-                                    formControlName="search" (ngModelChange)="search()">
-                            </div>
-                            <div class="col-auto">
-                                <div class="d-flex align-items-center">
-                                    <label for="status-select" class="me-2">por:</label>
-                                    <select class="form-select" id="status-select" formControlName="columna">
-                                        <option disabled selected value="">Elegir... </option>
-                                        <option value="codigo">Código</option>
-                                        <option value="nombre">Nombre</option>
-                                        <option value="descripcion">Descripcion</option>
-                                    </select>
-                                </div>
-                            </div>
-                        </form>
-                    </div>
-                    <div class="col-xl-4">
-                        <div class="text-xl-end mt-xl-0 mt-2">
-                            <button type="button" class="btn btn-primary mb-2 me-2" data-bs-toggle="modal"
-                                data-bs-target="#intencion-modal" (click)="nuevo()"><i class="mdi mdi-plus me-1"></i>
-                                Nuevo</button>
-                                <button type="button" class="btn btn-light mb-2" (click)="exportarReporte()"><i
-                                    class="mdi mdi-file-download mdi-24px"></i> Exportar</button>
-                        </div>
-                    </div><!-- end col-->
+  <div class="col-12">
+    <div class="card">
+      <div class="card-body">
+        <div class="row mb-2">
+          <div class="col-xl-8">
+            <form
+              [formGroup]="listarForm"
+              autocomplete="off"
+              class="row gy-2 gx-2 align-items-center justify-content-xl-start justify-content-between"
+            >
+              <div class="col-auto">
+                <label for="inputPassword2" class="visually-hidden"
+                  >Buscar</label
+                >
+                <input
+                  type="search"
+                  class="form-control"
+                  id="inputPassword2"
+                  placeholder="Buscar..."
+                  formControlName="search"
+                  (ngModelChange)="search()"
+                />
+              </div>
+              <div class="col-auto">
+                <div class="d-flex align-items-center">
+                  <label for="status-select" class="me-2">por:</label>
+                  <select
+                    class="form-select"
+                    id="status-select"
+                    formControlName="columna"
+                  >
+                    <option disabled selected value="">Elegir...</option>
+                    <option value="codigo">Código</option>
+                    <option value="nombre">Nombre</option>
+                    <option value="descripcion">Descripcion</option>
+                  </select>
                 </div>
+              </div>
+            </form>
+          </div>
+          <div class="col-xl-4">
+            <div class="text-xl-end mt-xl-0 mt-2">
+              <button
+                type="button"
+                class="btn btn-primary mb-2 me-2"
+                data-bs-toggle="modal"
+                data-bs-target="#intencion-modal"
+                (click)="nuevo()"
+              >
+                <i class="mdi mdi-plus me-1"></i> Nuevo
+              </button>
+              <button
+                type="button"
+                class="btn btn-light mb-2"
+                (click)="exportarReporte()"
+              >
+                <i class="mdi mdi-file-download mdi-24px"></i> Exportar
+              </button>
+            </div>
+          </div>
+          <!-- end col-->
+        </div>
 
-                <div class="table-responsive">
-                    <table *ngIf="!cargando && intenciones.length>0" class="table table-centered mb-0">
-                        <thead class="table-light">
-                            <tr>
-                                <th style="width: 20px;">#</th>
-                                <th>Nombre</th>
-                                <th>Descripcion</th>
-                                <th style="width: 125px;">Accion</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-
-                            <tr *ngFor="let intencion of intenciones; let i =index">
-                                <td><a class="text-body fw-bold">{{i+1}}</a>
-                                </td>
-                                <td>{{intencion.nombre|textElipsis:20}}</td>
-                                <td>{{intencion.descripcion|textElipsis:60}}</td>
-                                <td>
-
-                                    <a data-bs-toggle="modal" data-bs-target="#intencion-modal"
-                                        (click)="editar(intencion.id)" class="action-icon"> <i
-                                            class="mdi mdi-square-edit-outline"></i></a>
-                                    <a class="action-icon" (click)="eliminar(intencion)"> <i
-                                            class="mdi mdi-delete"></i></a>
-                                </td>
-                            </tr>
-
-                        </tbody>
-                    </table>
-                </div>
-            </div> <!-- end card-body-->
-        </div> <!-- end card-->
-    </div> <!-- end col -->
+        <div class="table-responsive">
+          <table
+            *ngIf="!cargando && intenciones.length > 0"
+            class="table table-centered mb-0"
+          >
+            <thead class="table-light">
+              <tr>
+                <th style="width: 20px">#</th>
+                <th>Nombre</th>
+                <th>Descripcion</th>
+                <th style="width: 125px">Accion</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let intencion of intenciones; let i = index">
+                <td>
+                  <a class="text-body fw-bold">{{ i + 1 }}</a>
+                </td>
+                <td>{{ intencion.nombre | textElipsis: 20 }}</td>
+                <td>{{ intencion.descripcion | textElipsis: 60 }}</td>
+                <td>
+                  <a
+                    data-bs-toggle="modal"
+                    data-bs-target="#intencion-modal"
+                    (click)="editar(intencion.id)"
+                    class="action-icon me-2"
+                  >
+                    <i class="mdi mdi-square-edit-outline"></i
+                  ></a>
+                  <a class="action-icon" (click)="eliminar(intencion)">
+                    <i class="mdi mdi-delete"></i
+                  ></a>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <!-- end card-body-->
+    </div>
+    <!-- end card-->
+  </div>
+  <!-- end col -->
 </div>
 <!-- end row -->
 
-
-
-
-
-
-
-
-
-<div *ngIf="!cargando && intenciones.length===0" class="alert alert-warning text-center mt-3 animated fadeIn faster">
-    <h4 class="alert-heading">No hay registro</h4>
-    <p>
-        <i class="fa fa-exclamation fa-2x"></i>
-    </p>
-
+<div
+  *ngIf="!cargando && intenciones.length === 0"
+  class="alert alert-warning text-center mt-3 animated fadeIn faster"
+>
+  <h4 class="alert-heading">No hay registro</h4>
+  <p>
+    <i class="fa fa-exclamation fa-2x"></i>
+  </p>
 </div>
 
-<div *ngIf="cargando" class="alert alert-info text-center mt-3 animated fadeIn faster">
-    <h4 class="alert-heading">Cargando</h4>
-    <p>
-        <i class="fa fa-sync-alt fa-spin fa-2x"></i>
-    </p>
-    <p class="mb-0">
-        Espere por favor
-    </p>
+<div
+  *ngIf="cargando"
+  class="alert alert-info text-center mt-3 animated fadeIn faster"
+>
+  <h4 class="alert-heading">Cargando</h4>
+  <p>
+    <i class="fa fa-sync-alt fa-spin fa-2x"></i>
+  </p>
+  <p class="mb-0">Espere por favor</p>
 </div>
-
-
 
 <!-- Long Content Scroll Modal -->
-<div class="modal fade" id="intencion-modal" tabindex="-1" role="dialog" aria-labelledby="scrollableModalTitle"
-    aria-hidden="true">
-    <div class="modal-dialog modal-dialog-scrollable" role="document">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h5 class="modal-title" id="scrollableModalTitle"> {{action}} registro</h5>
-                <button type="button" #closebutton class="btn-close" data-bs-dismiss="modal"
-                    aria-label="Close"></button>
+<div
+  class="modal fade"
+  id="intencion-modal"
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="scrollableModalTitle"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-dialog-scrollable" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="scrollableModalTitle">
+          {{ action }} registro
+        </h5>
+        <button
+          type="button"
+          #closebutton
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+
+      <div class="modal-body">
+        <form [formGroup]="intencionForm" autocomplete="off">
+          <div class="ps-3 pe-3">
+            <div class="mb-3">
+              <label for="nombre" class="form-label">Nombre</label>
+              <input
+                class="form-control"
+                type="text"
+                formControlName="nombre"
+                maxlength="50"
+                [class.is-invalid]="nombreNoValido"
+              />
+              <small *ngIf="nombreNoValido" class="form-text text-danger"
+                >El nombre es requerido</small
+              >
             </div>
 
-            <div class="modal-body">
-                <form [formGroup]="intencionForm" autocomplete="off">
-                    <div class="ps-3 pe-3">
-                        <div class="mb-3">
-                            <label for="nombre" class="form-label">Nombre</label>
-                            <input class="form-control" type="text" formControlName="nombre" maxlength="50"
-                                [class.is-invalid]="nombreNoValido">
-                            <small *ngIf="nombreNoValido" class="form-text text-danger">El nombre es requerido</small>
-                        </div>
-
-                        <div class="mb-3">
-                            <label for="descripcion" class="form-label">Descripcion</label>
-                            <textarea class="form-control" id="example-textarea" rows="5" formControlName="descripcion"
-                                maxlength="300" [class.is-invalid]="descripcionNoValida">
-                            </textarea>
-                            <small *ngIf="descripcionNoValida" class="form-text text-danger">La descripción
-                                es requerida</small>
-                        </div>
-
-                    </div>
-                </form>
+            <div class="mb-3">
+              <label for="descripcion" class="form-label">Descripcion</label>
+              <textarea
+                class="form-control"
+                id="example-textarea"
+                rows="5"
+                formControlName="descripcion"
+                maxlength="300"
+                [class.is-invalid]="descripcionNoValida"
+              >
+              </textarea>
+              <small *ngIf="descripcionNoValida" class="form-text text-danger"
+                >La descripción es requerida</small
+              >
             </div>
-            <div class="modal-footer">
-                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
-                <button type="button" class="btn btn-primary" [disabled]=intencionForm.invalid
-                    (click)="guardarIntencion()">{{submitType}}</button>
-            </div>
-
-        </div><!-- /.modal-content -->
-    </div><!-- /.modal-dialog -->
-</div><!-- /.modal -->
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          Cancelar
+        </button>
+        <button
+          type="button"
+          class="btn btn-primary"
+          [disabled]="intencionForm.invalid"
+          (click)="guardarIntencion()"
+        >
+          {{ submitType }}
+        </button>
+      </div>
+    </div>
+    <!-- /.modal-content -->
+  </div>
+  <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->

@@ -1,117 +1,150 @@
 <div class="row">
   <!-- start chat users-->
-  <div class="col-xl-4 order-xl-1">
+  <div class="col-xl-3 order-xl-1">
     <div class="card">
       <div class="card-body p-0">
         <ul class="nav nav-tabs nav-bordered">
           <li class="nav-item">
-            <a href="#allUsers" data-bs-toggle="tab" aria-expanded="false" class="nav-link active py-2">
-              All
+            <a
+              href="#interacciones"
+              data-bs-toggle="tab"
+              aria-expanded="false"
+              class="nav-link active py-2"
+            >
+              Interacciones
             </a>
           </li>
           <li class="nav-item">
-            <a href="#favUsers" data-bs-toggle="tab" aria-expanded="true" class="nav-link py-2">
-              Favourties
+            <a
+              href="#comandos"
+              data-bs-toggle="tab"
+              aria-expanded="true"
+              class="nav-link py-2"
+            >
+              Comandos
             </a>
           </li>
-          <li class="nav-item">
-            <a href="#friendUsers" data-bs-toggle="tab" aria-expanded="true" class="nav-link py-2">
-              Friends
-            </a>
-          </li>
-        </ul> <!-- end nav-->
+        </ul>
+        <!-- end nav-->
         <div class="tab-content">
-          <div class="tab-pane show active p-3" id="newpost">
-
+          <div class="tab-pane show active p-3" id="interacciones">
             <!-- users -->
             <div class="row">
               <div class="col">
-
-                <div class="container-scroll" (scroll)="doSomethingOnScroll($event)" #scrollMessages
-                  style="height:450px">
-                  <div *ngIf="solicitud?.attachments!== undefined ">
-                    <a *ngFor="let solicitud of solicitud?.attachments" class="text-body">
+                <div
+                  class="container-scroll"
+                  (scroll)="doSomethingOnScroll($event)"
+                  #scrollMessages
+                  style="height: 450px"
+                >
+                  <div *ngIf="solicitudes.length > 0">
+                    <a *ngFor="let solicitud of solicitudes" class="text-body">
                       <div class="d-flex align-items-start mt-1 p-2">
-                        <img [src]="'https://avatars.dicebear.com/api/initials/'+solicitud.from.name+'.svg'"
-                          class="me-2 rounded-circle" height="48" alt="Brandon Smith">
+                        <img
+                          [src]="
+                            'https://avatars.dicebear.com/api/initials/' +
+                            solicitud.from.name +
+                            '.svg'
+                          "
+                          class="me-2 rounded-circle"
+                          height="48"
+                          alt="Brandon Smith"
+                        />
                         <div class="w-100 overflow-hidden">
                           <h5 class="mt-0 mb-0 font-14">
-                            <span
-                              class="float-end text-muted font-12">{{solicitud.timestamp!.split('T')[1].substring(0,5)}}</span>
-                            {{solicitud.from.name}}
+                            <span class="float-end text-muted font-12">{{
+                              solicitud.timestamp!.split("T")[1].substring(0, 5)
+                            }}</span>
+                            {{ solicitud.from.name }}
                           </h5>
                           <p class="mt-1 mb-0 text-muted font-14">
-                            <!-- <span class="w-25 float-end text-end">
-                                    <span class="badge badge-danger-lighten">{{interaction.lastMessage.nuevos}}</span>
-                                </span> -->
-                            <span class="w-75">contenido</span>
+                            <a
+                              (click)="
+                                reaccionarSolicitud(
+                                  solicitud?.attachments[0]?.content?.buttons[0]
+                                    ?.value
+                                )
+                              "
+                              class="btn btn-sm px-1 btn-success"
+                              ><i class="mdi mdi-comment-check mdi-18px"></i
+                            ></a>
+                            <a
+                              (click)="
+                                reaccionarSolicitud(
+                                  solicitud?.attachments[0]?.content?.buttons[1]
+                                    ?.value
+                                )
+                              "
+                              class="btn btn-sm px-1 btn-danger"
+                              ><i class="mdi mdi-comment-remove mdi-18px"></i
+                            ></a>
                           </p>
                         </div>
                       </div>
                     </a>
                   </div>
-
-
-
-
-                </div> <!-- end slimscroll-->
-
-
-                <!-- <div data-simplebar="" style="max-height: 400px">
-                  <a href="javascript:void(0);" class="text-body">
-                    <div class="d-flex align-items-start mt-1 p-2">
-                      <img src="assets/images/users/avatar-2.jpg" class="me-2 rounded-circle" height="48"
-                        alt="Brandon Smith">
-                      <div class="w-100 overflow-hidden">
-                        <h5 class="mt-0 mb-0 font-14">
-                          <span class="float-end text-muted font-12">4:30am</span>
-                          Brandon Smith
-                        </h5>
-                        <p class="mt-1 mb-0 text-muted font-14">
-                          <span class="w-25 float-end text-end"><span class="badge badge-danger-lighten">3</span></span>
-                          <span class="w-75">How are you today?</span>
-                        </p>
-                      </div>
-                    </div>
-                  </a>
-
-
-
-
-                </div> -->
+                </div>
+                <!-- end slimscroll-->
 
                 <!-- end slimscroll-->
-              </div> <!-- End col -->
+              </div>
+              <!-- End col -->
             </div>
             <!-- end users -->
-          </div> <!-- end Tab Pane-->
-        </div> <!-- end tab content-->
-      </div> <!-- end card-body-->
-    </div> <!-- end card-->
+            <button  class="btn btn-info m-2"  href="#interacciones" (click)="sendComandos(1)">Conectar</button>
+          <button class="btn btn-info m-2 " data-bs-toggle="">Ayuda</button>
+          </div>
+          <div class="tab-pane show p-3" id="comandos">
+          <button  class="btn btn-info mb-2"  href="#interacciones" (click)="sendComandos(1)">Conectar</button>
+          <button  class="btn btn-info mb-2" (click)="sendComandos(2)">Dejar de recibir solicitudes</button>
+          <button  class="btn btn-info mb-2" (click)="sendComandos(3)">Solicitudes Pendientes</button>
+          <button  class="btn btn-info mb-2" (click)="sendComandos(4)">Aceptar Solicitud</button>
+          <button  class="btn btn-info mb-2" (click)="sendComandos(5)">Rechazar Solicitud</button>
+          <button  class="btn btn-info mb-2" (click)="sendComandos(6)">Desconectar</button>
+          </div>
+          <!-- end Tab Pane-->
+        </div>
+        <!-- end tab content-->
+      </div>
+      <!-- end card-body-->
+    </div>
+    <!-- end card-->
   </div>
   <!-- end chat users-->
 
   <!-- chat area -->
-  <div class=" col-xl-8 order-xl-2">
+  <div class="col-xl-8 order-xl-2">
     <div class="card">
       <div class="card-body">
-        <div class="container-scroll" #scrollChat style="height:450px">
+        <div class="container-scroll" #scrollChat style="height: 450px; width: 900px;">
           <a (click)="cargarMas()">Cargar mas</a>
           <div class="conversation-list">
-            <div *ngFor="let activity of activities"
-              [ngClass]="activity.from.id=== usuario!.id ? 'clearfix odd': 'clearfix' ">
-              <br>
+            <div
+              *ngFor="let activity of activities"
+              [ngClass]="
+                activity.from.id === usuario!.id ? 'clearfix odd' : 'clearfix'
+              "
+            >
+              <br />
               <div class="chat-avatar">
-                <img src=""
-                  [src]="activity.from.id=== usuario!.id ? 'https://avatars.dicebear.com/api/initials/'+ activity.from.name+'.svg' :'assets/images/users/robot.jpg'"
-                  alt="Female">
-                <i>{{activity.timestamp!.split('T')[1].substring(0,5)}}</i>
+                <img
+                  src=""
+                  [src]="
+                    activity.from.id === usuario!.id
+                      ? 'https://avatars.dicebear.com/api/initials/' +
+                        activity.from.name +
+                        '.svg'
+                      : 'assets/images/users/robot.jpg'
+                  "
+                  alt="Female"
+                />
+                <i>{{ activity.timestamp!.split("T")[1].substring(0, 5) }}</i>
               </div>
               <div class="conversation-text">
                 <div class="ctext-wrap chat-widgets-cn">
-                  <i>{{activity.from.name}}</i>
+                  <i>{{ activity.from.name }}</i>
                   <p>
-                    {{activity.text}}
+                    {{ activity.text }}
                   </p>
                 </div>
               </div>
@@ -122,32 +155,51 @@
         <div class="row">
           <div class="col">
             <div class="mt-2 bg-light p-3 rounded">
-              <form [formGroup]="mensageForm" (ngSubmit)="guardarMessage()" class="needs-validation" novalidate=""
-                name="chat-form" id="chat-form">
+              <form
+                [formGroup]="mensageForm"
+                (ngSubmit)="guardarMessage()"
+                class="needs-validation"
+                novalidate=""
+                name="chat-form"
+                id="chat-form"
+              >
                 <div class="row">
                   <div class="col mb-2 mb-sm-0">
-                    <input type="text" #txtmessage class="form-control border-0" placeholder="Mensaje ..."
-                      formControlName="message">
+                    <input
+                      type="text"
+                      #txtmessage
+                      class="form-control border-0"
+                      placeholder="Mensaje ..."
+                      formControlName="message"
+                    />
                   </div>
                   <div class="col-sm-auto">
                     <div class="btn-group">
                       <div class="d-grid">
-                        <button type="submit" [disabled]="mensageForm.invalid" class="btn btn-success chat-send"><i
-                            class='uil uil-message'></i></button>
+                        <button
+                          type="submit"
+                          [disabled]="mensageForm.invalid"
+                          class="btn btn-success chat-send"
+                        >
+                          <i class="uil uil-message"></i>
+                        </button>
                       </div>
                     </div>
                   </div>
                 </div>
               </form>
             </div>
-          </div> <!-- end col-->
+          </div>
+          <!-- end col-->
         </div>
         <!-- end row -->
-      </div> <!-- end card-body -->
-    </div> <!-- end card -->
+      </div>
+      <!-- end card-body -->
+    </div>
+    <!-- end card -->
   </div>
   <!-- end chat area-->
 
-
   <!-- end user detail -->
-</div> <!-- end row-->
+</div>
+<!-- end row-->

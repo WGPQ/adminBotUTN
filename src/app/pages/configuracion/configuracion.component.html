@@ -1,0 +1,174 @@
+<div class="row">
+  <div class="col-12">
+    <div class="card">
+      <div class="card-body">
+        <div class="table-responsive">
+          <table
+            *ngIf="!cargando && disponibilidad.length > 0"
+            class="table table-centered mb-0"
+          >
+            <thead class="table-light">
+              <tr>
+                <th style="width: 20px">#</th>
+                <th>Dia</th>
+                <th>Hora inicio</th>
+                <th>Hora fin</th>
+                <th>Status</th>
+                <th style="width: 125px">Accion</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let disp of disponibilidad; let i = index">
+                <td>
+                  <a class="text-body fw-bold">{{ i + 1 }}</a>
+                </td>
+                <td>{{ disp.dia | textElipsis: 20 }}</td>
+                <td>{{ disp.hora_inicio | textElipsis: 60 }}</td>
+                <td>{{ disp.hora_fin | textElipsis: 60 }}</td>
+                <td>
+                  <i
+                    [ngClass]="
+                      disp.activo
+                        ? 'mdi mdi-circle me-2 text-success'
+                        : 'mdi mdi-circle me-2 text-danger'
+                    "
+                  ></i
+                  >{{ disp.activo | activo }}
+                </td>
+                <td>
+                  <a
+                    data-bs-toggle="modal"
+                    data-bs-target="#scrollable-modal"
+                    (click)="editar(disp.id)"
+                    class="action-icon"
+                  >
+                    <i class="mdi mdi-square-edit-outline"></i
+                  ></a>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <!-- end card-body-->
+    </div>
+    <!-- end card-->
+  </div>
+  <!-- end col -->
+</div>
+<!-- end row -->
+
+<div
+  *ngIf="!cargando && disponibilidad.length === 0"
+  class="alert alert-warning text-center mt-3 animated fadeIn faster"
+>
+  <h4 class="alert-heading">No hay registro</h4>
+  <p>
+    <i class="fa fa-exclamation fa-2x"></i>
+  </p>
+</div>
+
+<div
+  *ngIf="cargando"
+  class="alert alert-info text-center mt-3 animated fadeIn faster"
+>
+  <h4 class="alert-heading">Cargando</h4>
+  <p>
+    <i class="fa fa-sync-alt fa-spin fa-2x"></i>
+  </p>
+  <p class="mb-0">Espere por favor</p>
+</div>
+
+<!-- Long Content Scroll Modal -->
+<div
+  class="modal fade"
+  id="scrollable-modal"
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="scrollableModalTitle"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-dialog-scrollable" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="scrollableModalTitle">
+          {{ action }} registro
+        </h5>
+        <button
+          type="button"
+          #closebutton
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+
+      <div class="modal-body">
+        <form [formGroup]="disponibilidadForm" autocomplete="off">
+          <div class="ps-3 pe-3">
+            <div class="mb-3">
+              <label for="nombre" class="form-label">Dia</label>
+              <input
+                class="form-control"
+                type="text"
+                formControlName="dia"
+                maxlength="50"
+                [class.is-invalid]="diaNoValido"
+              />
+            </div>
+            <div class="row g-2">
+              <div class="col-md">
+                <label for="inicio" class="form-label">Hora inicio</label>
+                <select
+                  class="form-select"
+                  id="inicio"
+                  formControlName="hora_inicio"
+                >
+                  <option value="" disabled selected>Selecciona una hora</option>
+                  <option *ngFor="let hora of horarios" [ngValue]="hora">
+                    {{ hora}}
+                  </option>
+                </select>
+              </div>
+              <div class="col-md">
+                <label for="fin" class="form-label">Hora Fin</label>
+                <select
+                  class="form-select"
+                  id="fin"
+                  formControlName="hora_fin"
+                >
+                  <option value="" disabled selected>Selecciona una hora</option>
+                  <option *ngFor="let hora of horarios" [ngValue]="hora">
+                    {{ hora}}
+                  </option>
+                </select>
+              </div>
+            </div>
+            <div class="mb-3 mt-3">
+              <label class="form-check-label" for="customCheck1">Activo</label>
+              &nbsp;&nbsp;
+              <input type="checkbox" class="form-check-input" id="customCheck1"
+                  formControlName="activo">
+          </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          Cancelar
+        </button>
+        <button
+          type="button"
+          class="btn btn-primary"
+          [disabled]="disponibilidadForm.invalid"
+          (click)="guardarDisponibilidad()"
+        >
+          {{ submitType }}
+        </button>
+      </div>
+    </div>
+    <!-- /.modal-content -->
+  </div>
+  <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->

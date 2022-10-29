@@ -10,6 +10,7 @@ export const environment = {
   // baseUrl: "http://localhost:9095",
   // hubConnectionURL: 'http://localhost:9095/session',
   apiRol: "/api/rol",
+  apiConfig: "/api/disponibilidad",
   apiUsuario: "/api/usuario",
   apiCliente: "/api/cliente",
   apiLogin: "/api/auth",

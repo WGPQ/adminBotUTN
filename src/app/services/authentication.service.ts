@@ -59,7 +59,7 @@ export class AuthenticationService {
     //     await this.start();
     //   });
     //  this.connection.on("ReceiveOne", (user: string, message: string) => { this.mapReceivedMessage(user, message); });
-    //  this.start(); 
+    //  this.start();
     // this.startConnection();
     // this.hubConnection!.on('transferchartdata', (data) => {
 
@@ -69,7 +69,7 @@ export class AuthenticationService {
   httpOptions = {
     headers: new HttpHeaders({
       'Content-Type': 'application/json',
-      'Authorization': 'Bearer ' + this.leerToken()
+      'Authorization': 'Bearer ' + this.leerToken(),
     })
   }
 
@@ -90,7 +90,7 @@ export class AuthenticationService {
   //   } catch (err) {
   //     console.log(err);
   //     setTimeout(() => this.start(), 5000);
-  //   } 
+  //   }
   // }
   acceso(login: Login): Observable<boolean> {
     return this.http.post(this.appUrl + this.apiUrl+"/login/portal", login).pipe(
@@ -106,6 +106,21 @@ export class AuthenticationService {
       catchError(this.errorHandler)
     );
   }
+  acceso_chat_blog(correo: string): Observable<boolean> {
+    return this.http.post(this.appUrl + this.apiUrl+"/login/chatbot", {correo}).pipe(
+      map((resp: any) => {
+        if (resp.exito) {
+          this.guardarToken(resp.token);
+          this.guardarSession(resp.id_session);
+        } else {
+          this.alertService.error('', resp.message);
+        }
+        return resp.exito;
+      }),
+      catchError(this.errorHandler)
+    );
+  }
+
   cerrarSesion() {
    var session_id=this.leerSession();
     this.logout(session_id).subscribe(resp=>{
@@ -116,7 +131,7 @@ export class AuthenticationService {
         this.router.navigate(['/login']);
       }
     })
- 
+
   }
 
   resetearClave(id?: string): Observable<any> {
@@ -134,7 +149,7 @@ export class AuthenticationService {
     return this.http.post(this.appUrl + this.apiUrl + '/actualizar', data, { headers: headers });
   }
   logout(session?: string): Observable<any> {
-    return this.http.get(this.appUrl + this.apiUrl + '/logout/'+session, this.httpOptions);
+    return this.http.get(this.appUrl + this.apiUrl + '/logout/'+session, {headers:{'Authorization': 'Bearer ' + this.leerToken()}});
   }
 
   guardarSession(session: string) {

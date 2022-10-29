@@ -1,4 +1,10 @@
-import { Component, ElementRef, HostListener, OnInit, ViewChild } from '@angular/core';
+import {
+  Component,
+  ElementRef,
+  HostListener,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { Activity } from 'botframework-directlinejs';
 import { Interaction } from 'src/app/interfaces/interaction.interface';
@@ -16,38 +22,37 @@ import { UsuariosComponent } from '../usuarios/usuarios.component';
 @Component({
   selector: 'app-chat',
   templateUrl: './chat.component.html',
-  styleUrls: ['./chat.component.css']
+  styleUrls: ['./chat.component.css'],
 })
 export class ChatComponent implements OnInit {
   @ViewChild('scrollMessages') private scrollMessages!: ElementRef;
   @ViewChild('scrollChat') private scrollChat!: ElementRef;
-  @ViewChild("txtmessage") private txtMessage!: ElementRef;
+  @ViewChild('txtmessage') private txtMessage!: ElementRef;
   messages: MensageModel[] = [];
   activities: any[] = [];
   interactions: Interaction[] = [];
-  solicitud: any;
-  idBot = "";
-  idChat = "";
+  solicitudes: any[] = [];
+  idBot = '';
+  idChat = '';
   usuario?: Usuario;
   public mensageForm: FormGroup;
   loading = false;
 
-
-  @HostListener("scroll", ['$event'])
+  @HostListener('scroll', ['$event'])
   doSomethingOnScroll($event: Event) {
     let scrollOffset = ($event.target as Element).scrollTop;
-    console.log("scroll: ", scrollOffset);
+    console.log('scroll: ', scrollOffset);
   }
-
 
   constructor(
     private formService: FormsService,
     private botService: BotService,
     private chatService: ChatService,
     private authService: AuthenticationService,
-    private bibliotecaService: BibliotecaService) {
+    private bibliotecaService: BibliotecaService
+  ) {
     this.usuario = authService.usuario;
-    this.idBot = environment.id_bot
+    this.idBot = environment.id_bot;
     this.loading = true;
     this.mensageForm = formService.crearFormularioMensaje();
   }
@@ -55,12 +60,13 @@ export class ChatComponent implements OnInit {
     this.scrollToBottom();
   }
 
-
   scrollToBottom(): void {
     try {
-      this.scrollChat.nativeElement.scrollTop = this.scrollChat.nativeElement.scrollHeight;
-      this.scrollMessages.nativeElement.scrollToBottom = this.scrollMessages.nativeElement.scrollHeight;
-    } catch (err) { }
+      this.scrollChat.nativeElement.scrollTop =
+        this.scrollChat.nativeElement.scrollHeight;
+      this.scrollMessages.nativeElement.scrollToBottom =
+        this.scrollMessages.nativeElement.scrollHeight;
+    } catch (err) {}
   }
 
   ngOnInit(): void {
@@ -68,18 +74,55 @@ export class ChatComponent implements OnInit {
     this.getInteractions();
   }
 
+  reaccionarSolicitud(message: string) {
+    this.botService.sendMessage(message).subscribe((resp) => {
+      console.log(resp);
+    });
+  }
 
+  sendComandos(comando: number) {
+    let cmd = '';
+    switch (comando) {
+      case 1:
+        cmd = `@${this.usuario?.nombres} Watch`;
+        break;
+      case 2:
+        cmd = `@${this.usuario?.nombres} Unwatch`;
+        break;
+      case 3:
+        cmd = `@${this.usuario?.nombres} GetRequests`;
+        break;
+      case 4:
+        cmd = `@${this.usuario?.nombres} AcceptRequest`;
+        break;
+      case 5:
+        cmd = `@${this.usuario?.nombres} RejectRequest`;
+        break;
+      case 6:
+        cmd = `@${this.usuario?.nombres} Disconnect`;
+        break;
+
+      default:
+        cmd = `@${this.usuario?.nombres} Watch`;
+        break;
+    }
+    console.log(cmd);
+
+    this.botService.sendMessage(cmd).subscribe((resp) => {
+      console.log(resp);
+    });
+  }
 
   cargarHistorial(idChat: string) {
     const listar: Listar = {
-      columna: "",
-      search: "",
+      columna: '',
+      search: '',
       offset: 0,
       limit: 100,
-      sort: ""
-    }
+      sort: '',
+    };
     this.idChat = idChat;
-    this.chatService.getMessages(idChat, listar).subscribe(resp => {
+    this.chatService.getMessages(idChat, listar).subscribe((resp) => {
       this.messages = resp;
     });
   }
@@ -89,29 +132,28 @@ export class ChatComponent implements OnInit {
     this.messages = [...this.messages, ...resp];
   }
   guardarMessage() {
-    if (this.mensageForm.valid && this.mensageForm.value.message.trim().length > 0) {
+    if (
+      this.mensageForm.valid &&
+      this.mensageForm.value.message.trim().length > 0
+    ) {
       const message = this.mensageForm.value.message.trim();
       try {
-        let nuevoMensaje: MensageModel = {
-          chat: this.idChat,
-          contenido: (message).trim(),
-        };
         this.botService.directLine!.activity$.subscribe((activity: any) => {
-          // if (activity.attachments) {
-          //   if (activity.attachments.length > 0) {
-          //     this.solicitud = activity;
-          //   }
-          // }
           if (!this.activities.includes(activity)) {
-            console.log(activity);
-            this.activities = [...this.activities, activity];
+            if (
+              activity.attachments &&
+              activity?.attachments[0]?.content?.title === 'Solicitud'
+            ) {
+              if (!this.solicitudes.includes(activity))
+                this.solicitudes = [...this.solicitudes, activity];
+            } else {
+              this.activities = [...this.activities, activity];
+            }
           }
         });
-        this.botService.sendMessage(message).subscribe(resp => {
-
-          console.log(resp);
-
-        })
+        this.botService.sendMessage(message).subscribe((resp) => {
+          // console.log(resp);
+        });
         // this.chatService.newMessage(nuevoMensaje).subscribe(
         //   (resp: any) => {
         //     if (resp.exito) {
@@ -125,7 +167,7 @@ export class ChatComponent implements OnInit {
 
         this.mensageForm.reset();
         this.mensageForm.enable();
-        this.txtMessage.nativeElement.focus()
+        this.txtMessage.nativeElement.focus();
       } catch (error) {
         console.warn(error);
         alert(`Can't send your message`);
@@ -134,18 +176,16 @@ export class ChatComponent implements OnInit {
   }
   getInteractions() {
     const listar: Listar = {
-      columna: "",
-      search: "",
+      columna: '',
+      search: '',
       offset: 0,
       limit: 100,
-      sort: ""
-    }
+      sort: '',
+    };
     this.loading = true;
-    this.chatService.getInteractios(listar).subscribe(resp => {
+    this.chatService.getInteractios(listar).subscribe((resp) => {
       this.interactions = resp;
       this.loading = false;
-
     });
   }
-
 }

@@ -84,7 +84,14 @@ export class ModulosService {
       icon: "uil-right-indent-alt",
       submenu: []
     },
-    
+    {
+      rol: ["Administrador", "Operador"],
+      nombre: 'Configuracion',
+      ruta: "/dashboard/configuracion",
+      icon: "uil-cog",
+      submenu: []
+    },
+
   ];
 
   getModulos(rol: string): Modulo[] {

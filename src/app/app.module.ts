@@ -30,6 +30,8 @@ import { AuthenticateComponent } from './auth/authenticate/authenticate.componen
 import { TextElipsisPipe } from './pipes/text-elipsis.pipe';
 import { ClientesComponent } from './pages/clientes/clientes.component';
 import { BibliochatComponent } from './pages/bibliochat/bibliochat.component';
+import { ChatBlogComponent } from './pages/chat-blog/chat-blog.component';
+import { ConfiguracionComponent } from './pages/configuracion/configuracion.component';
 const maskConfigFunction: () => Partial<IConfig> = () => {
   return {
     validation: false,
@@ -60,7 +62,9 @@ const maskConfigFunction: () => Partial<IConfig> = () => {
     AuthenticateComponent,
     TextElipsisPipe,
     ClientesComponent,
-    BibliochatComponent
+    BibliochatComponent,
+    ChatBlogComponent,
+    ConfiguracionComponent
   ],
   imports: [
     BrowserModule,

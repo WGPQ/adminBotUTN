@@ -18,10 +18,8 @@ export class BotService {
       secret: '2mQOcWjJgOc.Cu3pkgFaQporkiX2YzFMUYzuMRS5rPM6rJbOE8C9Igo',
       conversationStartProperties: { /* optional: properties to send to the bot on conversation start */
       locale: 'en-US'
-
   }
     });
-    this.directLine.activity$
   }
   statusConnectionBot() {
     this.directLine!.connectionStatus$
@@ -52,8 +50,8 @@ export class BotService {
   sendMessage(message: string) {
     return this.directLine!.postActivity({
       from: {
-        id: this.authtService.usuario.id!,
-        name: this.authtService.usuario.nombre_completo,
+        id: this.authtService?.usuario?.id! || "12903493748734834",
+        name: this.authtService?.usuario?.nombre_completo || "User",
         role: "channel"
       },
       type: 'message',

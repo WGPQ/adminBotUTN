@@ -1,14 +1,11 @@
 import { Component, OnInit } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
-import { delay } from 'rxjs/operators';
 import { Login } from 'src/app/interfaces/login.interface';
-import { Usuario } from 'src/app/interfaces/usuarios.interface';
 import { AlertService } from 'src/app/services/alert.service';
 import { AuthenticationService } from 'src/app/services/authentication.service';
 import { BibliotecaService } from 'src/app/services/biblioteca.service';
 import { FormsService } from 'src/app/services/forms.service';
-import { UsuarioService } from 'src/app/services/usuario.service';
 import Swal from 'sweetalert2';
 
 
@@ -25,6 +22,7 @@ export class LoginComponent implements OnInit {
   showPassword: Boolean = false;
   passwordtype: String = "password";
   classhow: String = "far fa-eye-slash nav-icon";
+  loading:boolean=false;
   constructor(
     private bibliotecaService: BibliotecaService,
     private formService: FormsService,
@@ -55,7 +53,7 @@ export class LoginComponent implements OnInit {
   }
 
   verificarLoggin() {
-    if (this.authservices.estaAutenticado() && this.authservices.usuario.verificado) {
+    if (this.authservices.estaAutenticado() && this.authservices?.usuario?.verificado) {
       this.router.navigate(['/dashboard']);
     } else {
       this.router.navigate(['/login']);
@@ -96,26 +94,25 @@ export class LoginComponent implements OnInit {
         }
       });
     }
-    
+
     const usuario: Login = {
       correo: this.loginForm.value.correo,
       clave: this.loginForm.value.clave
     }
-   
+  this.loading=true;
     this.authservices.acceso(usuario).subscribe(resp => {
       if (resp) {
         this.router.navigate(['/authenticate']);
         this.alertService.esperando('Autentificando');
-        
+        this.loading=false;
         if (this.loginForm.value.recordarme) {
           localStorage.setItem('correo', usuario.correo);
         } else {
           localStorage.removeItem('correo');
         }
-    
         Swal.showLoading();
-        setTimeout(() => {          
-          if (this.authservices.usuario.verificado) {
+        setTimeout(() => {
+          if (this.authservices?.usuario?.verificado) {
             this.router.navigate(['/dashboard']);
             this.alertService.correcto('', 'Acceso Correcto')
             Swal.close();
@@ -123,12 +120,10 @@ export class LoginComponent implements OnInit {
             this.router.navigate(['/confirmar']);
             Swal.close();
           }
-        }, 2000)
+        }, 500)
 
       }
     });
-
-
   }
 
 
