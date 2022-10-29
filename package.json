@@ -3,10 +3,15 @@
   "version": "0.0.0",
   "scripts": {
     "ng": "ng",
-    "start": "ng serve",
+    "start": "node server.js",
     "build": "ng build",
     "watch": "ng build --watch --configuration development",
-    "test": "ng test"
+    "test": "ng test",
+    "heroku-postbuild": "ng build --prod"
+  },
+  "engines": {
+    "node": "v12.19.0",
+    "npm": "6.14.8"
   },
   "private": true,
   "dependencies": {
@@ -21,6 +26,7 @@
     "@microsoft/signalr": "^6.0.5",
     "botframework-directlinejs": "^0.15.1",
     "crypto-js": "^4.1.1",
+    "express": "^4.18.2",
     "ngx-mask": "^13.1.15",
     "rxjs": "~6.6.0",
     "sweetalert2": "^11.4.0",
