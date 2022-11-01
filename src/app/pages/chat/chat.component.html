@@ -113,89 +113,76 @@
   <!-- end chat users-->
 
   <!-- chat area -->
-  <div class="col-xl-8 order-xl-2">
-    <div class="card">
-      <div class="card-body">
-        <div class="container-scroll" #scrollChat style="height: 450px; width: 900px;">
-          <a (click)="cargarMas()">Cargar mas</a>
-          <div class="conversation-list">
-            <div
-              *ngFor="let activity of activities"
-              [ngClass]="
-                activity.from.id === usuario!.id ? 'clearfix odd' : 'clearfix'
-              "
-            >
-              <br />
-              <div class="chat-avatar">
-                <img
-                  src=""
-                  [src]="
-                    activity.from.id === usuario!.id
-                      ? 'https://avatars.dicebear.com/api/initials/' +
-                        activity.from.name +
-                        '.svg'
-                      : 'assets/images/users/robot.jpg'
-                  "
-                  alt="Female"
-                />
-                <i>{{ activity.timestamp!.split("T")[1].substring(0, 5) }}</i>
-              </div>
-              <div class="conversation-text">
-                <div class="ctext-wrap chat-widgets-cn">
-                  <i>{{ activity.from.name }}</i>
-                  <p>
-                    {{ activity.text }}
-                  </p>
-                </div>
-              </div>
-            </div>
+  <div class="col-xl-9 order-xl-2">
+<div class="card">
+  <div class="card-body">
+    <div
+    class="container-scroll"
+    #scrollChat
+    style="max-height: 540px; height: 620px;"
+  >
+    <div class="conversation-list ">
+      <div
+        *ngFor="let activity of activities"
+        [ngClass]="
+          activity.from.id === usuario!.id ? 'clearfix odd' : 'clearfix'
+        "
+      >
+        <br />
+        <div class="chat-avatar">
+          <img
+            src=""
+            [src]="
+              activity.from.id === usuario!.id
+                ? 'https://avatars.dicebear.com/api/initials/' +
+                  activity.from.name +
+                  '.svg'
+                : 'assets/images/users/robot.jpg'
+            "
+            alt="Female"
+          />
+          <i>{{ activity.timestamp!.split("T")[1].substring(0, 5) }}</i>
+        </div>
+        <div class="conversation-text">
+          <div class="ctext-wrap chat-widgets-cn">
+            <i>{{ activity.from.name }}</i>
+            <p>{{ activity.text }}</p>
           </div>
         </div>
-
-        <div class="row">
-          <div class="col">
-            <div class="mt-2 bg-light p-3 rounded">
-              <form
-                [formGroup]="mensageForm"
-                (ngSubmit)="guardarMessage()"
-                class="needs-validation"
-                novalidate=""
-                name="chat-form"
-                id="chat-form"
-              >
-                <div class="row">
-                  <div class="col mb-2 mb-sm-0">
-                    <input
-                      type="text"
-                      #txtmessage
-                      class="form-control border-0"
-                      placeholder="Mensaje ..."
-                      formControlName="message"
-                    />
-                  </div>
-                  <div class="col-sm-auto">
-                    <div class="btn-group">
-                      <div class="d-grid">
-                        <button
-                          type="submit"
-                          [disabled]="mensageForm.invalid"
-                          class="btn btn-success chat-send"
-                        >
-                          <i class="uil uil-message"></i>
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </form>
-            </div>
-          </div>
-          <!-- end col-->
-        </div>
-        <!-- end row -->
       </div>
-      <!-- end card-body -->
     </div>
+  </div>
+  <form
+    [formGroup]="mensageForm"
+    (ngSubmit)="guardarMessage()"
+    class="needs-validation"
+    novalidate=""
+    name="chat-form"
+    id="chat-form"
+  >
+    <div class="row">
+      <div class="col">
+        <input
+          type="text"
+          class="form-control chat-input"
+          #txtmessage
+          placeholder="Mensaje ..."
+          formControlName="message"
+        />
+      </div>
+      <div class="col-auto d-grid">
+        <button
+          type="submit"
+          [disabled]="mensageForm.invalid"
+          class="btn btn-info chat-send waves-effect waves-light"
+        >
+          <i class="uil uil-message"></i>
+        </button>
+      </div>
+    </div>
+  </form>
+  </div>
+</div>
     <!-- end card -->
   </div>
   <!-- end chat area-->
