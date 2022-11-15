@@ -5,5 +5,5 @@ export interface MensageModel {
   usuario?: Usuario;
   chat: string;
   contenido: string;
-  createdAt?: string;
+  createdAt?: Date;
 }

@@ -12,16 +12,15 @@ import Swal from 'sweetalert2';
 @Component({
   selector: 'app-phraces',
   templateUrl: './phraces.component.html',
-  styles: [
-  ]
+  styles: [],
 })
 export class PhracesComponent implements OnInit {
   fraces: Frace[] = [];
   intenciones: Intencion[] = [];
   fraceForm!: FormGroup;
   listarForm!: FormGroup;
-  submitType: string = "Guardar";
-  action = "Agregar";
+  submitType: string = 'Guardar';
+  action = 'Agregar';
   idFrace?: string;
   nuevaFrace: boolean = false;
   cargando = false;
@@ -35,14 +34,16 @@ export class PhracesComponent implements OnInit {
     private fraceaService: FraceService,
     private intencionService: IntencionService,
     private alertService: AlertService,
-    private formService: FormsService) {
-      this.cargando = true;
+    private formService: FormsService
+  ) {
+    this.cargando = true;
     this.listarIntenciones();
     this.fraceForm = formService.crearFormularioFrace();
     this.listarForm = formService.crearFormularioListar();
   }
   ngOnInit(): void {
     this.listarFrace();
+
   }
 
   previusPage() {
@@ -74,19 +75,19 @@ export class PhracesComponent implements OnInit {
     this.listarFrace();
   }
   search() {
-    if (this.listarForm.value.columna != "") {
+    if (this.listarForm.value.columna != '') {
       this.listarFrace();
     }
   }
   listarIntenciones() {
     const listar: Listar = {
-      columna: "",
-      search: "",
+      columna: '',
+      search: '',
       offset: 0,
-      limit: 100,
-      sort: ""
-    }
-    this.intencionService.obtenerIntenciones(listar).subscribe(response => {
+      limit: '100',
+      sort: '',
+    };
+    this.intencionService.obtenerIntenciones(listar).subscribe((response) => {
       this.intenciones = response;
     });
   }
@@ -96,12 +97,13 @@ export class PhracesComponent implements OnInit {
       columna: this.listarForm.value.columna,
       search: this.listarForm.value.search,
       offset: this.listarForm.value.offset,
-      limit: Number.parseInt(this.listarForm.value.limit),
+      limit: this.listarForm.value.limit || 10,
       sort: this.listarForm.value.sort,
-    }
-    this.fraceaService.obtenerFraces(listar).subscribe(response => {
+    };
+
+    this.fraceaService.obtenerFraces(listar).subscribe((response) => {
       this.fraces = response;
-      this.cargando=false;
+      this.cargando = false;
       this.numeroPaginas = new Array(Math.ceil(this.fraces.length / 10));
     });
   }
@@ -110,16 +112,23 @@ export class PhracesComponent implements OnInit {
     this.fraceForm.reset({
       intencion: '',
     });
-    this.action = "Agregar"
-    this.submitType = "Guardar";
+    this.action = 'Agregar';
+    this.submitType = 'Guardar';
     this.nuevaFrace = false;
   }
   get intencionNoValido() {
-    return this.fraceForm.get('intencion')?.invalid && this.fraceForm.get('intencion')?.touched;
+    return (
+      this.fraceForm.get('intencion')?.invalid &&
+      this.fraceForm.get('intencion')?.touched
+    );
   }
   get fraceNoValida() {
-    return this.fraceForm.get('frace')?.invalid && this.fraceForm.get('frace')?.touched;
+    return (
+      this.fraceForm.get('frace')?.invalid &&
+      this.fraceForm.get('frace')?.touched
+    );
   }
+
   onCloseForm() {
     this.closebutton.nativeElement.click();
   }
@@ -135,8 +144,8 @@ export class PhracesComponent implements OnInit {
     this.alertService.esperando('Guardar informacion....');
     Swal.showLoading();
 
-    if (this.action == "Agregar") {
-      this.fraceaService.ingresarFrace(frace).subscribe(resp => {
+    if (this.action == 'Agregar') {
+      this.fraceaService.ingresarFrace(frace).subscribe((resp) => {
         if (resp.exito) {
           this.alertService.correcto('', resp.message).then(() => {
             this.closebutton.nativeElement.click();
@@ -147,30 +156,36 @@ export class PhracesComponent implements OnInit {
         }
       });
     } else {
-      this.fraceaService.actualizarFrace(frace).subscribe(resp => {
-        if (resp.exito) {
-          this.alertService.correcto('', resp.message).then(() => {
-            this.closebutton.nativeElement.click();
-            this.listarFrace();
-          });
-        } else {
-          this.alertService.error('Error', resp.message);
+      this.fraceaService.actualizarFrace(frace).subscribe(
+        (resp) => {
+          if (resp.exito) {
+            this.alertService.correcto('', resp.message).then(() => {
+              this.closebutton.nativeElement.click();
+              this.listarFrace();
+            });
+          } else {
+            this.alertService.error('Error', resp.message);
+          }
+        },
+        (err) => {
+          this.alertService.error(
+            'Error al actualizar',
+            `${err.status} ${err.statusText}`
+          );
         }
-      }, (err => {
-        this.alertService.error('Error al actualizar', `${err.status} ${err.statusText}`);
-      }));
+      );
     }
   }
   editar(id?: string) {
-    this.action = "Editar"
-    this.submitType = "Actualizar";
+    this.action = 'Editar';
+    this.submitType = 'Actualizar';
     this.idFrace = id;
     this.nuevaFrace = true;
     this.fraceaService.obtenerFrace(id).subscribe((resp) => {
       this.fraceForm.patchValue({
         intencion: resp.intencion,
         frace: resp.frace,
-        activo: resp.activo
+        activo: resp.activo,
       });
     });
   }
@@ -183,11 +198,9 @@ export class PhracesComponent implements OnInit {
         text: frace.frace,
         showConfirmButton: true,
         showCancelButton: true,
-      }).then(resp => {
-
+      }).then((resp) => {
         if (resp.value) {
-
-          this.fraceaService.eliminarFrace(frace.id).subscribe(resp => {
+          this.fraceaService.eliminarFrace(frace.id).subscribe((resp) => {
             if (resp.exito) {
               this.alertService.correcto('', resp.message).then(() => {
                 this.listarFrace();
@@ -202,13 +215,13 @@ export class PhracesComponent implements OnInit {
   }
   exportarReporte() {
     const listar: Listar = {
-      columna: "",
-      search: "",
-      offset: 0,
-      limit: 1000,
-      sort: ""
-    }
-    this.fraceaService.exportarExcel(listar).subscribe(blob => {
+      columna: this.listarForm.value.columna,
+      search: this.listarForm.value.search,
+      offset: this.listarForm.value.offset,
+      limit: this.listarForm.value.limit || 10,
+      sort: this.listarForm.value.sort,
+    };
+    this.fraceaService.exportarExcel(listar).subscribe((blob) => {
       let fileUrl = window.URL.createObjectURL(blob);
       window.open(fileUrl);
     });

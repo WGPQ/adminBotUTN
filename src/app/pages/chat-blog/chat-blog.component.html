@@ -71,14 +71,12 @@
   >
     <div class="card-header" style="background-color: #dd3333">
       <div class="dropdown float-end" style="height: 15px">
-        <button
-          (click)="salir()"
-          type="button"
-          class="btn btn-link btn-lg p-0 text-white"
-          style="display: block"
-        >
-          <i class="uil uil-multiply"></i>
-        </button>
+        <a
+          (click)="enviarChat()"
+          class="social-list-item border-white text-white"
+          style="display: flex; cursor: pointer; justify-content: center"
+          ><i class="uil uil-multiply"></i
+        ></a>
       </div>
       <h2 class="header-title text-white mt-1">Chat</h2>
     </div>
@@ -88,7 +86,7 @@
         #scrollChat
         style="min-height: 100%; height: 400px"
       >
-        <div class="conversation-list">
+        <div id="chat-messages" class="conversation-list">
           <div
             *ngFor="let activity of activities"
             [ngClass]="

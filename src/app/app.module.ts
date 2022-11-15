@@ -1,10 +1,14 @@
-import { NgModule } from '@angular/core';
+import { NgModule, LOCALE_ID } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 
 import { HttpClientModule } from '@angular/common/http'
 
 import { FormsModule, ReactiveFormsModule } from '@angular/forms'
 import { NgxMaskModule, IConfig } from 'ngx-mask'
+
+import {registerLocaleData} from '@angular/common';
+
+import localEs from '@angular/common/locales/es';
 
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
@@ -13,7 +17,6 @@ import { DashboardComponent } from './pages/dashboard/dashboard.component';
 import { LoginComponent } from './auth/login/login.component';
 import { HeaderComponent } from './shared/header/header.component';
 import { SiderbarComponent } from './shared/siderbar/siderbar.component';
-import { BreadcrumbsComponent } from './shared/breadcrumbs/breadcrumbs.component';
 import { NotfoundComponent } from './pages/notfound/notfound.component';
 import { PagesComponent } from './pages/pages.component';
 import { UsuariosComponent } from './pages/usuarios/usuarios.component';
@@ -32,6 +35,9 @@ import { ClientesComponent } from './pages/clientes/clientes.component';
 import { BibliochatComponent } from './pages/bibliochat/bibliochat.component';
 import { ChatBlogComponent } from './pages/chat-blog/chat-blog.component';
 import { ConfiguracionComponent } from './pages/configuracion/configuracion.component';
+import { SessionesComponent } from './pages/sessiones/sessiones.component';
+
+registerLocaleData(localEs);
 const maskConfigFunction: () => Partial<IConfig> = () => {
   return {
     validation: false,
@@ -46,7 +52,6 @@ const maskConfigFunction: () => Partial<IConfig> = () => {
     LoginComponent,
     HeaderComponent,
     SiderbarComponent,
-    BreadcrumbsComponent,
     NotfoundComponent,
     PagesComponent,
     UsuariosComponent,
@@ -64,7 +69,8 @@ const maskConfigFunction: () => Partial<IConfig> = () => {
     ClientesComponent,
     BibliochatComponent,
     ChatBlogComponent,
-    ConfiguracionComponent
+    ConfiguracionComponent,
+    SessionesComponent
   ],
   imports: [
     BrowserModule,
@@ -74,7 +80,10 @@ const maskConfigFunction: () => Partial<IConfig> = () => {
     ReactiveFormsModule,
     NgxMaskModule.forRoot(maskConfigFunction),
   ],
-  providers: [],
+  providers: [{
+    provide: LOCALE_ID,
+    useValue: 'es'
+  }],
   bootstrap: [AppComponent]
 })
 export class AppModule { }

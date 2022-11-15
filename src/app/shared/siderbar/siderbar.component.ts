@@ -32,7 +32,7 @@ export class SiderbarComponent implements OnInit {
   getUsers(rol?: string) {
 
     if (rol != null) {
-      
+
       this.router.navigate(['dashboard/usuarios/' + rol]);
     }
   }
@@ -46,7 +46,7 @@ export class SiderbarComponent implements OnInit {
       columna: "",
       search: "",
       offset: 0,
-      limit: 100,
+      limit: '100',
       sort: ""
     }
     this.rolService.obtenerRoles(listar).subscribe((resp: Rol[]) => {

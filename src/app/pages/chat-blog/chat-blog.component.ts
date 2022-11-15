@@ -12,6 +12,10 @@ import { AuthenticationService } from 'src/app/services/authentication.service';
 import { BibliotecaService } from 'src/app/services/biblioteca.service';
 import { BotService } from 'src/app/services/bot.service';
 import { FormsService } from 'src/app/services/forms.service';
+import html2canvas from 'html2canvas';
+import { SendChat } from 'src/app/interfaces/sendchat.interface';
+import { Cliente } from 'src/app/interfaces/cliente.interface';
+import { ChatService } from 'src/app/services/chat.service';
 
 @Component({
   selector: 'app-chat-blog',
@@ -37,6 +41,7 @@ export class ChatBlogComponent implements OnInit {
   constructor(
     private formService: FormsService,
     private botService: BotService,
+    private chatService:ChatService,
     private authservices: AuthenticationService,
   ) {
     this.chatForm = formService.crearFormularioChatBlog();
@@ -115,10 +120,7 @@ this.loading=true;
       console.log('listeMessages', error);
     }
   }
-  salir(){
-    this.chatId=null;
-    localStorage.removeItem("chat-id");
-  }
+
   sendMessage() {
     if (
       this.mensageForm.valid &&
@@ -136,5 +138,21 @@ this.loading=true;
         console.log('sendMessage', error);
       }
     }
+  }
+  enviarChat() {
+    this.chatId=null;
+    localStorage.removeItem("chat-id");
+    html2canvas(document.querySelector('#chat-messages')!).then((canvas) => {
+      const user:Cliente = {...this.usuario!};
+      const data: SendChat = {
+        image: canvas.toDataURL(),
+        comentario: '',
+        usuario: user,
+      };
+      this.chatService.sendChatCliente(data).subscribe((resp) => {
+        console.log(resp);
+
+      });
+    });
   }
 }

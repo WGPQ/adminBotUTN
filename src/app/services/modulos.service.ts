@@ -31,7 +31,7 @@ export class ModulosService {
       rol: ["Operador", "Administrador"],
       nombre: 'Clientes',
       ruta: "/dashboard/clientes",
-      icon: "uil-users-alt",
+      icon: "uil-user-square",
       submenu: []
     },
     {
@@ -67,7 +67,7 @@ export class ModulosService {
       rol: ["Administrador"],
       nombre: 'Roles',
       ruta: "/dashboard/roles",
-      icon: "uil-users-alt",
+      icon: "uil-lock-access",
       submenu: []
     },
     {

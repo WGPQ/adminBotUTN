@@ -21,6 +21,11 @@ export class IntentsComponent implements OnInit {
   action = "Agregar";
   idIntencion?: string;
   cargando = false;
+  pagina = 0;
+  paginaActiva = 0;
+  numeroPaginas = new Array(1);
+  previus = false;
+  next = true;
   @ViewChild('closebutton') closebutton: any;
   constructor(
     private intencionService: IntencionService,
@@ -35,6 +40,34 @@ export class IntentsComponent implements OnInit {
   ngOnInit(): void {
     this.listarIntencion();
   }
+  previusPage() {
+    if (this.pagina > 0) {
+      this.pagina -= 10;
+      this.paginaActiva -= 1;
+    }
+    if (this.pagina == 0) {
+      this.previus = false;
+      this.next = true;
+    }
+  }
+  irPagina(nPagina: number) {
+    this.previus = nPagina > 0 ? true : false;
+    this.pagina = nPagina * 10;
+    this.next = this.pagina + 10 < this.intenciones.length ? true : false;
+    this.paginaActiva = nPagina;
+  }
+  nextPage() {
+    if (this.intenciones.length > this.pagina) {
+      this.pagina += 10;
+      this.paginaActiva += 1;
+      this.previus = true;
+      this.next = this.pagina + 10 < this.intenciones.length ? true : false;
+    }
+  }
+
+  limitar() {
+    this.listarIntencion();
+  }
 
   search() {
     if (this.listarForm.value.columna != "") {
@@ -46,11 +79,12 @@ export class IntentsComponent implements OnInit {
       columna: this.listarForm.value.columna,
       search: this.listarForm.value.search,
       offset: this.listarForm.value.offset,
-      limit: this.listarForm.value.limit,
+      limit: this.listarForm.value.limit || 10,
       sort: this.listarForm.value.sort,
     }
     this.intencionService.obtenerIntenciones(listar).subscribe(response => {
       this.intenciones = response;
+      this.numeroPaginas = new Array(Math.ceil(this.intenciones.length / 10));
       this.cargando = false;
     });
   }
@@ -148,14 +182,14 @@ export class IntentsComponent implements OnInit {
       });
     }
   }
-  
+
   exportarReporte() {
     const listar: Listar = {
-      columna: "",
-      search: "",
-      offset: 0,
-      limit: 1000,
-      sort: ""
+      columna: this.listarForm.value.columna,
+      search: this.listarForm.value.search,
+      offset: this.listarForm.value.offset,
+      limit: this.listarForm.value.limit || 10,
+      sort: this.listarForm.value.sort,
     }
     this.intencionService.exportarExcel(listar).subscribe(blob => {
       let fileUrl = window.URL.createObjectURL(blob);

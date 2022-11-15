@@ -10,11 +10,11 @@ import { ClientesComponent } from './pages/clientes/clientes.component';
 import { ConfiguracionComponent } from './pages/configuracion/configuracion.component';
 import { DashboardComponent } from './pages/dashboard/dashboard.component';
 import { IntentsComponent } from './pages/intents/intents.component';
-import { NotfoundComponent } from './pages/notfound/notfound.component';
 import { PagesComponent } from './pages/pages.component';
 import { PerfilComponent } from './pages/perfil/perfil.component';
 import { PhracesComponent } from './pages/phraces/phraces.component';
 import { RolesComponent } from './pages/roles/roles.component';
+import { SessionesComponent } from './pages/sessiones/sessiones.component';
 import { UsuariosComponent } from './pages/usuarios/usuarios.component';
 
 const routes: Routes = [
@@ -30,6 +30,7 @@ const routes: Routes = [
       { path: 'fraces', component: PhracesComponent },
       { path: 'intenciones', component: IntentsComponent },
       { path: 'configuracion', component: ConfiguracionComponent },
+      { path: 'chats/:id', component: SessionesComponent },
       // { path: '', redirectTo: '/dashboard', pathMatch: 'full' },
     ]
   },

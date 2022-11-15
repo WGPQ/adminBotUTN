@@ -35,7 +35,7 @@ export class DashboardComponent implements OnInit {
       columna: '',
       search: '',
       offset: 0,
-      limit: 0,
+      limit: '0',
       sort: '',
     }
     // this.clienteService.obtenerClientes(listar).subscribe((resp) => {

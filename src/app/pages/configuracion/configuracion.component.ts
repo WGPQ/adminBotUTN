@@ -78,7 +78,7 @@ export class ConfiguracionComponent implements OnInit {
       columna: '',
       search: '',
       offset: 0,
-      limit: 10,
+      limit: '10',
       sort: '',
     };
     this.configServices

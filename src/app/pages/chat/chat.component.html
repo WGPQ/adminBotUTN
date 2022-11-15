@@ -1,4 +1,12 @@
 <div class="row">
+  <div class="col-12">
+    <div class="page-title-box">
+      <h4 class="page-title">Chat</h4>
+    </div>
+  </div>
+</div>
+
+<div class="row">
   <!-- start chat users-->
   <div class="col-xl-3 order-xl-1">
     <div class="card">
@@ -40,7 +48,7 @@
                   <div *ngIf="solicitudes.length > 0">
                     <a *ngFor="let solicitud of solicitudes" class="text-body">
                       <div class="d-flex align-items-start mt-1 p-2">
-                        <img
+                        <!-- <img
                           [src]="
                             'https://avatars.dicebear.com/api/initials/' +
                             solicitud.from.name +
@@ -49,7 +57,12 @@
                           class="me-2 rounded-circle"
                           height="48"
                           alt="Brandon Smith"
-                        />
+                        /> -->
+                        <div class="circle" [ngStyle]="{ 'background-color': circleColor }">
+                          <div class="initials">
+                            {{ "AJ" }}
+                          </div>
+                        </div>
                         <div class="w-100 overflow-hidden">
                           <h5 class="mt-0 mb-0 font-14">
                             <span class="float-end text-muted font-12">{{
@@ -91,16 +104,38 @@
               <!-- End col -->
             </div>
             <!-- end users -->
-            <button  class="btn btn-info m-2"  href="#interacciones" (click)="sendComandos(1)">Conectar</button>
-          <button class="btn btn-info m-2 " data-bs-toggle="">Ayuda</button>
+            <button
+              class="btn btn-info m-2"
+              href="#interacciones"
+              (click)="sendComandos(1)"
+            >
+              Conectar
+            </button>
+            <button class="btn btn-info m-2" data-bs-toggle="">Ayuda</button>
           </div>
           <div class="tab-pane show p-3" id="comandos">
-          <button  class="btn btn-info mb-2"  href="#interacciones" (click)="sendComandos(1)">Conectar</button>
-          <button  class="btn btn-info mb-2" (click)="sendComandos(2)">Dejar de recibir solicitudes</button>
-          <button  class="btn btn-info mb-2" (click)="sendComandos(3)">Solicitudes Pendientes</button>
-          <button  class="btn btn-info mb-2" (click)="sendComandos(4)">Aceptar Solicitud</button>
-          <button  class="btn btn-info mb-2" (click)="sendComandos(5)">Rechazar Solicitud</button>
-          <button  class="btn btn-info mb-2" (click)="sendComandos(6)">Desconectar</button>
+            <button
+              class="btn btn-info mb-2"
+              href="#interacciones"
+              (click)="sendComandos(1)"
+            >
+              Conectar
+            </button>
+            <button class="btn btn-info mb-2" (click)="sendComandos(2)">
+              Dejar de recibir solicitudes
+            </button>
+            <button class="btn btn-info mb-2" (click)="sendComandos(3)">
+              Solicitudes Pendientes
+            </button>
+            <button class="btn btn-info mb-2" (click)="sendComandos(4)">
+              Aceptar Solicitud
+            </button>
+            <button class="btn btn-info mb-2" (click)="sendComandos(5)">
+              Rechazar Solicitud
+            </button>
+            <button class="btn btn-info mb-2" (click)="sendComandos(6)">
+              Desconectar
+            </button>
           </div>
           <!-- end Tab Pane-->
         </div>
@@ -114,75 +149,81 @@
 
   <!-- chat area -->
   <div class="col-xl-9 order-xl-2">
-<div class="card">
-  <div class="card-body">
-    <div
-    class="container-scroll"
-    #scrollChat
-    style="max-height: 540px; height: 620px;"
-  >
-    <div class="conversation-list ">
-      <div
-        *ngFor="let activity of activities"
-        [ngClass]="
-          activity.from.id === usuario!.id ? 'clearfix odd' : 'clearfix'
-        "
-      >
-        <br />
-        <div class="chat-avatar">
-          <img
-            src=""
-            [src]="
-              activity.from.id === usuario!.id
-                ? 'https://avatars.dicebear.com/api/initials/' +
-                  activity.from.name +
-                  '.svg'
-                : 'assets/images/users/robot.jpg'
-            "
-            alt="Female"
-          />
-          <i>{{ activity.timestamp!.split("T")[1].substring(0, 5) }}</i>
-        </div>
-        <div class="conversation-text">
-          <div class="ctext-wrap chat-widgets-cn">
-            <i>{{ activity.from.name }}</i>
-            <p>{{ activity.text }}</p>
+    <div class="card">
+      <div class="card-body">
+        <div
+          class="container-scroll"
+          #scrollChat
+          style="max-height: 540px; height: 620px"
+        >
+          <div class="conversation-list">
+            <div
+              *ngFor="let activity of activities"
+              [ngClass]="
+                activity.from.id === usuario!.id ? 'clearfix odd' : 'clearfix'
+              "
+            >
+              <br />
+              <div class="chat-avatar">
+                <div class="circle" [ngStyle]="{ 'background-color': circleColor }">
+                  <div class="initials">
+                    {{ "AJ" }}
+                  </div>
+                </div>
+                <!-- <img
+                  src=""
+                  [src]="
+                    activity.from.id === usuario!.id
+                      ? 'https://avatars.dicebear.com/api/initials/' +
+                        activity.from.name +
+                        '.svg'
+                      : 'assets/images/users/robot.jpg'
+                  "
+                  alt="Female"
+                /> -->
+                <i>{{ activity.timestamp!.split("T")[1].substring(0, 5) }}</i>
+              </div>
+
+              <div class="conversation-text">
+                <div class="ctext-wrap chat-widgets-cn">
+                  <i>{{ activity.from.name }}</i>
+                  <p>{{ activity.text }}</p>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
-    </div>
-  </div>
-  <form
-    [formGroup]="mensageForm"
-    (ngSubmit)="guardarMessage()"
-    class="needs-validation"
-    novalidate=""
-    name="chat-form"
-    id="chat-form"
-  >
-    <div class="row">
-      <div class="col">
-        <input
-          type="text"
-          class="form-control chat-input"
-          #txtmessage
-          placeholder="Mensaje ..."
-          formControlName="message"
-        />
-      </div>
-      <div class="col-auto d-grid">
-        <button
-          type="submit"
-          [disabled]="mensageForm.invalid"
-          class="btn btn-info chat-send waves-effect waves-light"
+        <form
+          [formGroup]="mensageForm"
+          (ngSubmit)="guardarMessage()"
+          class="needs-validation"
+          novalidate=""
+          name="chat-form"
+          id="chat-form"
         >
-          <i class="uil uil-message"></i>
-        </button>
+          <div class="row">
+            <div class="col">
+              <input
+                type="text"
+                class="form-control chat-input"
+                #txtmessage
+                placeholder="Mensaje ..."
+                formControlName="message"
+              />
+            </div>
+            <div class="col-auto d-grid">
+              <button
+                type="submit"
+                [disabled]="mensageForm.invalid"
+                class="btn btn-info chat-send waves-effect waves-light"
+              >
+                <i class="uil uil-message"></i>
+              </button>
+            </div>
+          </div>
+        </form>
       </div>
     </div>
-  </form>
-  </div>
-</div>
     <!-- end card -->
   </div>
   <!-- end chat area-->

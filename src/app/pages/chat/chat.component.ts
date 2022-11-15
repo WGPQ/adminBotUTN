@@ -37,11 +37,18 @@ export class ChatComponent implements OnInit {
   usuario?: Usuario;
   public mensageForm: FormGroup;
   loading = false;
+  initials = '';
+  circleColor = '';
+  private colors = [
+    '#EB7181', // red
+    '#468547', // green
+    '#FFD558', // yellow
+    '#3670B2', // blue
+  ];
 
   @HostListener('scroll', ['$event'])
   doSomethingOnScroll($event: Event) {
     let scrollOffset = ($event.target as Element).scrollTop;
-    console.log('scroll: ', scrollOffset);
   }
 
   constructor(
@@ -72,11 +79,13 @@ export class ChatComponent implements OnInit {
   ngOnInit(): void {
     this.scrollToBottom();
     this.getInteractions();
+    const randomIndex = Math.floor(Math.random() * Math.floor(this.colors.length));
+    this.circleColor = this.colors[randomIndex];
   }
 
   reaccionarSolicitud(message: string) {
     this.botService.sendMessage(message).subscribe((resp) => {
-      console.log(resp);
+
     });
   }
 
@@ -106,7 +115,6 @@ export class ChatComponent implements OnInit {
         cmd = `@${this.usuario?.nombres} Watch`;
         break;
     }
-    console.log(cmd);
 
     this.botService.sendMessage(cmd).subscribe((resp) => {
       console.log(resp);
@@ -118,7 +126,7 @@ export class ChatComponent implements OnInit {
       columna: '',
       search: '',
       offset: 0,
-      limit: 100,
+      limit: '100',
       sort: '',
     };
     this.idChat = idChat;
@@ -179,7 +187,7 @@ export class ChatComponent implements OnInit {
       columna: '',
       search: '',
       offset: 0,
-      limit: 100,
+      limit: '100',
       sort: '',
     };
     this.loading = true;

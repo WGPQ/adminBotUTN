@@ -1,5 +1,13 @@
 <div class="row">
   <div class="col-12">
+      <div class="page-title-box">
+          <h4 class="page-title">Configuracion</h4>
+      </div>
+  </div>
+</div>
+
+<div class="row">
+  <div class="col-12">
     <div class="card">
       <div class="card-body">
         <div class="table-responsive">
@@ -26,14 +34,12 @@
                 <td>{{ disp.hora_inicio | textElipsis: 60 }}</td>
                 <td>{{ disp.hora_fin | textElipsis: 60 }}</td>
                 <td>
-                  <i
+                  <span
                     [ngClass]="
-                      disp.activo
-                        ? 'mdi mdi-circle me-2 text-success'
-                        : 'mdi mdi-circle me-2 text-danger'
+                    disp.activo ? 'badge bg-success' : 'badge bg-danger'
                     "
-                  ></i
-                  >{{ disp.activo | activo }}
+                    >{{ disp.activo | activo }}</span
+                  >
                 </td>
                 <td>
                   <a
