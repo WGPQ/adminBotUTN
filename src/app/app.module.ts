@@ -42,7 +42,7 @@ import { SessionesComponent } from './pages/sessiones/sessiones.component';
 import { SetAccountState } from './store/Account/account.state';
 import { PostSolicitudesState } from './store/Solicitudes/solicitudes.state';
 import { RouterModule } from '@angular/router';
-// import { NgChartsModule } from 'ng2-charts';
+import { NgChartsModule } from 'ng2-charts';
 
 registerLocaleData(localEs);
 const maskConfigFunction: () => Partial<IConfig> = () => {
@@ -81,7 +81,7 @@ const maskConfigFunction: () => Partial<IConfig> = () => {
   ],
   imports: [
     BrowserModule,
-    // NgChartsModule,
+    NgChartsModule,
     AppRoutingModule,
     HttpClientModule,
     FormsModule,
