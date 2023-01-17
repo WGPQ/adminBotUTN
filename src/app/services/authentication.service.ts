@@ -1,20 +1,25 @@
 import { Injectable } from '@angular/core';
-import { HttpClient, HttpErrorResponse, HttpHeaders, HttpParams } from '@angular/common/http';
+import {
+  HttpClient,
+  HttpErrorResponse,
+  HttpHeaders,
+} from '@angular/common/http';
 import { Login } from '../interfaces/login.interface';
 import { Observable, of, Subject, throwError } from 'rxjs';
-import { catchError, map, tap } from 'rxjs/operators'
+import { catchError, map, tap } from 'rxjs/operators';
 import * as crypto from 'crypto-js';
-import * as signalR from "@microsoft/signalr"
+import * as signalR from '@microsoft/signalr';
 import { environment } from 'src/environments/environment';
 import { AlertService } from './alert.service';
 import { Router } from '@angular/router';
 import { Usuario } from '../interfaces/usuarios.interface';
+import { Store } from '@ngxs/store';
+import { SetAccount } from '../store/Account/account.actions';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class AuthenticationService {
-
   appUrl = environment.baseUrl;
   apiUrl = environment.apiLogin;
   secret = environment.secret;
@@ -23,7 +28,7 @@ export class AuthenticationService {
   idUserRol!: string;
   usuario!: Usuario;
 
-  private hubConnection: signalR.HubConnection | undefined
+  private hubConnection: signalR.HubConnection | undefined;
   public startConnection = () => {
     this.hubConnection = new signalR.HubConnectionBuilder()
       .withUrl(environment.hubConnectionURL)
@@ -31,17 +36,14 @@ export class AuthenticationService {
     this.hubConnection
       .start()
       .then(() => console.log('Connection started'))
-      .catch(err => console.log('Error while starting connection: ' + err))
-  }
+      .catch((err) => console.log('Error while starting connection: ' + err));
+  };
 
   public addTransferChartDataListener = () => {
     this.hubConnection!.on('transferchartdata', (data) => {
-
       console.log(data);
     });
-  }
-
-
+  };
 
   // private  connection: any = new signalR.HubConnectionBuilder().withUrl(environment.hubConnectionURL)   // mapping to the chathub as in startup.cs
   // .configureLogging(signalR.LogLevel.Information)
@@ -51,7 +53,8 @@ export class AuthenticationService {
   constructor(
     private http: HttpClient,
     private router: Router,
-    private alertService: AlertService
+    private alertService: AlertService,
+    private store: Store
   ) {
     this.leerToken();
     this.leerIdUserRol();
@@ -69,9 +72,9 @@ export class AuthenticationService {
   httpOptions = {
     headers: new HttpHeaders({
       'Content-Type': 'application/json',
-      'Authorization': 'Bearer ' + this.leerToken(),
-    })
-  }
+      Authorization: 'Bearer ' + this.leerToken(),
+    }),
+  };
 
   //   private mapReceivedMessage(user: string, message: string): void {
   //     // this.receivedMessageObject.user = user;
@@ -93,67 +96,77 @@ export class AuthenticationService {
   //   }
   // }
   acceso(login: Login): Observable<boolean> {
-    return this.http.post(this.appUrl + this.apiUrl+"/login/portal", login).pipe(
-      map((resp: any) => {
-        if (resp.exito) {
-          this.guardarToken(resp.token);
-          this.guardarSession(resp.id_session);
-        } else {
-          this.alertService.error('', resp.message);
-        }
-        return resp.exito;
-      }),
-      catchError(this.errorHandler)
-    );
+    return this.http
+      .post(this.appUrl + this.apiUrl + '/login/portal', login)
+      .pipe(
+        map((resp: any) => {
+          if (resp?.exito) {
+            this.guardarToken(resp.token);
+            this.guardarSession(resp.id_session);
+          } else {
+            this.alertService.error('', resp.message);
+          }
+          return resp.exito;
+        }),
+        catchError(this.errorHandler)
+      );
   }
   acceso_chat_blog(correo: string): Observable<boolean> {
-    return this.http.post(this.appUrl + this.apiUrl+"/login/chatbot", {correo}).pipe(
-      map((resp: any) => {
-        if (resp.exito) {
-          this.guardarToken(resp.token);
-          this.guardarSession(resp.id_session);
-        } else {
-          this.alertService.error('', resp.message);
-        }
-        return resp.exito;
-      }),
-      catchError(this.errorHandler)
-    );
+    return this.http
+      .post(this.appUrl + this.apiUrl + '/login/chatbot', { correo })
+      .pipe(
+        map((resp: any) => {
+          if (resp.exito) {
+            this.guardarToken(resp.token);
+            this.guardarSession(resp.id_session);
+          } else {
+            this.alertService.error('', resp.message);
+          }
+          return resp.exito;
+        }),
+        catchError(this.errorHandler)
+      );
   }
 
   cerrarSesion() {
-   var session_id=this.leerSession();
-    this.logout(session_id).subscribe(resp=>{
-      if(resp.exito){
+    var session_id = this.leerSession();
+    this.logout(session_id).subscribe((resp) => {
+      if (resp.exito) {
         this.access_token = '';
         sessionStorage.removeItem('acces-token');
         sessionStorage.removeItem('user-key');
         this.router.navigate(['/login']);
       }
-    })
-
+    });
   }
 
   resetearClave(id?: string): Observable<any> {
-    return this.http.get(this.appUrl + this.apiUrl + '/resetear/' + id, this.httpOptions);
+    return this.http.get(
+      this.appUrl + this.apiUrl + '/resetear/' + id,
+      this.httpOptions
+    );
   }
 
   actualizarClave(clave?: string, token?: string): Observable<any> {
     var headers = new HttpHeaders({
       'Content-Type': 'application/json',
-      'Authorization': 'Bearer ' + token
-    })
+      Authorization: 'Bearer ' + token,
+    });
     let data = {
-      'clave': clave
+      clave: clave,
     };
-    return this.http.post(this.appUrl + this.apiUrl + '/actualizar', data, { headers: headers });
+    return this.http.post(this.appUrl + this.apiUrl + '/actualizar', data, {
+      headers: headers,
+    });
   }
   logout(session?: string): Observable<any> {
-    return this.http.get(this.appUrl + this.apiUrl + '/logout/'+session, {headers:{'Authorization': 'Bearer ' + this.leerToken()}});
+    return this.http.get(this.appUrl + this.apiUrl + '/logout/' + session, {
+      headers: { Authorization: 'Bearer ' + this.leerToken() },
+    });
   }
 
   guardarSession(session: string) {
-    this.session=session;
+    this.session = session;
     sessionStorage.setItem('session', session);
   }
   guardarToken(token: string) {
@@ -164,6 +177,10 @@ export class AuthenticationService {
   guardarIdUserRol(id: string) {
     this.idUserRol = crypto.AES.encrypt(id.toString(), this.secret).toString();
     sessionStorage.setItem('user-key', this.idUserRol);
+  }
+  actualizarUsuario(usuario: Usuario) {
+    console.log(usuario);
+    this.usuario = usuario;
   }
 
   leerSession() {
@@ -201,8 +218,6 @@ export class AuthenticationService {
     if (error.error instanceof ErrorEvent) {
       // A client-side or network error occurred. Handle it accordingly.
       //console.error('An error occurred:', error.error.message);
-
-
     } else {
       // The backend returned an unsuccessful response code.
       // The response body may contain clues as to what went wrong,
@@ -210,28 +225,56 @@ export class AuthenticationService {
       //this.alertService.error('error.statusText','error.message');
     }
     // return an observable with a user-facing error message
-    return throwError(
-      error.error);
+    return throwError(error.error);
   }
 
   verificarToken(): Observable<boolean> {
     var headers = new HttpHeaders({
       'Content-Type': 'application/json',
-      'Authorization': 'Bearer ' + this.leerToken()
-    })
-    return this.http.get(this.appUrl + this.apiUrl + '/verificar/token', { headers: headers }).pipe(
-      map((resp: any) => {
-        if (resp.exito) {
-          this.guardarToken(resp.data.token);
-          const { id, nombres, apellidos, nombre_completo, telefono, correo, id_rol,rol, activo, verificado } = resp.data.usuario;
-          this.guardarIdUserRol(id)
-          this.usuario = new Usuario(id, nombres, apellidos, nombre_completo, correo, telefono, '',id_rol, rol, activo, verificado);
-        } else {
-          this.alertService.error('', resp.message);
-        }
-        return true;
-      }),
-      catchError(error => of(false))
-    );
+      Authorization: 'Bearer ' + this.leerToken(),
+    });
+    return this.http
+      .get(this.appUrl + this.apiUrl + '/verificar/token', { headers: headers })
+      .pipe(
+        map((resp: any) => {
+          if (resp?.exito) {
+            this.guardarToken(resp?.data?.token);
+            const {
+              id,
+              nombres,
+              apellidos,
+              nombre_completo,
+              telefono,
+              correo,
+              id_rol,
+              rol,
+              activo,
+              verificado,
+            } = resp?.data?.usuario;
+            this.guardarIdUserRol(id);
+            this.usuario = new Usuario(
+              id,
+              nombres,
+              apellidos,
+              nombre_completo,
+              correo,
+              telefono,
+              '',
+              id_rol,
+              rol,
+              activo,
+              verificado
+            );
+            this.store.dispatch(new SetAccount(this.usuario));
+          } else {
+            this.alertService.error('', resp?.message);
+          }
+          return true;
+        }),
+        catchError((error) => {
+          console.log(error);
+          return of(false);
+        })
+      );
   }
 }

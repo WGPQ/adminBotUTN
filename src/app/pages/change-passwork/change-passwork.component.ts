@@ -5,61 +5,96 @@ import { Usuario } from 'src/app/interfaces/usuarios.interface';
 import { AlertService } from 'src/app/services/alert.service';
 import { AuthenticationService } from 'src/app/services/authentication.service';
 import { FormsService } from 'src/app/services/forms.service';
+import { HelpersService } from 'src/app/services/helpers.service';
 import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-change-passwork',
   templateUrl: './change-passwork.component.html',
-  styles: [
-  ]
+  styleUrls: ['./change-passwork.component.css'],
 })
 export class ChangePassworkComponent implements OnInit {
   actualizarForm!: FormGroup;
   usuario?: Usuario;
   loading: boolean = true;
   token: string;
+  showPassword1: Boolean = false;
+  showPassword2: Boolean = false;
+  passwordtype1: String = 'password';
+  passwordtype2: String = 'password';
+  classhow1: String = 'far fa-eye-slash nav-icon';
+  classhow2: String = 'far fa-eye-slash nav-icon';
   constructor(
     private formService: FormsService,
     private authservices: AuthenticationService,
     private alertService: AlertService,
+    private helperService: HelpersService,
     private router: Router
   ) {
     this.actualizarForm = formService.crearFormularioActualizarPass();
-    this.token = sessionStorage.getItem('acces-token') ?? "";
+    this.token = sessionStorage.getItem('acces-token') ?? '';
     sessionStorage.removeItem('acces-token');
   }
 
   ngOnInit(): void {
-    if (this.token != "") {
-      this.usuario = this.authservices.usuario;
+    if (this.token != '') {
+      this.usuario = this.authservices?.usuario;
       if (this.usuario != null) {
         this.loading = false;
       }
     } else {
       this.router.navigate(['/login']);
     }
-
-
   }
   get clave1NoValido() {
-    return this.actualizarForm.get('clave')?.invalid && this.actualizarForm.get('clave')?.touched;
+    return (
+      this.actualizarForm.get('clave')?.invalid &&
+      this.actualizarForm.get('clave')?.touched
+    );
   }
 
   get clave2NoValido() {
     const pass1 = this.actualizarForm.get('clave')?.value;
     const pass2 = this.actualizarForm.get('rclave')?.value;
-    return (pass1 == pass2) ? false : true;
+    return pass1 == pass2 ? false : true;
   }
 
+  initialsName(name: string) {
+    return this.helperService.initialLettersName(name);
+  }
+  visibilitiPassword(option: number) {
+    if (option === 1) {
+      if (!this.showPassword1) {
+        this.showPassword1 = true;
+        this.passwordtype1 = 'password';
+        this.classhow1 = 'far fa-eye-slash nav-icon';
+      } else {
+        this.showPassword1 = false;
+        this.passwordtype1 = 'text';
+        this.classhow1 = 'far fa-eye nav-icon';
+      }
+    }
+    if (option === 2) {
+      if (!this.showPassword2) {
+        this.showPassword2 = true;
+        this.passwordtype2 = 'password';
+        this.classhow2 = 'far fa-eye-slash nav-icon';
+      } else {
+        this.showPassword2 = false;
+        this.passwordtype2 = 'text';
+        this.classhow2 = 'far fa-eye nav-icon';
+      }
+    }
+  }
   actualizarPassword() {
     let clave = this.actualizarForm.value.clave;
-    this.authservices.actualizarClave(clave, this.token).subscribe(resp => {
-      if (resp.exito) {
-        this.alertService.correcto("", resp.message);
+    this.authservices.actualizarClave(clave, this.token).subscribe((resp) => {
+      if (resp?.exito) {
+        this.alertService.correcto('', resp?.message);
         this.authservices.cerrarSesion();
         this.router.navigate(['/login']);
       } else {
-        this.alertService.error("Error al ingresar", resp.message);
+        this.alertService.error('Error al ingresar', resp?.message);
       }
     });
   }
@@ -71,10 +106,8 @@ export class ChangePassworkComponent implements OnInit {
       if (pass1Control.value === pass2Control.value) {
         pass2Control.setErrors(null);
       } else {
-        pass2Control.setErrors({ noEsIgual: true })
+        pass2Control.setErrors({ noEsIgual: true });
       }
-    }
+    };
   }
-
-
 }

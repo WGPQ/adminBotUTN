@@ -1,0 +1,15 @@
+.circleHeader {
+  border-radius   : 50%;
+  width           : 40px;
+  height          : 40px;
+  display         : flex;
+  justify-content : center;
+  align-items     : center;
+}
+
+.initialsHeader {
+      color         : #FFFFFF;
+      font-size     : 15px;
+      line-height   : 14px;
+      letter-spacing: 0.2625px;
+}

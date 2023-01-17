@@ -1,0 +1,15 @@
+.circlePerfil {
+  border-radius   : 50%;
+  width           : 100px;
+  height          : 100px;
+  display         : flex;
+  justify-content : center;
+  align-items     : center;
+}
+
+.initialsPerfil {
+      color         : #FFFFFF;
+      font-size     : 30px;
+      line-height   : 20px;
+      letter-spacing: 0.2625px;
+}

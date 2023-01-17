@@ -1,15 +1,18 @@
+
 import { NgModule, LOCALE_ID } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
+import { NgxsModule } from '@ngxs/store';
+import { NgxsReduxDevtoolsPluginModule } from '@ngxs/devtools-plugin';
+import { NgxsLoggerPluginModule } from '@ngxs/logger-plugin';
+import { environment } from 'src/environments/environment';
 
-import { HttpClientModule } from '@angular/common/http'
+import { HttpClientModule } from '@angular/common/http';
 
-import { FormsModule, ReactiveFormsModule } from '@angular/forms'
-import { NgxMaskModule, IConfig } from 'ngx-mask'
-
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
+import { NgxMaskModule, IConfig } from 'ngx-mask';
 import {registerLocaleData} from '@angular/common';
 
 import localEs from '@angular/common/locales/es';
-
 import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 import { PerfilComponent } from './pages/perfil/perfil.component';
@@ -36,6 +39,10 @@ import { BibliochatComponent } from './pages/bibliochat/bibliochat.component';
 import { ChatBlogComponent } from './pages/chat-blog/chat-blog.component';
 import { ConfiguracionComponent } from './pages/configuracion/configuracion.component';
 import { SessionesComponent } from './pages/sessiones/sessiones.component';
+import { SetAccountState } from './store/Account/account.state';
+import { PostSolicitudesState } from './store/Solicitudes/solicitudes.state';
+import { RouterModule } from '@angular/router';
+// import { NgChartsModule } from 'ng2-charts';
 
 registerLocaleData(localEs);
 const maskConfigFunction: () => Partial<IConfig> = () => {
@@ -74,11 +81,22 @@ const maskConfigFunction: () => Partial<IConfig> = () => {
   ],
   imports: [
     BrowserModule,
+    // NgChartsModule,
     AppRoutingModule,
     HttpClientModule,
     FormsModule,
+    RouterModule,
     ReactiveFormsModule,
     NgxMaskModule.forRoot(maskConfigFunction),
+    NgxsModule.forRoot([SetAccountState, PostSolicitudesState], {
+      developmentMode: !environment.production,
+    }),
+    NgxsReduxDevtoolsPluginModule.forRoot({
+      disabled: environment.production,
+    }),
+    NgxsLoggerPluginModule.forRoot({
+      disabled: environment.production,
+    }),
   ],
   providers: [{
     provide: LOCALE_ID,
@@ -87,3 +105,4 @@ const maskConfigFunction: () => Partial<IConfig> = () => {
   bootstrap: [AppComponent]
 })
 export class AppModule { }
+

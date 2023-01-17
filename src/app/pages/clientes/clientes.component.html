@@ -18,19 +18,19 @@
                 autocomplete="off"
                 class="row gy-2 gx-2 align-items-center justify-content-xl-start justify-content-between"
               >
-              <div class="col-auto">
-                <select
-                  class="form-select"
-                  id="status-select"
-                  (change)="limitar()"
-                  formControlName="limit"
-                >
-                  <option selected value="10">10</option>
-                  <option value="20">20</option>
-                  <option value="50">50</option>
-                  <option value="200">200</option>
-                </select>
-              </div>
+                <div class="col-auto">
+                  <select
+                    class="form-select"
+                    id="status-select"
+                    (change)="limitar()"
+                    formControlName="limit"
+                  >
+                    <option selected value="10">10</option>
+                    <option value="20">20</option>
+                    <option value="50">50</option>
+                    <option value="200">200</option>
+                  </select>
+                </div>
                 <div class="col-auto">
                   <label for="inputPassword2" class="visually-hidden"
                     >Buscar</label
@@ -99,9 +99,14 @@
                 </tr>
               </thead>
               <tbody>
-                <tr *ngFor="let cliente of clientes | filtro: pagina; let i = index">
+                <tr
+                  *ngFor="
+                    let cliente of clientes | filtro : pagina;
+                    let i = index
+                  "
+                >
                   <td>
-                    <a class="text-body fw-bold">{{ (i +1 )+ pagina }}</a>
+                    <a class="text-body fw-bold">{{ i + 1 + pagina }}</a>
                   </td>
                   <td>{{ cliente.nombres }}</td>
                   <td>{{ cliente.apellidos }}</td>
@@ -287,7 +292,13 @@
 
   <div class="card">
     <div class="card-header">
-      <button (click)="backClients()">Atras</button>
+      <button
+        type="button"
+        (click)="backClients()"
+        class="btn btn-outline-info btn-rounded"
+      >
+        <i class="mdi mdi-keyboard-backspace"></i> Atrás
+      </button>
     </div>
 
     <div class="card-body">
@@ -353,7 +364,7 @@
                             >
                           </h5>
                           <p class="mt-1 mb-0 text-muted font-13">
-                            {{ session.inicio | date: "EEE d MMM y HH:mm" }}
+                            {{ session.inicio | date : "EEE d MMM y HH:mm" }}
                           </p>
                         </div>
                       </div>
@@ -402,7 +413,7 @@
                   Bot - {{ usuario.nombre_completo }}
                 </h2>
                 <h6>
-                  {{ fecha_chat_seleccionado | date: "EEEE d MMMM y" }}
+                  {{ fecha_chat_seleccionado | date : "EEEE d MMMM y" }}
                 </h6>
               </div>
             </div>
@@ -456,7 +467,7 @@
                         <!-- <i>{{
                           message.createdAt!.split("T")[1].substring(0, 5)
                         }}</i> -->
-                        <i> {{ message.createdAt | date: "HH:mm" }}</i>
+                        <i> {{ message.createdAt | date : "HH:mm" }}</i>
                       </div>
                       <div class="conversation-text">
                         <div class="ctext-wrap chat-widgets-cn">

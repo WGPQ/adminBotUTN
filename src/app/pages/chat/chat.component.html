@@ -6,156 +6,104 @@
   </div>
 </div>
 
-<div class="row">
+<div *ngIf="isInitialized" class="row">
   <!-- start chat users-->
-  <div class="col-xl-3 order-xl-1">
+  <div class="col-xl-4 order-xl-1">
     <div class="card">
-      <div class="card-body p-0">
-        <ul class="nav nav-tabs nav-bordered">
-          <li class="nav-item">
+      <div class="card-body pb-0" >
+        <div class="dropdown float-end">
+          <a
+            href="#"
+            class="dropdown-toggle arrow-none card-drop"
+            data-bs-toggle="dropdown"
+            aria-expanded="false"
+          >
+            <i class="mdi mdi-dots-horizontal"></i>
+          </a>
+          <div class="dropdown-menu dropdown-menu-end">
+            <!-- item-->
             <a
-              href="#interacciones"
-              data-bs-toggle="tab"
-              aria-expanded="false"
-              class="nav-link active py-2"
+              href="javascript:void(0);"
+              (click)="closeChat()"
+              class="dropdown-item"
+              >Cerrar Chat</a
             >
-              Interacciones
-            </a>
-          </li>
-          <li class="nav-item">
+          </div>
+        </div>
+
+        <h4 class="header-title mb-3">Solicitudes</h4>
+        <div
+          class="inbox-widget container-scroll"
+          (scroll)="doSomethingOnScroll($event)"
+          #scrollMessages
+          style="height: 65vh"
+        >
+          <div *ngFor="let solicitud of solicitudes">
             <a
-              href="#comandos"
-              data-bs-toggle="tab"
-              aria-expanded="true"
-              class="nav-link py-2"
+              class="inbox-item"
+              href="javascript:void(0);"
+              (click)="selectChat(solicitud?.id)"
             >
-              Comandos
-            </a>
-          </li>
-        </ul>
-        <!-- end nav-->
-        <div class="tab-content">
-          <div class="tab-pane show active p-3" id="interacciones">
-            <!-- users -->
-            <div class="row">
-              <div class="col">
+              <div class="inbox-item-img">
                 <div
-                  class="container-scroll"
-                  (scroll)="doSomethingOnScroll($event)"
-                  #scrollMessages
-                  style="height: 450px"
+                  class="circle"
+                  [ngStyle]="{ 'background-color': solicitud?.color }"
                 >
-                  <div *ngIf="solicitudes.length > 0">
-                    <a *ngFor="let solicitud of solicitudes" class="text-body">
-                      <div class="d-flex align-items-start mt-1 p-2">
-                        <!-- <img
-                          [src]="
-                            'https://avatars.dicebear.com/api/initials/' +
-                            solicitud.from.name +
-                            '.svg'
-                          "
-                          class="me-2 rounded-circle"
-                          height="48"
-                          alt="Brandon Smith"
-                        /> -->
-                        <div class="circle" [ngStyle]="{ 'background-color': circleColor }">
-                          <div class="initials">
-                            {{ "AJ" }}
-                          </div>
-                        </div>
-                        <div class="w-100 overflow-hidden">
-                          <h5 class="mt-0 mb-0 font-14">
-                            <span class="float-end text-muted font-12">{{
-                              solicitud.timestamp!.split("T")[1].substring(0, 5)
-                            }}</span>
-                            {{ solicitud.from.name }}
-                          </h5>
-                          <p class="mt-1 mb-0 text-muted font-14">
-                            <a
-                              (click)="
-                                reaccionarSolicitud(
-                                  solicitud?.attachments[0]?.content?.buttons[0]
-                                    ?.value
-                                )
-                              "
-                              class="btn btn-sm px-1 btn-success"
-                              ><i class="mdi mdi-comment-check mdi-18px"></i
-                            ></a>
-                            <a
-                              (click)="
-                                reaccionarSolicitud(
-                                  solicitud?.attachments[0]?.content?.buttons[1]
-                                    ?.value
-                                )
-                              "
-                              class="btn btn-sm px-1 btn-danger"
-                              ><i class="mdi mdi-comment-remove mdi-18px"></i
-                            ></a>
-                          </p>
-                        </div>
-                      </div>
-                    </a>
+                  <div class="initials">
+                    {{ initialsName(solicitud?.from?.name) }}
                   </div>
                 </div>
-                <!-- end slimscroll-->
-
-                <!-- end slimscroll-->
               </div>
-              <!-- End col -->
-            </div>
-            <!-- end users -->
-            <button
-              class="btn btn-info m-2"
-              href="#interacciones"
-              (click)="sendComandos(1)"
-            >
-              Conectar
-            </button>
-            <button class="btn btn-info m-2" data-bs-toggle="">Ayuda</button>
+              <p class="inbox-item-author">{{ solicitud?.from?.name }}</p>
+              <p class="inbox-item-text">
+                {{ solicitud?.timestamp | date : "EEE d MMM y HH:mm" }}
+              </p>
+              <p *ngIf="!solicitud?.accept" class="inbox-item-date">
+                <button
+                  type="button"
+                  (click)="
+                    reaccionarSolicitud(
+                      true,
+                      solicitud?.id,
+                      solicitud?.attachments
+                    )
+                  "
+                  class="btn btn-sm btn-outline-primary px-1 py-0"
+                >
+                  <i class="uil uil-check font-16"></i>
+                </button>
+                <button
+                  type="button"
+                  (click)="
+                    reaccionarSolicitud(
+                      false,
+                      solicitud?.id,
+                      solicitud?.attachments
+                    )
+                  "
+                  class="btn btn-sm btn-outline-danger px-1 py-0 mx-1"
+                >
+                  <i class="uil uil-times font-16"></i>
+                </button>
+              </p>
+              <hr />
+            </a>
           </div>
-          <div class="tab-pane show p-3" id="comandos">
-            <button
-              class="btn btn-info mb-2"
-              href="#interacciones"
-              (click)="sendComandos(1)"
-            >
-              Conectar
-            </button>
-            <button class="btn btn-info mb-2" (click)="sendComandos(2)">
-              Dejar de recibir solicitudes
-            </button>
-            <button class="btn btn-info mb-2" (click)="sendComandos(3)">
-              Solicitudes Pendientes
-            </button>
-            <button class="btn btn-info mb-2" (click)="sendComandos(4)">
-              Aceptar Solicitud
-            </button>
-            <button class="btn btn-info mb-2" (click)="sendComandos(5)">
-              Rechazar Solicitud
-            </button>
-            <button class="btn btn-info mb-2" (click)="sendComandos(6)">
-              Desconectar
-            </button>
-          </div>
-          <!-- end Tab Pane-->
         </div>
-        <!-- end tab content-->
+        <!-- end inbox-widget -->
       </div>
-      <!-- end card-body-->
+      <!-- end card-body -->
     </div>
+
     <!-- end card-->
   </div>
   <!-- end chat users-->
 
   <!-- chat area -->
-  <div class="col-xl-9 order-xl-2">
-    <div class="card">
+  <div class="col-xl-8 order-xl-2">
+    <div class="card" >
       <div class="card-body">
-        <div
-          class="container-scroll"
-          #scrollChat
-          style="max-height: 540px; height: 620px"
-        >
+        <div class="container-scroll" #scrollChat style="height: 63vh" >
           <div class="conversation-list">
             <div
               *ngFor="let activity of activities"
@@ -165,7 +113,10 @@
             >
               <br />
               <div class="chat-avatar">
-                <div class="circle" [ngStyle]="{ 'background-color': circleColor }">
+                <div
+                  class="circle"
+                  [ngStyle]="{ 'background-color': activity?.color }"
+                >
                   <div class="initials">
                     {{ "AJ" }}
                   </div>
@@ -229,5 +180,38 @@
   <!-- end chat area-->
 
   <!-- end user detail -->
+</div>
+
+<div *ngIf="!isInitialized" class="row justify-content-center">
+  <div class="col-xxl-10">
+    <!-- Pricing Title-->
+    <div class="text-center">
+      <h3 class="mb-2">BiblioChat UTN</h3>
+      <p class="text-muted w-50 m-auto">
+        Este servicio esta disponible para brindar servicio de soporte a
+        usuarios de la comunidad universitaria UTN.
+      </p>
+
+      <button
+        type="button"
+        (click)="startWorkChat()"
+        class="btn btn-info mt-4"
+        [disabled]="loadingStartChat"
+      >
+        <i
+          [class]="
+            loadingStartChat
+              ? 'mdi mdi-refresh mdi-spin me-2'
+              : 'mdi mdi-chat-processing-outline mdi-18px me-2'
+          "
+        ></i>
+
+        <span>
+          {{ loadingStartChat ? "Inicializando" : "Empezar" }}
+        </span>
+      </button>
+    </div>
+  </div>
+  <!-- end col-->
 </div>
 <!-- end row-->

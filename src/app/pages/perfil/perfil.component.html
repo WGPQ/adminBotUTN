@@ -1,47 +1,322 @@
-<div *ngIf="!cargando" class="row">
-    <div class="col-xl-12 col-lg-5">
-        <div class="card text-center">
-            <div class="card-body">
-                <img src="assets/images/users/avatar-1.jpg" class="rounded-circle avatar-lg img-thumbnail" alt="profile-image">
-
-                <h4 class="mb-0 mt-2">{{usuario.nombres}} {{usuario.apellidos}}</h4>
-                <p class="text-muted font-14">{{usuario.rol}}</p>
-
-                <button type="button" class="btn btn-success btn-sm mb-2">Follow</button>
-                <button type="button" class="btn btn-danger btn-sm mb-2">Message</button>
-
-                <div class="text-start mt-3">
-                    <h4 class="font-13 text-uppercase">About Me :</h4>
-                    <p class="text-muted font-13 mb-3">
-                        Hi I'm Johnathn Deo,has been the industry's standard dummy text ever since the
-                        1500s, when an unknown printer took a galley of type.
-                    </p>
-                    <p class="text-muted mb-2 font-13"><strong>Nombres Completos :</strong> <span class="ms-2">{{usuario.nombres}} {{usuario.apellidos}}</span></p>
-
-                    <p class="text-muted mb-2 font-13"><strong>Telefono :</strong><span class="ms-2">{{usuario.telefono}}</span></p>
-
-                    <p class="text-muted mb-2 font-13"><strong>Correo :</strong> <span class="ms-2 ">{{usuario.correo}}</span></p>
-
-                    <p class="text-muted mb-1 font-13"><strong>Localidad :</strong> <span class="ms-2">Ecuador</span></p>
-                </div>
-
-                <ul class="social-list list-inline mt-3 mb-0">
-                    <li class="list-inline-item">
-                        <a href="javascript: void(0);" class="social-list-item border-primary text-primary"><i class="mdi mdi-facebook"></i></a>
-                    </li>
-                    <li class="list-inline-item">
-                        <a href="javascript: void(0);" class="social-list-item border-danger text-danger"><i class="mdi mdi-google"></i></a>
-                    </li>
-                    <li class="list-inline-item">
-                        <a href="javascript: void(0);" class="social-list-item border-info text-info"><i class="mdi mdi-twitter"></i></a>
-                    </li>
-                    <li class="list-inline-item">
-                        <a href="javascript: void(0);" class="social-list-item border-secondary text-secondary"><i class="mdi mdi-github"></i></a>
-                    </li>
-                </ul>
-            </div> <!-- end card-body -->
-        </div> <!-- end card -->
-    </div> <!-- end col-->
-
+<div class="row">
+  <div class="col-12">
+    <div class="page-title-box">
+      <h4 class="page-title">Perfil</h4>
+    </div>
+  </div>
 </div>
-<!-- end row-->
+<div *ngIf="!cargando">
+  <div class="row">
+    <div class="col-sm-12">
+      <!-- Profile -->
+      <div class="card bg-primary">
+        <div class="card-body profile-user-box">
+          <div class="row">
+            <div class="col-sm-8">
+              <div class="row align-items-center">
+                <div class="col-auto">
+                  <div class="avatar-lg">
+                    <div class="rounded-circle">
+                      <div
+                        class="circlePerfil"
+                        [ngStyle]="{ 'background-color': '#0DA1E6' }"
+                      >
+                        <div class="initialsPerfil">
+                          {{ initialsName(usuario.nombre_completo!) }}
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="col">
+                  <div>
+                    <h4 class="mt-1 mb-1 text-white">
+                      {{ usuario!.nombre_completo || "" }}
+                    </h4>
+                    <p class="font-13 text-white-50">
+                      {{ usuario!.rol || "" }}
+                    </p>
+
+                    <ul class="mb-0 list-inline text-light">
+                      <li class="list-inline-item">
+                        <h5 class="mb-1">Ultimo inicio de session</h5>
+                        <p class="mb-0 font-13 text-white-50">
+                          Viernes 21 de noviembre del 2022 21:00
+                        </p>
+                      </li>
+                    </ul>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <!-- end col-->
+
+            <div class="col-sm-4">
+              <div class="text-center mt-sm-0 mt-3 text-sm-end">
+                <button
+                  type="button"
+                  data-bs-toggle="modal"
+                  data-bs-target="#scrollable-modal"
+                  class="btn btn-light"
+                  (click)="obtenetPerfil()"
+                >
+                  <i class="mdi mdi-account-edit me-1"></i> Editar Perfil
+                </button>
+              </div>
+              <hr />
+              <div class="text-center mt-sm-0 mt-3 text-sm-end">
+                <button
+                  type="button"
+                  data-bs-toggle="modal"
+                  data-bs-target="#change-password"
+                  class="btn btn-light"
+                  (click)="obtenetPerfil()"
+                >
+                  <i class="mdi mdi-account-key me-1"></i> Cambiar contraseña
+                </button>
+              </div>
+            </div>
+            <!-- end col-->
+          </div>
+          <!-- end row -->
+        </div>
+        <!-- end card-body/ profile-user-box-->
+      </div>
+      <!--end profile/ card -->
+    </div>
+    <!-- end col-->
+  </div>
+  <!-- end row -->
+  <div class="row">
+    <div class="col-xl-12">
+      <!-- Personal-Information -->
+      <div class="card">
+        <div class="card-body">
+          <h4 class="header-title mt-0 mb-3">Informacion del usuario</h4>
+          <hr />
+
+          <div class="text-start">
+            <p class="text-muted">
+              <strong>Nombres completos :</strong>
+              <span class="ms-2">{{ usuario!.nombre_completo || "" }}</span>
+            </p>
+
+            <p class="text-muted">
+              <strong>Teléfono :</strong
+              ><span class="ms-2">{{ usuario!.telefono || "" }}</span>
+            </p>
+
+            <p class="text-muted">
+              <strong>Correo electrónico :</strong>
+              <span class="ms-2">{{ usuario!.correo || "" }}</span>
+            </p>
+
+            <p class="text-muted">
+              <strong>Locación :</strong> <span class="ms-2">Ecuador</span>
+            </p>
+
+            <p class="text-muted">
+              <strong>Rol :</strong>
+              <span class="ms-2"> {{ usuario!.rol || "" }}</span>
+            </p>
+          </div>
+        </div>
+      </div>
+      <!-- Personal-Information -->
+    </div>
+    <!-- end col-->
+  </div>
+  <!-- end row -->
+</div>
+
+<!-- Long Content Scroll Modal -->
+<div
+  class="modal fade"
+  id="scrollable-modal"
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="scrollableModalTitle"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-dialog-scrollable" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="scrollableModalTitle">Actualizar Perfil</h5>
+        <button
+          type="button"
+          #closebutton
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+
+      <div class="modal-body">
+        <form [formGroup]="usuarioForm" autocomplete="off">
+          <div class="ps-3 pe-3">
+            <div class="mb-3">
+              <label for="username" class="form-label">Nombres</label>
+              <input
+                class="form-control"
+                type="text"
+                formControlName="nombres"
+                maxlength="50"
+                [class.is-invalid]="nombresNoValido"
+              />
+              <small *ngIf="nombresNoValido" class="form-text text-danger"
+                >Los nombres son requeridos</small
+              >
+            </div>
+            <div class="mb-3">
+              <label for="username" class="form-label">Apellidos</label>
+              <input
+                class="form-control"
+                type="text"
+                formControlName="apellidos"
+                maxlength="50"
+                [class.is-invalid]="apellidosNoValida"
+              />
+              <small *ngIf="apellidosNoValida" class="form-text text-danger"
+                >Los apellidos son requeridos</small
+              >
+            </div>
+            <div class="mb-3">
+              <label for="username" class="form-label">Teléfono</label>
+              <input
+                class="form-control"
+                type="text"
+                data-toggle="input-mask"
+                data-mask-format="0000-0000"
+                formControlName="telefono"
+                maxlength="20"
+                mask="000 000 0000"
+                [class.is-invalid]="telefonoNoValida"
+              />
+              <small *ngIf="telefonoNoValida" class="form-text text-danger"
+                >El teléfono es requerido</small
+              >
+            </div>
+            <div class="mb-3">
+              <label for="username" class="form-label">Correo</label>
+              <input
+                class="form-control"
+                type="text"
+                formControlName="correo"
+                maxlength="60"
+                [class.is-invalid]="correoNoValido"
+              />
+              <small *ngIf="correoNoValido" class="form-text text-danger"
+                >El correo es invalido</small
+              >
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          Cancelar
+        </button>
+        <button
+          type="button"
+          class="btn btn-primary"
+          [disabled]="usuarioForm.invalid"
+          (click)="actualizarPerfil()"
+        >
+          Actualizar
+        </button>
+      </div>
+    </div>
+    <!-- /.modal-content -->
+  </div>
+  <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
+
+<!-- Long Content Scroll Modal cambio de contrasenia -->
+<div
+  class="modal fade"
+  id="change-password"
+  tabindex="-1"
+  role="dialog"
+  aria-labelledby="scrollableModalTitle"
+  aria-hidden="true"
+>
+  <div class="modal-dialog modal-dialog-scrollable" role="document">
+    <div class="modal-content">
+      <div class="modal-header">
+        <h5 class="modal-title" id="scrollableModalTitle">
+          Cambiar Contraseña
+        </h5>
+        <button
+          type="button"
+          #closebuttonChange
+          class="btn-close"
+          data-bs-dismiss="modal"
+          aria-label="Close"
+        ></button>
+      </div>
+
+      <div class="modal-body">
+        <form [formGroup]="actualizarForm" autocomplete="off">
+          <div class="ps-3 pe-3">
+            <div class="mb-3">
+              <label for="password" class="form-label">Nueva Contraseña</label>
+              <div class="input-group">
+                <input
+                  [type]="passwordtype1"
+                  class="form-control"
+                  formControlName="clave"
+                  maxlength="50"
+                  [class.is-invalid]="clave1NoValido"
+                />
+                <button class="input-group-text" (click)="visibilitiPassword(1)">
+                  <i [class]="classhow1"></i>
+                </button>
+              </div>
+            </div>
+            <small *ngIf="clave1NoValido" class="form-text text-danger"
+              >La contraseña es requerida</small
+            >
+
+            <div class="mb-3">
+              <label for="password" class="form-label"
+                >Confirmar nueva contraseña</label
+              >
+              <div class="input-group">
+                <input
+                  class="form-control"
+                  [type]="passwordtype2"
+                  formControlName="rclave"
+                  maxlength="50"
+                  [class.is-invalid]="clave2NoValido"
+                />
+                <button class="input-group-text" (click)="visibilitiPassword(2)">
+                  <i [class]="classhow2"></i>
+                </button>
+              </div>
+              <small *ngIf="clave2NoValido" class="form-text text-danger"
+                >Las contraseñas no coinciden</small
+              >
+            </div>
+          </div>
+        </form>
+      </div>
+      <div class="modal-footer">
+        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+          Cancelar
+        </button>
+        <button
+          type="button"
+          class="btn btn-primary"
+          [disabled]="actualizarForm.invalid || clave2NoValido"
+          (click)="actualizarPassword()"
+        >
+          Actualizar
+        </button>
+      </div>
+    </div>
+    <!-- /.modal-content -->
+  </div>
+  <!-- /.modal-dialog -->
+</div>
+<!-- /.modal -->
