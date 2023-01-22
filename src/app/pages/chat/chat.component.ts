@@ -12,7 +12,6 @@ import { Listar } from 'src/app/interfaces/listar.interface';
 import { MensageModel } from 'src/app/interfaces/mensaje.interface';
 import { Usuario } from 'src/app/interfaces/usuarios.interface';
 import { AlertService } from 'src/app/services/alert.service';
-import { AuthenticationService } from 'src/app/services/authentication.service';
 import { BibliotecaService } from 'src/app/services/biblioteca.service';
 import { BotService } from 'src/app/services/bot.service';
 import { ChatService } from 'src/app/services/chat.service';
@@ -22,8 +21,8 @@ import { SetAccountState } from 'src/app/store/Account/account.state';
 import { PostSolicitudes } from 'src/app/store/Solicitudes/solicitudes.actions';
 import { PostSolicitudesState } from 'src/app/store/Solicitudes/solicitudes.state';
 import { environment } from 'src/environments/environment';
+import { ConnectionStatus } from 'botframework-directlinejs';
 import Swal from 'sweetalert2';
-import { UsuariosComponent } from '../usuarios/usuarios.component';
 
 @Component({
   selector: 'app-chat',
@@ -39,418 +38,10 @@ export class ChatComponent implements OnInit {
   interactions: Interaction[] = [];
   isInitialized: boolean = false;
   loadingStartChat: boolean = false;
-  solicitudes: any[] = [
-    {
-      color: '#EB7181',
-      type: 'message',
-      accept: false,
-      reject: false,
-      id: 'DamM237uwi7F0iETW6MjW8-us|0000003',
-      timestamp: '2022-12-16T06:52:41.3032109Z',
-      channelId: 'webchat',
-      from: {
-        id: 'bibliochatUTN',
-        name: 'Julio Gonzales',
-      },
-      conversation: {
-        id: 'DamM237uwi7F0iETW6MjW8-us',
-      },
-      attachments: [
-        {
-          contentType: 'application/vnd.microsoft.card.hero',
-          content: {
-            title: 'Solicitud',
-            subtitle: 'Solicitado por el usuario "User" en el canal "Emulator"',
-            text: 'Aceptar o rechazar la solicitud: digite "@bibliochatUTN AcceptRequest 8d3bc141-fef2-40a6-a8cc-6f5b197b81b1 331742d0-7d0e-11ed-a63a-3743987e816e|livechat" para aceptar, "@bibliochatUTN RejectRequest 8d3bc141-fef2-40a6-a8cc-6f5b197b81b1 331742d0-7d0e-11ed-a63a-3743987e816e|livechat" para rechazar o usar los botones si está habilitado.',
-            buttons: [
-              {
-                type: 'imBack',
-                title: 'Aceptar',
-                value:
-                  '@bibliochatUTN AcceptRequest 8d3bc141-fef2-40a6-a8cc-6f5b197b81b1 331742d0-7d0e-11ed-a63a-3743987e816e|livechat',
-              },
-              {
-                type: 'imBack',
-                title: 'Rechazar',
-                value:
-                  '@bibliochatUTN RejectRequest 8d3bc141-fef2-40a6-a8cc-6f5b197b81b1 331742d0-7d0e-11ed-a63a-3743987e816e|livechat',
-              },
-            ],
-          },
-        },
-      ],
-      entities: [],
-    },
-    {
-      color: '#EB7181',
-      type: 'message',
-      accept: false,
-      reject: false,
-      id: 'DamM237uwi7F0iETW6MjW8-us|0000004',
-      timestamp: '2022-12-16T06:52:41.3032109Z',
-      channelId: 'webchat',
-      from: {
-        id: 'bibliochatUTN',
-        name: 'Julio Gonzales',
-      },
-      conversation: {
-        id: 'DamM237uwi7F0iETW6MjW8-us',
-      },
-      attachments: [
-        {
-          contentType: 'application/vnd.microsoft.card.hero',
-          content: {
-            title: 'Solicitud',
-            subtitle: 'Solicitado por el usuario "User" en el canal "Emulator"',
-            text: 'Aceptar o rechazar la solicitud: digite "@bibliochatUTN AcceptRequest 8d3bc141-fef2-40a6-a8cc-6f5b197b81b1 331742d0-7d0e-11ed-a63a-3743987e816e|livechat" para aceptar, "@bibliochatUTN RejectRequest 8d3bc141-fef2-40a6-a8cc-6f5b197b81b1 331742d0-7d0e-11ed-a63a-3743987e816e|livechat" para rechazar o usar los botones si está habilitado.',
-            buttons: [
-              {
-                type: 'imBack',
-                title: 'Aceptar',
-                value:
-                  '@bibliochatUTN AcceptRequest 8d3bc141-fef2-40a6-a8cc-6f5b197b81b1 331742d0-7d0e-11ed-a63a-3743987e816e|livechat',
-              },
-              {
-                type: 'imBack',
-                title: 'Rechazar',
-                value:
-                  '@bibliochatUTN RejectRequest 8d3bc141-fef2-40a6-a8cc-6f5b197b81b1 331742d0-7d0e-11ed-a63a-3743987e816e|livechat',
-              },
-            ],
-          },
-        },
-      ],
-      entities: [],
-    },
-    {
-      color: '#EB7181',
-      type: 'message',
-      accept: false,
-      reject: false,
-      id: 'DamM237uwi7F0iETW6MjW8-us|0000005',
-      timestamp: '2022-12-16T06:52:41.3032109Z',
-      channelId: 'webchat',
-      from: {
-        id: 'bibliochatUTN',
-        name: 'Julio Gonzales',
-      },
-      conversation: {
-        id: 'DamM237uwi7F0iETW6MjW8-us',
-      },
-      attachments: [
-        {
-          contentType: 'application/vnd.microsoft.card.hero',
-          content: {
-            title: 'Solicitud',
-            subtitle: 'Solicitado por el usuario "User" en el canal "Emulator"',
-            text: 'Aceptar o rechazar la solicitud: digite "@bibliochatUTN AcceptRequest 8d3bc141-fef2-40a6-a8cc-6f5b197b81b1 331742d0-7d0e-11ed-a63a-3743987e816e|livechat" para aceptar, "@bibliochatUTN RejectRequest 8d3bc141-fef2-40a6-a8cc-6f5b197b81b1 331742d0-7d0e-11ed-a63a-3743987e816e|livechat" para rechazar o usar los botones si está habilitado.',
-            buttons: [
-              {
-                type: 'imBack',
-                title: 'Aceptar',
-                value:
-                  '@bibliochatUTN AcceptRequest 8d3bc141-fef2-40a6-a8cc-6f5b197b81b1 331742d0-7d0e-11ed-a63a-3743987e816e|livechat',
-              },
-              {
-                type: 'imBack',
-                title: 'Rechazar',
-                value:
-                  '@bibliochatUTN RejectRequest 8d3bc141-fef2-40a6-a8cc-6f5b197b81b1 331742d0-7d0e-11ed-a63a-3743987e816e|livechat',
-              },
-            ],
-          },
-        },
-      ],
-      entities: [],
-    },
-    {
-      color: '#EB7181',
-      type: 'message',
-      accept: false,
-      reject: false,
-      id: 'DamM237uwi7F0iETW6MjW8-us|0000006',
-      timestamp: '2022-12-16T06:52:41.3032109Z',
-      channelId: 'webchat',
-      from: {
-        id: 'bibliochatUTN',
-        name: 'Julio Gonzales',
-      },
-      conversation: {
-        id: 'DamM237uwi7F0iETW6MjW8-us',
-      },
-      attachments: [
-        {
-          contentType: 'application/vnd.microsoft.card.hero',
-          content: {
-            title: 'Solicitud',
-            subtitle: 'Solicitado por el usuario "User" en el canal "Emulator"',
-            text: 'Aceptar o rechazar la solicitud: digite "@bibliochatUTN AcceptRequest 8d3bc141-fef2-40a6-a8cc-6f5b197b81b1 331742d0-7d0e-11ed-a63a-3743987e816e|livechat" para aceptar, "@bibliochatUTN RejectRequest 8d3bc141-fef2-40a6-a8cc-6f5b197b81b1 331742d0-7d0e-11ed-a63a-3743987e816e|livechat" para rechazar o usar los botones si está habilitado.',
-            buttons: [
-              {
-                type: 'imBack',
-                title: 'Aceptar',
-                value:
-                  '@bibliochatUTN AcceptRequest 8d3bc141-fef2-40a6-a8cc-6f5b197b81b1 331742d0-7d0e-11ed-a63a-3743987e816e|livechat',
-              },
-              {
-                type: 'imBack',
-                title: 'Rechazar',
-                value:
-                  '@bibliochatUTN RejectRequest 8d3bc141-fef2-40a6-a8cc-6f5b197b81b1 331742d0-7d0e-11ed-a63a-3743987e816e|livechat',
-              },
-            ],
-          },
-        },
-      ],
-      entities: [],
-    },
-    {
-      color: '#EB7181',
-      type: 'message',
-      accept: false,
-      reject: false,
-      id: 'DamM237uwi7F0iETW6MjW8-us|0000007',
-      timestamp: '2022-12-16T06:52:41.3032109Z',
-      channelId: 'webchat',
-      from: {
-        id: 'bibliochatUTN',
-        name: 'Julio Gonzales',
-      },
-      conversation: {
-        id: 'DamM237uwi7F0iETW6MjW8-us',
-      },
-      attachments: [
-        {
-          contentType: 'application/vnd.microsoft.card.hero',
-          content: {
-            title: 'Solicitud',
-            subtitle: 'Solicitado por el usuario "User" en el canal "Emulator"',
-            text: 'Aceptar o rechazar la solicitud: digite "@bibliochatUTN AcceptRequest 8d3bc141-fef2-40a6-a8cc-6f5b197b81b1 331742d0-7d0e-11ed-a63a-3743987e816e|livechat" para aceptar, "@bibliochatUTN RejectRequest 8d3bc141-fef2-40a6-a8cc-6f5b197b81b1 331742d0-7d0e-11ed-a63a-3743987e816e|livechat" para rechazar o usar los botones si está habilitado.',
-            buttons: [
-              {
-                type: 'imBack',
-                title: 'Aceptar',
-                value:
-                  '@bibliochatUTN AcceptRequest 8d3bc141-fef2-40a6-a8cc-6f5b197b81b1 331742d0-7d0e-11ed-a63a-3743987e816e|livechat',
-              },
-              {
-                type: 'imBack',
-                title: 'Rechazar',
-                value:
-                  '@bibliochatUTN RejectRequest 8d3bc141-fef2-40a6-a8cc-6f5b197b81b1 331742d0-7d0e-11ed-a63a-3743987e816e|livechat',
-              },
-            ],
-          },
-        },
-      ],
-      entities: [],
-    },
-    {
-      color: '#EB7181',
-      type: 'message',
-      accept: false,
-      reject: false,
-      id: 'DamM237uwi7F0iETW6MjW8-us|0000008',
-      timestamp: '2022-12-16T06:52:41.3032109Z',
-      channelId: 'webchat',
-      from: {
-        id: 'bibliochatUTN',
-        name: 'Julio Gonzales',
-      },
-      conversation: {
-        id: 'DamM237uwi7F0iETW6MjW8-us',
-      },
-      attachments: [
-        {
-          contentType: 'application/vnd.microsoft.card.hero',
-          content: {
-            title: 'Solicitud',
-            subtitle: 'Solicitado por el usuario "User" en el canal "Emulator"',
-            text: 'Aceptar o rechazar la solicitud: digite "@bibliochatUTN AcceptRequest 8d3bc141-fef2-40a6-a8cc-6f5b197b81b1 331742d0-7d0e-11ed-a63a-3743987e816e|livechat" para aceptar, "@bibliochatUTN RejectRequest 8d3bc141-fef2-40a6-a8cc-6f5b197b81b1 331742d0-7d0e-11ed-a63a-3743987e816e|livechat" para rechazar o usar los botones si está habilitado.',
-            buttons: [
-              {
-                type: 'imBack',
-                title: 'Aceptar',
-                value:
-                  '@bibliochatUTN AcceptRequest 8d3bc141-fef2-40a6-a8cc-6f5b197b81b1 331742d0-7d0e-11ed-a63a-3743987e816e|livechat',
-              },
-              {
-                type: 'imBack',
-                title: 'Rechazar',
-                value:
-                  '@bibliochatUTN RejectRequest 8d3bc141-fef2-40a6-a8cc-6f5b197b81b1 331742d0-7d0e-11ed-a63a-3743987e816e|livechat',
-              },
-            ],
-          },
-        },
-      ],
-      entities: [],
-    },
-    {
-      color: '#EB7181',
-      type: 'message',
-      accept: false,
-      reject: false,
-      id: 'DamM237uwi7F0iETW6MjW8-us|0000009',
-      timestamp: '2022-12-16T06:52:41.3032109Z',
-      channelId: 'webchat',
-      from: {
-        id: 'bibliochatUTN',
-        name: 'Julio Gonzales',
-      },
-      conversation: {
-        id: 'DamM237uwi7F0iETW6MjW8-us',
-      },
-      attachments: [
-        {
-          contentType: 'application/vnd.microsoft.card.hero',
-          content: {
-            title: 'Solicitud',
-            subtitle: 'Solicitado por el usuario "User" en el canal "Emulator"',
-            text: 'Aceptar o rechazar la solicitud: digite "@bibliochatUTN AcceptRequest 8d3bc141-fef2-40a6-a8cc-6f5b197b81b1 331742d0-7d0e-11ed-a63a-3743987e816e|livechat" para aceptar, "@bibliochatUTN RejectRequest 8d3bc141-fef2-40a6-a8cc-6f5b197b81b1 331742d0-7d0e-11ed-a63a-3743987e816e|livechat" para rechazar o usar los botones si está habilitado.',
-            buttons: [
-              {
-                type: 'imBack',
-                title: 'Aceptar',
-                value:
-                  '@bibliochatUTN AcceptRequest 8d3bc141-fef2-40a6-a8cc-6f5b197b81b1 331742d0-7d0e-11ed-a63a-3743987e816e|livechat',
-              },
-              {
-                type: 'imBack',
-                title: 'Rechazar',
-                value:
-                  '@bibliochatUTN RejectRequest 8d3bc141-fef2-40a6-a8cc-6f5b197b81b1 331742d0-7d0e-11ed-a63a-3743987e816e|livechat',
-              },
-            ],
-          },
-        },
-      ],
-      entities: [],
-    },
-    {
-      color: '#EB7181',
-      type: 'message',
-      accept: false,
-      reject: false,
-      id: 'DamM237uwi7F0iETW6MjW8-us|00000010',
-      timestamp: '2022-12-16T06:52:41.3032109Z',
-      channelId: 'webchat',
-      from: {
-        id: 'bibliochatUTN',
-        name: 'Julio Gonzales',
-      },
-      conversation: {
-        id: 'DamM237uwi7F0iETW6MjW8-us',
-      },
-      attachments: [
-        {
-          contentType: 'application/vnd.microsoft.card.hero',
-          content: {
-            title: 'Solicitud',
-            subtitle: 'Solicitado por el usuario "User" en el canal "Emulator"',
-            text: 'Aceptar o rechazar la solicitud: digite "@bibliochatUTN AcceptRequest 8d3bc141-fef2-40a6-a8cc-6f5b197b81b1 331742d0-7d0e-11ed-a63a-3743987e816e|livechat" para aceptar, "@bibliochatUTN RejectRequest 8d3bc141-fef2-40a6-a8cc-6f5b197b81b1 331742d0-7d0e-11ed-a63a-3743987e816e|livechat" para rechazar o usar los botones si está habilitado.',
-            buttons: [
-              {
-                type: 'imBack',
-                title: 'Aceptar',
-                value:
-                  '@bibliochatUTN AcceptRequest 8d3bc141-fef2-40a6-a8cc-6f5b197b81b1 331742d0-7d0e-11ed-a63a-3743987e816e|livechat',
-              },
-              {
-                type: 'imBack',
-                title: 'Rechazar',
-                value:
-                  '@bibliochatUTN RejectRequest 8d3bc141-fef2-40a6-a8cc-6f5b197b81b1 331742d0-7d0e-11ed-a63a-3743987e816e|livechat',
-              },
-            ],
-          },
-        },
-      ],
-      entities: [],
-    },
-    {
-      color: '#EB7181',
-      type: 'message',
-      accept: false,
-      reject: false,
-      id: 'DamM237uwi7F0iETW6MjW8-us|00000011',
-      timestamp: '2022-12-16T06:52:41.3032109Z',
-      channelId: 'webchat',
-      from: {
-        id: 'bibliochatUTN',
-        name: 'Julio Gonzales',
-      },
-      conversation: {
-        id: 'DamM237uwi7F0iETW6MjW8-us',
-      },
-      attachments: [
-        {
-          contentType: 'application/vnd.microsoft.card.hero',
-          content: {
-            title: 'Solicitud',
-            subtitle: 'Solicitado por el usuario "User" en el canal "Emulator"',
-            text: 'Aceptar o rechazar la solicitud: digite "@bibliochatUTN AcceptRequest 8d3bc141-fef2-40a6-a8cc-6f5b197b81b1 331742d0-7d0e-11ed-a63a-3743987e816e|livechat" para aceptar, "@bibliochatUTN RejectRequest 8d3bc141-fef2-40a6-a8cc-6f5b197b81b1 331742d0-7d0e-11ed-a63a-3743987e816e|livechat" para rechazar o usar los botones si está habilitado.',
-            buttons: [
-              {
-                type: 'imBack',
-                title: 'Aceptar',
-                value:
-                  '@bibliochatUTN AcceptRequest 8d3bc141-fef2-40a6-a8cc-6f5b197b81b1 331742d0-7d0e-11ed-a63a-3743987e816e|livechat',
-              },
-              {
-                type: 'imBack',
-                title: 'Rechazar',
-                value:
-                  '@bibliochatUTN RejectRequest 8d3bc141-fef2-40a6-a8cc-6f5b197b81b1 331742d0-7d0e-11ed-a63a-3743987e816e|livechat',
-              },
-            ],
-          },
-        },
-      ],
-      entities: [],
-    },
-    {
-      color: '#EB7181',
-      type: 'message',
-      accept: false,
-      reject: false,
-      id: 'DamM237uwi7F0iETW6MjW8-us|00000012',
-      timestamp: '2022-12-16T06:52:41.3032109Z',
-      channelId: 'webchat',
-      from: {
-        id: 'bibliochatUTN',
-        name: 'Julio Gonzales',
-      },
-      conversation: {
-        id: 'DamM237uwi7F0iETW6MjW8-us',
-      },
-      attachments: [
-        {
-          contentType: 'application/vnd.microsoft.card.hero',
-          content: {
-            title: 'Solicitud',
-            subtitle: 'Solicitado por el usuario "User" en el canal "Emulator"',
-            text: 'Aceptar o rechazar la solicitud: digite "@bibliochatUTN AcceptRequest 8d3bc141-fef2-40a6-a8cc-6f5b197b81b1 331742d0-7d0e-11ed-a63a-3743987e816e|livechat" para aceptar, "@bibliochatUTN RejectRequest 8d3bc141-fef2-40a6-a8cc-6f5b197b81b1 331742d0-7d0e-11ed-a63a-3743987e816e|livechat" para rechazar o usar los botones si está habilitado.',
-            buttons: [
-              {
-                type: 'imBack',
-                title: 'Aceptar',
-                value:
-                  '@bibliochatUTN AcceptRequest 8d3bc141-fef2-40a6-a8cc-6f5b197b81b1 331742d0-7d0e-11ed-a63a-3743987e816e|livechat',
-              },
-              {
-                type: 'imBack',
-                title: 'Rechazar',
-                value:
-                  '@bibliochatUTN RejectRequest 8d3bc141-fef2-40a6-a8cc-6f5b197b81b1 331742d0-7d0e-11ed-a63a-3743987e816e|livechat',
-              },
-            ],
-          },
-        },
-      ],
-      entities: [],
-    },
-  ];
+  showError: boolean = false;
+  errorMessage: String =
+    'Ocurrion un error desconocido contáctese con el Administrador.';
+  solicitudes: any[] = [];
   idBot = '';
   idChat = '';
   usuario?: Usuario;
@@ -488,7 +79,9 @@ export class ChatComponent implements OnInit {
     this.scrollToBottom();
   }
   selectChat(id: string) {
-    let chat = this.solicitudes.find((s) => s?.id === id && s?.accept);
+    let chat = this.solicitudes.find(
+      (s) => s?.content?.buttons[0]?.value === id && s?.accept
+    );
     if (chat) console.log(`Chat Seleccionad ${id}`);
   }
 
@@ -497,10 +90,11 @@ export class ChatComponent implements OnInit {
   }
   closeChat() {
     try {
-      this.alertService.esperando('Cerrando Chat.');
+      this.alertService.esperando('Cerrando Conección.');
       Swal.showLoading();
       this.loadingStartChat = true;
-      this.botService.sendMessage('chao').subscribe((resp: any) => {
+      this.sendComandos(6);
+      this.botService.sendMessage('chao',this.usuario!).subscribe((resp: any) => {
         sessionStorage.removeItem('isInitialized');
         this.isInitialized = false;
         this.loadingStartChat = false;
@@ -514,13 +108,14 @@ export class ChatComponent implements OnInit {
   startWorkChat() {
     let correo = this.usuario?.correo;
     this.loadingStartChat = true;
-    this.botService.sendMessage(correo!).subscribe(
+    this.botService.sendMessage(correo!,this.usuario!).subscribe(
       (resp: any) => {
         if (resp) {
           this.sendComandos(1);
           sessionStorage.isInitialized = true;
           this.isInitialized = true;
           this.loadingStartChat = false;
+          this.getSolicitudes();
         } else {
           this.isInitialized = false;
           sessionStorage.isInitialized = false;
@@ -557,9 +152,40 @@ export class ChatComponent implements OnInit {
 
   ngOnInit(): void {
     this.scrollToBottom();
-    // this.getSolicitudes();
     this.getInteractions();
     this.getAccount();
+    this.statusConnectionBot();
+    this.saveRequest();
+  }
+
+  saveRequest() {
+    const attachments = [
+      {
+        contentType: 'application/vnd.microsoft.card.hero',
+        color: '#0DA1E6',
+        timestamp: '2023-01-20T05:27:16.6093237Z',
+        content: {
+          title: 'Solicitud',
+          subtitle: 'Solicitado por:-William Puma ',
+          text: 'Aceptar o rechazar la solicitud: digite "@bibliochatUTN AcceptRequest 8d3bc141-fef2-40a6-a8cc-6f5b197b81b1 331742d0-7d0e-11ed-a63a-3743987e816e|livechat" para aceptar, "@bibliochatUTN RejectRequest 8d3bc141-fef2-40a6-a8cc-6f5b197b81b1 331742d0-7d0e-11ed-a63a-3743987e816e|livechat" para rechazar o usar los botones si está habilitado.',
+          buttons: [
+            {
+              type: 'imBack',
+              title: 'Aceptar',
+              value:
+                '@bibliochatUTN AcceptRequest 8d3bc141-fef2-40a6-a8cc-6f5b197b81b1 331742d0-7d0e-11ed-a63a-3743987e816e|livechat',
+            },
+            {
+              type: 'imBack',
+              title: 'Rechazar',
+              value:
+                '@bibliochatUTN RejectRequest 8d3bc141-fef2-40a6-a8cc-6f5b197b81b1 331742d0-7d0e-11ed-a63a-3743987e816e|livechat',
+            },
+          ],
+        },
+      },
+    ];
+    this.store.dispatch(new PostSolicitudes(attachments));
   }
 
   getAccount() {
@@ -575,19 +201,22 @@ export class ChatComponent implements OnInit {
       });
   }
 
-  reaccionarSolicitud(option: boolean, id: string, value: any) {
-    const buttons = value?.content?.buttons;
-    const message = option ? buttons[0].value : buttons[1].value;
-    this.solicitudes = this.solicitudes.map((s) => {
-      let req = { ...s };
-      if (s?.id === id) {
-        if (option) {
-          req['accept'] = option;
+  reaccionarSolicitud(option: boolean, value: string) {
+    this.botService.sendMessage(value,this.usuario!).subscribe((resp) => {
+      this.solicitudes = this.solicitudes.map((s) => {
+        let req = { ...s };
+        if (
+          (s?.content?.buttons[0]?.value || s?.content?.buttons[1]?.value) ===
+          value
+        ) {
+          if (option) {
+            req['accept'] = option;
+          }
         }
-      }
-      return req;
+        return req;
+      });
     });
-    this.botService.sendMessage(message).subscribe((resp) => {});
+    this.catchMessage();
   }
 
   sendComandos(comando: number) {
@@ -617,9 +246,12 @@ export class ChatComponent implements OnInit {
         break;
     }
 
-    this.botService.sendMessage(cmd).subscribe((resp) => {
-      console.log('si se envio ');
+    this.botService.sendMessage(cmd,this.usuario!).subscribe((resp) => {
+      if (comando === 3) {
+        this.getSolicitudes();
+      }
     });
+    this.catchMessage();
   }
 
   cargarHistorial(idChat: string) {
@@ -647,39 +279,53 @@ export class ChatComponent implements OnInit {
     ) {
       const message = this.mensageForm.value.message.trim();
       try {
-        this.botService.directLine!.activity$.subscribe((activity: any) => {
-          if (!this.activities.includes(activity)) {
-            if (
-              activity.attachments &&
-              activity?.attachments[0]?.content?.title === 'Solicitud'
-            ) {
-              if (!this.solicitudes.includes(activity)) {
-                const item = { ...activity };
-                const randomIndex = Math.floor(
-                  Math.random() * Math.floor(this.colors.length)
-                );
-                item['color'] = this.colors[randomIndex];
-                this.store.dispatch(new PostSolicitudes(item));
-                this.solicitudes = [...this.solicitudes, activity];
-              }
-            } else {
-              this.activities = [...this.activities, activity];
-            }
-          }
-        });
-        this.botService.sendMessage(message).subscribe((resp: any) => {
+        this.botService.sendMessage(message,this.usuario!).subscribe((resp: any) => {
           console.log(resp);
         });
-
+        this.catchMessage();
         this.mensageForm.disable();
         this.mensageForm.reset();
         this.mensageForm.enable();
         this.txtMessage.nativeElement.focus();
       } catch (error) {
-        console.warn(error);
         alert(`Can't send your message`);
       }
     }
+  }
+
+  catchMessage() {
+    try {
+      this.botService.directLine!.activity$.subscribe((activity: any) => {
+        console.log(activity);
+
+        if (!this.activities.includes(activity)) {
+          if (
+            activity.attachments &&
+            activity.attachments.length > 0 &&
+            activity?.attachments[0]?.content?.title === 'Solicitud'
+          ) {
+            if (
+              !this.solicitudes.some((s) => activity['attachments'].includes(s))
+            ) {
+              const item = { ...activity };
+              const listAttachments = [...item['attachments']];
+              const listWithColor = listAttachments.map((a) => {
+                const solicitud = { ...a };
+                const randomIndex = Math.floor(
+                  Math.random() * Math.floor(this.colors.length)
+                );
+                solicitud['timestamp'] = item?.timestamp;
+                solicitud['color'] = this.colors[randomIndex];
+                return solicitud;
+              });
+              this.store.dispatch(new PostSolicitudes(listWithColor));
+            }
+          } else {
+            this.activities = [...this.activities, activity];
+          }
+        }
+      });
+    } catch (error) {}
   }
   getInteractions() {
     const listar: Listar = {
@@ -695,4 +341,252 @@ export class ChatComponent implements OnInit {
       this.loading = false;
     });
   }
+  statusConnectionBot() {
+    this.botService.directLine!.connectionStatus$.subscribe(
+      (connectionStatus) => {
+        switch (connectionStatus) {
+          case ConnectionStatus.Uninitialized: // the status when the DirectLine object is first created/constructed
+            this.showError = false;
+            this.isInitialized = sessionStorage.isInitialized;
+            break;
+          case ConnectionStatus.Connecting: // currently trying to connect to the conversation
+            this.showError = false;
+            this.loadingStartChat = true;
+            break;
+          case ConnectionStatus.Online: // successfully connected to the converstaion. Connection is healthy so far as we know.
+            this.showError = false;
+            this.isInitialized = true;
+            this.loadingStartChat = false;
+            this.getSolicitudes();
+            break;
+          case ConnectionStatus.ExpiredToken: // last operation errored out with an expired token. Your app should supply a new one.
+            this.errorMessage =
+              'Su conección a finalizado, vuelva a intentarlo por favor.';
+            this.isInitialized = false;
+            this.showError = true;
+            this.loadingStartChat = false;
+            sessionStorage.isInitialized = false;
+            break;
+          case ConnectionStatus.FailedToConnect: // the initial attempt to connect to the conversation failed. No recovery possible.
+            this.errorMessage =
+              'Ocurrion un error al intentar conectarse al servicio, vuelva a intentarlo por favor.';
+            this.isInitialized = false;
+            this.showError = true;
+            this.loadingStartChat = false;
+            sessionStorage.isInitialized = false;
+            Swal.close();
+            break;
+          case ConnectionStatus.Ended: // the bot ended the conversation
+            this.errorMessage =
+              'Parece que la conección ha finalizado, vuelva a conectarse por favor. ';
+            this.showError = true;
+            this.isInitialized = false;
+            this.loadingStartChat = false;
+            sessionStorage.isInitialized = false;
+            Swal.close();
+            break;
+        }
+      }
+    );
+  }
 }
+
+// {
+//   "type": "message",
+//   "id": "2gSxQmQwHF5Gbq0TTnAaI9-us|0000004",
+//   "timestamp": "2023-01-20T05:27:16.6093237Z",
+//   "channelId": "webchat",
+//   "from": {
+//       "id": "bibliochatUTN",
+//       "name": "bibliochatUTN"
+//   },
+//   "conversation": {
+//       "id": "2gSxQmQwHF5Gbq0TTnAaI9-us"
+//   },
+//   "text": "",
+//   "attachments": [
+//       {
+//           "contentType": "application/vnd.microsoft.card.hero",
+//           "content": {
+//               "title": "Solicitud",
+//               "subtitle": "Solicitado por el usuario \"User\" en el canal \"Emulator\"",
+//               "text": "Aceptar o rechazar la solicitud: digite \"@bibliochatUTN AcceptRequest 48ef5358-1eab-44e2-b9cb-83ffc39a5f0c 02333d40-7d0e-11ed-a63a-3743987e816e|livechat\" para aceptar, \"@bibliochatUTN RejectRequest 48ef5358-1eab-44e2-b9cb-83ffc39a5f0c 02333d40-7d0e-11ed-a63a-3743987e816e|livechat\" para rechazar o usar los botones si está habilitado.",
+//               "buttons": [
+//                   {
+//                       "type": "imBack",
+//                       "title": "Aceptar",
+//                       "value": "@bibliochatUTN AcceptRequest 48ef5358-1eab-44e2-b9cb-83ffc39a5f0c 02333d40-7d0e-11ed-a63a-3743987e816e|livechat"
+//                   },
+//                   {
+//                       "type": "imBack",
+//                       "title": "Rechazar",
+//                       "value": "@bibliochatUTN RejectRequest 48ef5358-1eab-44e2-b9cb-83ffc39a5f0c 02333d40-7d0e-11ed-a63a-3743987e816e|livechat"
+//                   }
+//               ]
+//           }
+//       },
+//       {
+//           "contentType": "application/vnd.microsoft.card.hero",
+//           "content": {
+//               "title": "Solicitud",
+//               "subtitle": "Solicitado por el usuario \"User\" en el canal \"Emulator\"",
+//               "text": "Aceptar o rechazar la solicitud: digite \"@bibliochatUTN AcceptRequest cb2f12d5-dc1f-4643-a1b3-48146f384f3a 171ed290-915f-11ed-a84b-f3c8f6a6f242|livechat\" para aceptar, \"@bibliochatUTN RejectRequest cb2f12d5-dc1f-4643-a1b3-48146f384f3a 171ed290-915f-11ed-a84b-f3c8f6a6f242|livechat\" para rechazar o usar los botones si está habilitado.",
+//               "buttons": [
+//                   {
+//                       "type": "imBack",
+//                       "title": "Aceptar",
+//                       "value": "@bibliochatUTN AcceptRequest cb2f12d5-dc1f-4643-a1b3-48146f384f3a 171ed290-915f-11ed-a84b-f3c8f6a6f242|livechat"
+//                   },
+//                   {
+//                       "type": "imBack",
+//                       "title": "Rechazar",
+//                       "value": "@bibliochatUTN RejectRequest cb2f12d5-dc1f-4643-a1b3-48146f384f3a 171ed290-915f-11ed-a84b-f3c8f6a6f242|livechat"
+//                   }
+//               ]
+//           }
+//       },
+//       {
+//           "contentType": "application/vnd.microsoft.card.hero",
+//           "content": {
+//               "title": "Solicitud",
+//               "subtitle": "Solicitado por el usuario \"User\" en el canal \"Emulator\"",
+//               "text": "Aceptar o rechazar la solicitud: digite \"@bibliochatUTN AcceptRequest 8d3bc141-fef2-40a6-a8cc-6f5b197b81b1 331742d0-7d0e-11ed-a63a-3743987e816e|livechat\" para aceptar, \"@bibliochatUTN RejectRequest 8d3bc141-fef2-40a6-a8cc-6f5b197b81b1 331742d0-7d0e-11ed-a63a-3743987e816e|livechat\" para rechazar o usar los botones si está habilitado.",
+//               "buttons": [
+//                   {
+//                       "type": "imBack",
+//                       "title": "Aceptar",
+//                       "value": "@bibliochatUTN AcceptRequest 8d3bc141-fef2-40a6-a8cc-6f5b197b81b1 331742d0-7d0e-11ed-a63a-3743987e816e|livechat"
+//                   },
+//                   {
+//                       "type": "imBack",
+//                       "title": "Rechazar",
+//                       "value": "@bibliochatUTN RejectRequest 8d3bc141-fef2-40a6-a8cc-6f5b197b81b1 331742d0-7d0e-11ed-a63a-3743987e816e|livechat"
+//                   }
+//               ]
+//           }
+//       },
+//       {
+//           "contentType": "application/vnd.microsoft.card.hero",
+//           "content": {
+//               "title": "Solicitud",
+//               "subtitle": "Solicitado por el usuario \"(no user name)\" en el canal \"Webchat\"",
+//               "text": "Aceptar o rechazar la solicitud: digite \"@bibliochatUTN AcceptRequest 9db5b90c-44d9-4051-a29c-9e4d070e40b5 6YQzwOGY5hhDfdEjSOW8ek-us\" para aceptar, \"@bibliochatUTN RejectRequest 9db5b90c-44d9-4051-a29c-9e4d070e40b5 6YQzwOGY5hhDfdEjSOW8ek-us\" para rechazar o usar los botones si está habilitado.",
+//               "buttons": [
+//                   {
+//                       "type": "imBack",
+//                       "title": "Aceptar",
+//                       "value": "@bibliochatUTN AcceptRequest 9db5b90c-44d9-4051-a29c-9e4d070e40b5 6YQzwOGY5hhDfdEjSOW8ek-us"
+//                   },
+//                   {
+//                       "type": "imBack",
+//                       "title": "Rechazar",
+//                       "value": "@bibliochatUTN RejectRequest 9db5b90c-44d9-4051-a29c-9e4d070e40b5 6YQzwOGY5hhDfdEjSOW8ek-us"
+//                   }
+//               ]
+//           }
+//       },
+//       {
+//           "contentType": "application/vnd.microsoft.card.hero",
+//           "content": {
+//               "title": "Solicitud",
+//               "subtitle": "Solicitado por el usuario \"User\" en el canal \"Emulator\"",
+//               "text": "Aceptar o rechazar la solicitud: digite \"@bibliochatUTN AcceptRequest aa28ee0e-d0b8-4b56-b1d0-0b87e64f7dd7 7d7a9e10-9309-11ed-a8e6-65ad54b3f1f9|livechat\" para aceptar, \"@bibliochatUTN RejectRequest aa28ee0e-d0b8-4b56-b1d0-0b87e64f7dd7 7d7a9e10-9309-11ed-a8e6-65ad54b3f1f9|livechat\" para rechazar o usar los botones si está habilitado.",
+//               "buttons": [
+//                   {
+//                       "type": "imBack",
+//                       "title": "Aceptar",
+//                       "value": "@bibliochatUTN AcceptRequest aa28ee0e-d0b8-4b56-b1d0-0b87e64f7dd7 7d7a9e10-9309-11ed-a8e6-65ad54b3f1f9|livechat"
+//                   },
+//                   {
+//                       "type": "imBack",
+//                       "title": "Rechazar",
+//                       "value": "@bibliochatUTN RejectRequest aa28ee0e-d0b8-4b56-b1d0-0b87e64f7dd7 7d7a9e10-9309-11ed-a8e6-65ad54b3f1f9|livechat"
+//                   }
+//               ]
+//           }
+//       },
+//       {
+//           "contentType": "application/vnd.microsoft.card.hero",
+//           "content": {
+//               "title": "Solicitud",
+//               "subtitle": "Solicitado por el usuario \"(no user name)\" en el canal \"Webchat\"",
+//               "text": "Aceptar o rechazar la solicitud: digite \"@bibliochatUTN AcceptRequest 9db5b90c-44d9-4051-a29c-9e4d070e40b5 8niU539O31mEPi549ButZP-us\" para aceptar, \"@bibliochatUTN RejectRequest 9db5b90c-44d9-4051-a29c-9e4d070e40b5 8niU539O31mEPi549ButZP-us\" para rechazar o usar los botones si está habilitado.",
+//               "buttons": [
+//                   {
+//                       "type": "imBack",
+//                       "title": "Aceptar",
+//                       "value": "@bibliochatUTN AcceptRequest 9db5b90c-44d9-4051-a29c-9e4d070e40b5 8niU539O31mEPi549ButZP-us"
+//                   },
+//                   {
+//                       "type": "imBack",
+//                       "title": "Rechazar",
+//                       "value": "@bibliochatUTN RejectRequest 9db5b90c-44d9-4051-a29c-9e4d070e40b5 8niU539O31mEPi549ButZP-us"
+//                   }
+//               ]
+//           }
+//       },
+//       {
+//           "contentType": "application/vnd.microsoft.card.hero",
+//           "content": {
+//               "title": "Solicitud",
+//               "subtitle": "Solicitado por el usuario \"User\" en el canal \"Emulator\"",
+//               "text": "Aceptar o rechazar la solicitud: digite \"@bibliochatUTN AcceptRequest 219f6e76-5870-4b3d-ac0c-5ca194fe110e 9fc7ed40-7d0d-11ed-a63a-3743987e816e|livechat\" para aceptar, \"@bibliochatUTN RejectRequest 219f6e76-5870-4b3d-ac0c-5ca194fe110e 9fc7ed40-7d0d-11ed-a63a-3743987e816e|livechat\" para rechazar o usar los botones si está habilitado.",
+//               "buttons": [
+//                   {
+//                       "type": "imBack",
+//                       "title": "Aceptar",
+//                       "value": "@bibliochatUTN AcceptRequest 219f6e76-5870-4b3d-ac0c-5ca194fe110e 9fc7ed40-7d0d-11ed-a63a-3743987e816e|livechat"
+//                   },
+//                   {
+//                       "type": "imBack",
+//                       "title": "Rechazar",
+//                       "value": "@bibliochatUTN RejectRequest 219f6e76-5870-4b3d-ac0c-5ca194fe110e 9fc7ed40-7d0d-11ed-a63a-3743987e816e|livechat"
+//                   }
+//               ]
+//           }
+//       },
+//       {
+//           "contentType": "application/vnd.microsoft.card.hero",
+//           "content": {
+//               "title": "Solicitud",
+//               "subtitle": "Solicitado por el usuario \"(no user name)\" en el canal \"Webchat\"",
+//               "text": "Aceptar o rechazar la solicitud: digite \"@bibliochatUTN AcceptRequest 9db5b90c-44d9-4051-a29c-9e4d070e40b5 GcjTCT9Dnn36YRdJLb9v9T-us\" para aceptar, \"@bibliochatUTN RejectRequest 9db5b90c-44d9-4051-a29c-9e4d070e40b5 GcjTCT9Dnn36YRdJLb9v9T-us\" para rechazar o usar los botones si está habilitado.",
+//               "buttons": [
+//                   {
+//                       "type": "imBack",
+//                       "title": "Aceptar",
+//                       "value": "@bibliochatUTN AcceptRequest 9db5b90c-44d9-4051-a29c-9e4d070e40b5 GcjTCT9Dnn36YRdJLb9v9T-us"
+//                   },
+//                   {
+//                       "type": "imBack",
+//                       "title": "Rechazar",
+//                       "value": "@bibliochatUTN RejectRequest 9db5b90c-44d9-4051-a29c-9e4d070e40b5 GcjTCT9Dnn36YRdJLb9v9T-us"
+//                   }
+//               ]
+//           }
+//       },
+//       {
+//           "contentType": "application/vnd.microsoft.card.hero",
+//           "content": {
+//               "title": "Solicitud",
+//               "subtitle": "Solicitado por el usuario \"(no user name)\" en el canal \"Webchat\"",
+//               "text": "Aceptar o rechazar la solicitud: digite \"@bibliochatUTN AcceptRequest 9db5b90c-44d9-4051-a29c-9e4d070e40b5 XfuK5HymaXIgv7gmVjLEI-us\" para aceptar, \"@bibliochatUTN RejectRequest 9db5b90c-44d9-4051-a29c-9e4d070e40b5 XfuK5HymaXIgv7gmVjLEI-us\" para rechazar o usar los botones si está habilitado.",
+//               "buttons": [
+//                   {
+//                       "type": "imBack",
+//                       "title": "Aceptar",
+//                       "value": "@bibliochatUTN AcceptRequest 9db5b90c-44d9-4051-a29c-9e4d070e40b5 XfuK5HymaXIgv7gmVjLEI-us"
+//                   },
+//                   {
+//                       "type": "imBack",
+//                       "title": "Rechazar",
+//                       "value": "@bibliochatUTN RejectRequest 9db5b90c-44d9-4051-a29c-9e4d070e40b5 XfuK5HymaXIgv7gmVjLEI-us"
+//                   }
+//               ]
+//           }
+//       }
+//   ],
+//   "entities": [],
+//   "channelData": "[{\"Requestor\":{\"activityId\":null,\"user\":{\"id\":\"48ef5358-1eab-44e2-b9cb-83ffc39a5f0c\",\"name\":\"User\",\"aadObjectId\":null,\"role\":\"user\"},\"bot\":null,\"conversation\":{\"isGroup\":null,\"conversationType\":null,\"id\":\"02333d40-7d0e-11ed-a63a-3743987e816e|livechat\",\"name\":null,\"aadObjectId\":null,\"role\":null,\"tenantId\":null},\"channelId\":\"emulator\",\"locale\":null,\"serviceUrl\":\"http://localhost:55435\"},\"ConnectionRequestTime\":\"2022-12-16T06:51:24.53396Z\"},{\"Requestor\":{\"activityId\":null,\"user\":{\"id\":\"cb2f12d5-dc1f-4643-a1b3-48146f384f3a\",\"name\":\"User\",\"aadObjectId\":null,\"role\":\"user\"},\"bot\":null,\"conversation\":{\"isGroup\":null,\"conversationType\":null,\"id\":\"171ed290-915f-11ed-a84b-f3c8f6a6f242|livechat\",\"name\":null,\"aadObjectId\":null,\"role\":null,\"tenantId\":null},\"channelId\":\"emulator\",\"locale\":null,\"serviceUrl\":\"http://localhost:64534\"},\"ConnectionRequestTime\":\"2023-01-11T03:22:19.875538Z\"},{\"Requestor\":{\"activityId\":null,\"user\":{\"id\":\"8d3bc141-fef2-40a6-a8cc-6f5b197b81b1\",\"name\":\"User\",\"aadObjectId\":null,\"role\":\"user\"},\"bot\":null,\"conversation\":{\"isGroup\":null,\"conversationType\":null,\"id\":\"331742d0-7d0e-11ed-a63a-3743987e816e|livechat\",\"name\":null,\"aadObjectId\":null,\"role\":null,\"tenantId\":null},\"channelId\":\"emulator\",\"locale\":null,\"serviceUrl\":\"http://localhost:55435\"},\"ConnectionRequestTime\":\"2022-12-16T06:52:37.860666Z\"},{\"Requestor\":{\"activityId\":null,\"user\":{\"id\":\"9db5b90c-44d9-4051-a29c-9e4d070e40b5\",\"name\":\"\",\"aadObjectId\":null,\"role\":null},\"bot\":null,\"conversation\":{\"isGroup\":null,\"conversationType\":null,\"id\":\"6YQzwOGY5hhDfdEjSOW8ek-us\",\"name\":null,\"aadObjectId\":null,\"role\":null,\"tenantId\":null},\"channelId\":\"webchat\",\"locale\":null,\"serviceUrl\":\"https://webchat.botframework.com/\"},\"ConnectionRequestTime\":\"2023-01-10T05:40:00.2592618Z\"},{\"Requestor\":{\"activityId\":null,\"user\":{\"id\":\"aa28ee0e-d0b8-4b56-b1d0-0b87e64f7dd7\",\"name\":\"User\",\"aadObjectId\":null,\"role\":\"user\"},\"bot\":null,\"conversation\":{\"isGroup\":null,\"conversationType\":null,\"id\":\"7d7a9e10-9309-11ed-a8e6-65ad54b3f1f9|livechat\",\"name\":null,\"aadObjectId\":null,\"role\":null,\"tenantId\":null},\"channelId\":\"emulator\",\"locale\":null,\"serviceUrl\":\"http://localhost:49286\"},\"ConnectionRequestTime\":\"2023-01-13T06:18:30.257432Z\"},{\"Requestor\":{\"activityId\":null,\"user\":{\"id\":\"9db5b90c-44d9-4051-a29c-9e4d070e40b5\",\"name\":\"\",\"aadObjectId\":null,\"role\":null},\"bot\":null,\"conversation\":{\"isGroup\":null,\"conversationType\":null,\"id\":\"8niU539O31mEPi549ButZP-us\",\"name\":null,\"aadObjectId\":null,\"role\":null,\"tenantId\":null},\"channelId\":\"webchat\",\"locale\":null,\"serviceUrl\":\"https://webchat.botframework.com/\"},\"ConnectionRequestTime\":\"2023-01-20T05:13:08.527809Z\"},{\"Requestor\":{\"activityId\":null,\"user\":{\"id\":\"219f6e76-5870-4b3d-ac0c-5ca194fe110e\",\"name\":\"User\",\"aadObjectId\":null,\"role\":\"user\"},\"bot\":null,\"conversation\":{\"isGroup\":null,\"conversationType\":null,\"id\":\"9fc7ed40-7d0d-11ed-a63a-3743987e816e|livechat\",\"name\":null,\"aadObjectId\":null,\"role\":null,\"tenantId\":null},\"channelId\":\"emulator\",\"locale\":null,\"serviceUrl\":\"http://localhost:55435\"},\"ConnectionRequestTime\":\"2022-12-16T06:48:37.493665Z\"},{\"Requestor\":{\"activityId\":null,\"user\":{\"id\":\"9db5b90c-44d9-4051-a29c-9e4d070e40b5\",\"name\":\"\",\"aadObjectId\":null,\"role\":null},\"bot\":null,\"conversation\":{\"isGroup\":null,\"conversationType\":null,\"id\":\"GcjTCT9Dnn36YRdJLb9v9T-us\",\"name\":null,\"aadObjectId\":null,\"role\":null,\"tenantId\":null},\"channelId\":\"webchat\",\"locale\":null,\"serviceUrl\":\"https://webchat.botframework.com/\"},\"ConnectionRequestTime\":\"2023-01-20T05:16:06.2910546Z\"},{\"Requestor\":{\"activityId\":null,\"user\":{\"id\":\"9db5b90c-44d9-4051-a29c-9e4d070e40b5\",\"name\":\"\",\"aadObjectId\":null,\"role\":null},\"bot\":null,\"conversation\":{\"isGroup\":null,\"conversationType\":null,\"id\":\"XfuK5HymaXIgv7gmVjLEI-us\",\"name\":null,\"aadObjectId\":null,\"role\":null,\"tenantId\":null},\"channelId\":\"webchat\",\"locale\":null,\"serviceUrl\":\"https://webchat.botframework.com/\"},\"ConnectionRequestTime\":\"2023-01-10T05:35:17.4319341Z\"}]",
+//   "replyToId": "2gSxQmQwHF5Gbq0TTnAaI9-us|0000003"
+// }

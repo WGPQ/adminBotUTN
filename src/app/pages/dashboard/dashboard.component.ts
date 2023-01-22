@@ -48,7 +48,7 @@ export class DashboardComponent implements OnInit {
     labels: this.barChartLabels,
     datasets: [
       { data: [65, 59, 80, 81, 56, 55, 40], label: 'Bot' },
-      { data: [28, 48, 40, 19, 86, 27, 90], label: 'Operador' },
+      { data: [28, 48, 40, 19, 86, 27, 100], label: 'Operador' },
     ],
   };
 

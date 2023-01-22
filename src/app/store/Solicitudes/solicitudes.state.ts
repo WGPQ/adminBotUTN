@@ -9,7 +9,6 @@ import { SolicitudesStateModel } from './solicitudes.models';
     solicitudes: [],
   },
 })
-
 @Injectable()
 export class PostSolicitudesState {
   @Selector()
@@ -24,7 +23,7 @@ export class PostSolicitudesState {
   ) {
     const state = getState();
     patchState({
-      solicitudes: [...state.solicitudes, payload],
+      solicitudes: state.solicitudes.concat(payload),
     });
   }
 

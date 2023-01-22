@@ -1,5 +1,8 @@
 import { Injectable } from '@angular/core';
-import { DirectLine, ConnectionStatus } from 'botframework-directlinejs';
+import { Store } from '@ngxs/store';
+import { DirectLine } from 'botframework-directlinejs';
+import { Usuario } from '../interfaces/usuarios.interface';
+import { SetAccountState } from '../store/Account/account.state';
 import { AuthenticationService } from './authentication.service';
 
 @Injectable({
@@ -7,55 +10,48 @@ import { AuthenticationService } from './authentication.service';
 })
 export class BotService {
   directLine?: DirectLine;
-  constructor(private authtService: AuthenticationService) {
+  usuario?: Usuario;
+  constructor(
+    private authtService: AuthenticationService,
+    private store: Store
+  ) {
     this.initBotConfig();
-    this.statusConnectionBot();
+    this.getCurrentUser();
   }
   initBotConfig() {
-    console.log("se inicializo",this.directLine);
     this.directLine = new DirectLine({
       secret: '2mQOcWjJgOc.Cu3pkgFaQporkiX2YzFMUYzuMRS5rPM6rJbOE8C9Igo',
-      // conversationId: '3LUBpf2gRbZpRLlzfA814-us|0000001',
       conversationStartProperties: {
         locale: 'en-US',
       },
     });
   }
-  statusConnectionBot() {
-    this.directLine!.connectionStatus$.subscribe((connectionStatus) => {
-      switch (connectionStatus) {
-        case ConnectionStatus.Uninitialized: // the status when the DirectLine object is first created/constructed
-          console.log('Uninitialized');
-          break;
-        case ConnectionStatus.Connecting: // currently trying to connect to the conversation
-          console.log('Connecting');
-          break;
-        case ConnectionStatus.Online: // successfully connected to the converstaion. Connection is healthy so far as we know.
-          console.log('Online');
-          break;
-        case ConnectionStatus.ExpiredToken: // last operation errored out with an expired token. Your app should supply a new one.
-          console.log('ExpiredToken');
-          break;
-        case ConnectionStatus.FailedToConnect: // the initial attempt to connect to the conversation failed. No recovery possible.
-          console.log('FailedToConnect');
-          break;
-        case ConnectionStatus.Ended: // the bot ended the conversation
-          console.log('Ended');
-          break;
-      }
-    });
 
-  }
-
-  sendMessage(message: string) {
+  sendMessage(message: string, usuario: Usuario) {
     return this.directLine!.postActivity({
       from: {
-        id: this.authtService?.usuario?.id!,
-        name: this.authtService?.usuario?.nombre_completo,
-        role: 'channel',
+        id: usuario?.id!,
+        name: usuario?.nombre_completo,
+        role: 'user',
       },
       type: 'message',
       text: message,
     });
+  }
+  getCurrentUser() {
+    if (sessionStorage?.session) {
+      this.store.select(SetAccountState.getAccount).subscribe((user) => {
+        console.log('usuario de portal');
+
+        this.usuario = user!;
+      });
+    }
+    if (sessionStorage.getItem('session-blog')) {
+      this.store.select(SetAccountState.getAccountBlog).subscribe((user) => {
+        console.log('usuario del blog');
+
+        this.usuario = user!;
+      });
+    }
   }
 }

@@ -1,3 +1,3 @@
 export class SolicitudesStateModel {
-  solicitudes: any;
+  solicitudes: any[] = [];
 }

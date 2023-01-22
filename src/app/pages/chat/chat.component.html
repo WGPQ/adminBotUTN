@@ -6,11 +6,11 @@
   </div>
 </div>
 
-<div *ngIf="isInitialized" class="row">
+<div *ngIf="isInitialized && !showError" class="row">
   <!-- start chat users-->
   <div class="col-xl-4 order-xl-1">
     <div class="card">
-      <div class="card-body pb-0" >
+      <div class="card-body pb-0">
         <div class="dropdown float-end">
           <a
             href="#"
@@ -24,9 +24,28 @@
             <!-- item-->
             <a
               href="javascript:void(0);"
+              (click)="sendComandos(1)"
+              class="dropdown-item"
+              >Recibir Solicitudes</a
+            >
+            <a
+              href="javascript:void(0);"
+              (click)="sendComandos(2)"
+              class="dropdown-item"
+              >No Recbir Solicitudes</a
+            >
+
+            <a
+              href="javascript:void(0);"
+              (click)="sendComandos(3)"
+              class="dropdown-item"
+              >Consultar Solicitudes</a
+            >
+            <a
+              href="javascript:void(0);"
               (click)="closeChat()"
               class="dropdown-item"
-              >Cerrar Chat</a
+              >Desconectar</a
             >
           </div>
         </div>
@@ -42,7 +61,7 @@
             <a
               class="inbox-item"
               href="javascript:void(0);"
-              (click)="selectChat(solicitud?.id)"
+              (click)="selectChat(solicitud?.content?.buttons[0]?.value)"
             >
               <div class="inbox-item-img">
                 <div
@@ -50,37 +69,27 @@
                   [ngStyle]="{ 'background-color': solicitud?.color }"
                 >
                   <div class="initials">
-                    {{ initialsName(solicitud?.from?.name) }}
+                    {{
+                      initialsName(solicitud?.content?.subtitle.split("-")[1])
+                    }}
                   </div>
                 </div>
               </div>
-              <p class="inbox-item-author">{{ solicitud?.from?.name }}</p>
+              <p class="inbox-item-author">{{ solicitud?.content?.subtitle.split("-")[1] }}</p>
               <p class="inbox-item-text">
                 {{ solicitud?.timestamp | date : "EEE d MMM y HH:mm" }}
               </p>
               <p *ngIf="!solicitud?.accept" class="inbox-item-date">
                 <button
                   type="button"
-                  (click)="
-                    reaccionarSolicitud(
-                      true,
-                      solicitud?.id,
-                      solicitud?.attachments
-                    )
-                  "
+                  (click)="reaccionarSolicitud(true, solicitud?.content?.buttons[0]?.value)"
                   class="btn btn-sm btn-outline-primary px-1 py-0"
                 >
                   <i class="uil uil-check font-16"></i>
                 </button>
                 <button
                   type="button"
-                  (click)="
-                    reaccionarSolicitud(
-                      false,
-                      solicitud?.id,
-                      solicitud?.attachments
-                    )
-                  "
+                  (click)="reaccionarSolicitud(false, solicitud?.content?.buttons[1]?.value)"
                   class="btn btn-sm btn-outline-danger px-1 py-0 mx-1"
                 >
                   <i class="uil uil-times font-16"></i>
@@ -101,9 +110,9 @@
 
   <!-- chat area -->
   <div class="col-xl-8 order-xl-2">
-    <div class="card" >
+    <div class="card">
       <div class="card-body">
-        <div class="container-scroll" #scrollChat style="height: 63vh" >
+        <div class="container-scroll" #scrollChat style="height: 63vh">
           <div class="conversation-list">
             <div
               *ngFor="let activity of activities"
@@ -187,10 +196,16 @@
     <!-- Pricing Title-->
     <div class="text-center">
       <h3 class="mb-2">BiblioChat UTN</h3>
-      <p class="text-muted w-50 m-auto">
+      <p *ngIf="!showError" class="text-muted w-50 m-auto">
         Este servicio esta disponible para brindar servicio de soporte a
         usuarios de la comunidad universitaria UTN.
       </p>
+      <div *ngIf="showError" class="d-block">
+        <i class="mdi mdi-image-broken-variant mdi-48px"></i>
+        <p class="text-muted w-50 m-auto">
+          {{ errorMessage }}
+        </p>
+      </div>
 
       <button
         type="button"
@@ -207,7 +222,7 @@
         ></i>
 
         <span>
-          {{ loadingStartChat ? "Inicializando" : "Empezar" }}
+          {{ loadingStartChat ? "Conectando" : "Conectar" }}
         </span>
       </button>
     </div>

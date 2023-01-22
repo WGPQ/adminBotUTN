@@ -17,9 +17,8 @@ export class BibliochatComponent implements OnInit {
 
   }
 
-  senMessage() {    
-    var message = this.myNameElem!.nativeElement.value;
-    this.botservice.sendMessage(message);
+  senMessage() {
+
 
   }
 

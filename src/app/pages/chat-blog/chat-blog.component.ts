@@ -6,10 +6,8 @@ import {
   ViewChild,
 } from '@angular/core';
 import { FormGroup } from '@angular/forms';
-import { tap } from 'rxjs/operators';
 import { Usuario } from 'src/app/interfaces/usuarios.interface';
 import { AuthenticationService } from 'src/app/services/authentication.service';
-import { BibliotecaService } from 'src/app/services/biblioteca.service';
 import { BotService } from 'src/app/services/bot.service';
 import { FormsService } from 'src/app/services/forms.service';
 import html2canvas from 'html2canvas';
@@ -31,7 +29,7 @@ export class ChatBlogComponent implements OnInit {
   activities: any[] = [];
   usuario?: Usuario;
   mensageForm!: FormGroup;
-  loading:boolean=false;
+  loading: boolean = false;
 
   @HostListener('scroll', ['$event'])
   doSomethingOnScroll($event: Event) {
@@ -41,8 +39,8 @@ export class ChatBlogComponent implements OnInit {
   constructor(
     private formService: FormsService,
     private botService: BotService,
-    private chatService:ChatService,
-    private authservices: AuthenticationService,
+    private chatService: ChatService,
+    private authservices: AuthenticationService
   ) {
     this.chatForm = formService.crearFormularioChatBlog();
     this.mensageForm = formService.crearFormularioMensaje();
@@ -65,7 +63,7 @@ export class ChatBlogComponent implements OnInit {
   ngOnInit(): void {
     this.scrollToBottom();
     this.listeMessages();
-    this.chatId = localStorage.getItem("chat-id");
+    this.chatId = localStorage.getItem('chat-id');
   }
   get correoNoValido() {
     return (
@@ -86,25 +84,23 @@ export class ChatBlogComponent implements OnInit {
         }
       });
     }
-this.loading=true;
+    this.loading = true;
     const correo = this.chatForm.value.correo;
-    this.authservices.acceso_chat_blog(correo).subscribe(resp => {
-      if(resp){
-        this.authservices.verificarToken().subscribe(authenticate=>{
-          if(authenticate){
+    this.authservices.acceso_chat_blog(correo).subscribe((resp) => {
+      if (resp) {
+        this.authservices.verificarTokenBlog().subscribe((authenticate) => {
+          if (authenticate) {
             this.mensageForm.patchValue({
               message: correo,
             });
-            this.sendMessage();
-            localStorage.setItem("chat-id",correo);
-            this.chatId = correo ;
+            // this.sendMessage();
+            localStorage.setItem('chat-id', correo);
+            this.chatId = correo;
             this.usuario = this.authservices.usuario;
-            this.loading=false;
+            this.loading = false;
           }
-
         });
       }
-
     });
   }
   listeMessages() {
@@ -113,8 +109,7 @@ this.loading=true;
         if (!this.activities.includes(activity)) {
           this.activities = [...this.activities, activity];
         }
-        console.log("Hola",activity);
-
+        console.log('Hola', activity);
       });
     } catch (error) {
       console.log('listeMessages', error);
@@ -128,8 +123,7 @@ this.loading=true;
     ) {
       const message = this.mensageForm.value.message.trim();
       try {
-        this.botService.sendMessage(message).subscribe((resp) => {
-        });
+        this.botService.sendMessage(message,this.usuario!).subscribe((resp) => {});
         this.mensageForm.disable();
         this.mensageForm.reset();
         this.mensageForm.enable();
@@ -140,10 +134,10 @@ this.loading=true;
     }
   }
   enviarChat() {
-    this.chatId=null;
-    localStorage.removeItem("chat-id");
+    this.chatId = null;
+    localStorage.removeItem('chat-id');
     html2canvas(document.querySelector('#chat-messages')!).then((canvas) => {
-      const user:Cliente = {...this.usuario!};
+      const user: Cliente = { ...this.usuario! };
       const data: SendChat = {
         image: canvas.toDataURL(),
         comentario: '',
@@ -151,7 +145,6 @@ this.loading=true;
       };
       this.chatService.sendChatCliente(data).subscribe((resp) => {
         console.log(resp);
-
       });
     });
   }
