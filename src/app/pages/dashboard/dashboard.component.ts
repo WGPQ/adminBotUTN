@@ -1,11 +1,10 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { Cliente } from 'src/app/interfaces/cliente.interface';
-import { Listar } from 'src/app/interfaces/listar.interface';
-import { Usuario } from 'src/app/interfaces/usuarios.interface';
-import { ClienteService } from 'src/app/services/cliente.service';
-import { UsuarioService } from 'src/app/services/usuario.service';
-import { ChartConfiguration, ChartData, ChartEvent, ChartType } from 'chart.js';
-import { BaseChartDirective } from 'ng2-charts';
+import { Usuario } from 'src/app/interfaces/usuario.interface';
+import { Store } from '@ngxs/store';
+import { UsuariosState } from 'src/app/store/Usuarios/usuarios.state';
+import { ChatState } from 'src/app/store/Chat/chat.state';
+import { Comentario } from 'src/app/interfaces/comentarios.interface';
 
 @Component({
   selector: 'app-dashboard',
@@ -14,90 +13,73 @@ import { BaseChartDirective } from 'ng2-charts';
 })
 export class DashboardComponent implements OnInit {
   usuariosOnline: Usuario[] = [];
+  usuarios: Usuario[] = [];
   clientes: Cliente[] = [];
-  @ViewChild(BaseChartDirective) chart: BaseChartDirective | undefined;
+  comentarios: Comentario[] = [];
+  rolOperador: string = 'Agente';
+  rolCliente: string = 'Usuario';
+  barChartLabels: string[] = [];
+  chatsPerdidos: Number = 0;
+  totalchatsAtendidos: Number = 0;
 
-  public barChartOptions: ChartConfiguration['options'] = {
-    elements: {
-      line: {
-        tension: 0.4,
-      },
-    },
-    scales: {
-      x: {},
-      y: {
-        min: 10,
-      },
-    },
-    plugins: {
-      legend: { display: true },
-    },
-  };
-  public barChartLabels: string[] = [
-    '2006',
-    '2007',
-    '2008',
-    '2009',
-    '2010',
-    '2011',
-    '2012',
-  ];
-  public barChartType: ChartType = 'bar';
-
-  public barChartData: ChartData<'bar'> = {
-    labels: this.barChartLabels,
-    datasets: [
-      { data: [65, 59, 80, 81, 56, 55, 40], label: 'Bot' },
-      { data: [28, 48, 40, 19, 86, 27, 100], label: 'Operador' },
-    ],
-  };
-
-  // events
-  public chartClicked({
-    event,
-    active,
-  }: {
-    event?: ChartEvent;
-    active?: {}[];
-  }): void {
-    console.log(event, active);
+  constructor(private store: Store) {
+    this.store
+      .select(ChatState.getInteracciones)
+      .subscribe((interacciones: any) => {
+        if (interacciones) {
+          const total = [...interacciones?.bot, ...interacciones?.agente];
+          this.totalchatsAtendidos = total.reduce(
+            (total: Number, item: any) => (total = total + item),
+            0
+          );
+          const array = interacciones?.bot ?? [];
+          this.chatsPerdidos = array.reduce(
+            (resp: any, item: any) => (resp = resp + item),
+            0
+          );
+        }
+      });
   }
-
-  public chartHovered({
-    event,
-    active,
-  }: {
-    event?: ChartEvent;
-    active?: {}[];
-  }): void {
-    console.log(event, active);
-  }
-
-  constructor(
-    private usuarioService: UsuarioService,
-    private clienteService: ClienteService
-  ) {}
 
   ngOnInit(): void {
-    this.getConectados(2);
+    this.getConectados();
     this.getClientes();
+    this.getComentarios();
   }
 
-  getConectados(rol: number) {
-    this.usuarioService.usuarioEnLinea(rol).subscribe((resp) => {
-      this.usuariosOnline = resp;
-    });
+  getConectados() {
+    this.store
+      .select(UsuariosState.getUsuariosList)
+      .subscribe((usuariosList: Usuario[]) => {
+        this.usuariosOnline = usuariosList.filter(
+          (usuario) =>
+            usuario.rol?.toLowerCase() === this.rolOperador.toLowerCase() &&
+            usuario.conectado === true
+        );
+      });
   }
   getClientes() {
-    var listar: Listar = {
-      columna: '',
-      search: '',
-      offset: 0,
-      limit: '0',
-      sort: '',
-    };
-    // this.clienteService.obtenerClientes(listar).subscribe((resp) => {
-    //   this.clientes = resp;
-    // });
+    this.store
+      .select(UsuariosState.getUsuariosList)
+      .subscribe((usuariosList: Usuario[]) => {
+        this.clientes = usuariosList.filter(
+          (usuario) =>
+            usuario.rol?.toLowerCase() === this.rolCliente.toLowerCase()
+        );
+
+        this.usuarios = usuariosList.filter(
+          (usuario) =>
+            usuario.rol?.toLowerCase() === this.rolOperador.toLowerCase()
+        );
+      });
+  }
+  getInteracciones(anio: string, meses: string) {}
+
+  getComentarios() {
+    this.store
+      .select(ChatState.getComentarios)
+      .subscribe((comentariosList: Comentario[]) => {
+        this.comentarios = comentariosList;
+      });
   }
 }

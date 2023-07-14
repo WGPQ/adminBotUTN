@@ -51,52 +51,52 @@
         </div>
 
         <h4 class="header-title mb-3">Solicitudes</h4>
+        <div *ngIf="solicitudes?.length === 0">No hay solicitudes</div>
         <div
           class="inbox-widget container-scroll"
           (scroll)="doSomethingOnScroll($event)"
           #scrollMessages
-          style="height: 65vh"
+          style="height: 70vh"
         >
           <div *ngFor="let solicitud of solicitudes">
-            <a
-              class="inbox-item"
-              href="javascript:void(0);"
-              (click)="selectChat(solicitud?.content?.buttons[0]?.value)"
-            >
+            <div class="inbox-item" (click)="selectChat(solicitud)">
               <div class="inbox-item-img">
                 <div
                   class="circle"
                   [ngStyle]="{ 'background-color': solicitud?.color }"
                 >
                   <div class="initials">
-                    {{
-                      initialsName(solicitud?.content?.subtitle.split("-")[1])
-                    }}
+                    {{ initialsName(solicitud?.name) }}
                   </div>
                 </div>
               </div>
-              <p class="inbox-item-author">{{ solicitud?.content?.subtitle.split("-")[1] }}</p>
-              <p class="inbox-item-text">
-                {{ solicitud?.timestamp | date : "EEE d MMM y HH:mm" }}
+              <p class="inbox-item-author">
+                {{ solicitud?.content?.subtitle.split("-")[1] }}
               </p>
-              <p *ngIf="!solicitud?.accept" class="inbox-item-date">
+              <p class="inbox-item-text">
+                {{ solicitud?.timestamp | timeAgo }}
+              </p>
+
+              <p
+                *ngIf="!solicitud?.accept"
+                class="inbox-item-date"
+              >
                 <button
                   type="button"
-                  (click)="reaccionarSolicitud(true, solicitud?.content?.buttons[0]?.value)"
+                  (click)="reaccionarSolicitud(true, solicitud)"
                   class="btn btn-sm btn-outline-primary px-1 py-0"
                 >
                   <i class="uil uil-check font-16"></i>
                 </button>
                 <button
                   type="button"
-                  (click)="reaccionarSolicitud(false, solicitud?.content?.buttons[1]?.value)"
+                  (click)="reaccionarSolicitud(false, solicitud)"
                   class="btn btn-sm btn-outline-danger px-1 py-0 mx-1"
                 >
                   <i class="uil uil-times font-16"></i>
                 </button>
               </p>
-              <hr />
-            </a>
+            </div>
           </div>
         </div>
         <!-- end inbox-widget -->
@@ -111,8 +111,21 @@
   <!-- chat area -->
   <div class="col-xl-8 order-xl-2">
     <div class="card">
+      <div class="card-header" style="background-color: #dd3333">
+        <div class="dropdown float-end" style="height: 15px">
+          <a
+            (click)="finalizarChat()"
+            class="social-list-item border-white text-white"
+            style="display: flex; cursor: pointer; justify-content: center"
+            ><i class="uil uil-multiply"></i
+          ></a>
+        </div>
+        <h2 class="header-title text-white mt-1">
+          {{ chatActual?.name || botName }}
+        </h2>
+      </div>
       <div class="card-body">
-        <div class="container-scroll" #scrollChat style="height: 63vh">
+        <div class="container-scroll" #scrollChat style="height: 60vh">
           <div class="conversation-list">
             <div
               *ngFor="let activity of activities"
@@ -122,31 +135,92 @@
             >
               <br />
               <div class="chat-avatar">
-                <div
-                  class="circle"
-                  [ngStyle]="{ 'background-color': activity?.color }"
-                >
-                  <div class="initials">
-                    {{ "AJ" }}
+                <div *ngIf="activity.from.id === usuario!.id">
+                  <div *ngIf="usuario?.foto">
+                    <img
+                      [src]="usuario?.foto"
+                      [alt]="usuario?.nombres"
+                      class="circleHeader"
+                    />
+                  </div>
+                  <div
+                    *ngIf="!usuario?.foto"
+                    class="circle"
+                    [ngStyle]="{
+                      'background-color':
+                        activity.from.id === usuario!.id
+                          ? '#0DA1E6'
+                          : activity?.color
+                    }"
+                  >
+                    <div class="initials">
+                      {{
+                        initialsName(
+                          activity.from.id === usuario!.id
+                            ? usuario?.nombre_completo
+                            : activity.from?.name || botName
+                        )
+                      }}
+                    </div>
                   </div>
                 </div>
-                <!-- <img
-                  src=""
-                  [src]="
-                    activity.from.id === usuario!.id
-                      ? 'https://avatars.dicebear.com/api/initials/' +
-                        activity.from.name +
-                        '.svg'
-                      : 'assets/images/users/robot.jpg'
-                  "
-                  alt="Female"
-                /> -->
-                <i>{{ activity.timestamp!.split("T")[1].substring(0, 5) }}</i>
+                <div *ngIf="activity.from.id !== usuario!.id">
+                  <div
+                    *ngIf="usuarioChat && activity.from.id == usuarioChat?.id"
+                  >
+                    <div *ngIf="usuarioChat?.foto">
+                      <img
+                        [src]="usuarioChat.foto"
+                        [alt]="usuarioChat.nombres"
+                        class="circleHeader"
+                      />
+                    </div>
+
+                    <div
+                      *ngIf="!usuarioChat?.foto"
+                      class="circle"
+                      [ngStyle]="{
+                        'background-color': '#dd3333'
+                      }"
+                    >
+                      <div class="initials">
+                        {{ initialsName(usuarioChat.nombre_completo!) }}
+                      </div>
+                    </div>
+                  </div>
+                  <div *ngIf="bot && activity.from.id != usuarioChat?.id">
+                    <div *ngIf="bot?.foto">
+                      <img
+                        [src]="bot.foto"
+                        [alt]="bot.nombres"
+                        class="circleHeader"
+                      />
+                    </div>
+
+                    <div
+                      *ngIf="!bot?.foto"
+                      class="circle"
+                      [ngStyle]="{
+                        'background-color': '#dd3333'
+                      }"
+                    >
+                      <div class="initials">
+                        {{ initialsName(botName) }}
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <i>{{localDate(activity.timestamp) | date : " HH:mm"  }}</i>
               </div>
 
               <div class="conversation-text">
                 <div class="ctext-wrap chat-widgets-cn">
-                  <i>{{ activity.from.name }}</i>
+                  <i>{{
+                    activity.from.id === usuario!.id
+                      ? usuario?.nombre_completo
+                      : activity.from.name || chatActual?.name
+                  }}</i>
                   <p>{{ activity.text }}</p>
                 </div>
               </div>

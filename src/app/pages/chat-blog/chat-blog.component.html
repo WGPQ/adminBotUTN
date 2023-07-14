@@ -1,11 +1,8 @@
-<div *ngIf="chatId === null">
-  <div
-    class="card"
-    style="position: fixed; min-height: 100%; max-height: 100%; min-width: 100%"
-  >
+<div *ngIf="conversationId === null && !showComentario">
+  <div class="card">
     <!-- Logo -->
     <div class="pt-2 text-center bg-white">
-      <img src="assets/images/logo-chat-blog.webp" alt="" height="100" />
+      <img src="assets/images/logo-chat-blog.jpg" alt="" height="100px" />
     </div>
 
     <div class="card-body">
@@ -31,20 +28,23 @@
             >Ingrese un correo valido</small
           >
         </div>
-        <!-- <div class="mb-3">
-          <label for="emailaddress" class="form-label">Nombre: </label>
+        <div *ngIf="showInputName" class="mb-3">
+          <label for="nombreCliente" class="form-label">Nombre: </label>
           <input
             class="form-control"
             type="text"
-            id="emailaddress"
+            id="nombreCliente"
             placeholder="Introduce tu nombre"
             formControlName="nombre"
-            [class.is-invalid]="correoNoValido"
+            [class.is-invalid]="nombreNoValido"
           />
-          <small *ngIf="correoNoValido" class="form-text text-danger"
-            >Ingrese un correo valido</small
+          <small *ngIf="nombreNoValido" class="form-text text-danger"
+            >Ingrese un nombre</small
           >
-        </div> -->
+        </div>
+        <small *ngIf="showError" class="form-text text-danger">{{
+          messageError
+        }}</small>
         <div class="d-grid mb-5 mt-4 text-center">
           <button
             class="btn btn-primary"
@@ -64,27 +64,26 @@
   </div>
 </div>
 
-<div *ngIf="chatId !== null">
-  <div
-    class="card"
-    style="position: fixed; height: 95vh; max-height: 100vh; min-width: 100%"
-  >
+<div *ngIf="conversationId !== null && !showComentario">
+  <div class="card">
     <div class="card-header" style="background-color: #dd3333">
       <div class="dropdown float-end" style="height: 15px">
         <a
-          (click)="enviarChat()"
+          (click)="salirChat()"
           class="social-list-item border-white text-white"
           style="display: flex; cursor: pointer; justify-content: center"
           ><i class="uil uil-multiply"></i
         ></a>
       </div>
-      <h2 class="header-title text-white mt-1">Chat</h2>
+      <h2 class="header-title text-white mt-1">
+        Chat {{ usuario?.nombre_completo || "BiblioChat Utn" }}
+      </h2>
     </div>
     <div class="card-body" style="padding: 10px">
       <div
         class="container-scroll"
         #scrollChat
-        style="min-height: 100%; height: 400px"
+        style="min-height: 100%; height: 440px"
       >
         <div id="chat-messages" class="conversation-list">
           <div
@@ -95,22 +94,82 @@
           >
             <br />
             <div class="chat-avatar">
-              <img
-                src=""
-                [src]="
-                  activity.from.id === usuario!.id
-                    ? 'https://avatars.dicebear.com/api/initials/' +
-                      activity.from.name +
-                      '.svg'
-                    : 'assets/images/users/robot.jpg'
-                "
-                alt="Female"
-              />
-              <i>{{ activity.timestamp!.split("T")[1].substring(0, 5) }}</i>
+              <div *ngIf="activity.from.id === usuario!.id">
+                <div *ngIf="usuario?.foto">
+                  <img
+                    [src]="usuario?.foto"
+                    [alt]="usuario?.nombres"
+                    class="circleHeader"
+                  />
+                </div>
+                <div
+                  *ngIf="!usuario?.foto"
+                  class="circle"
+                  [ngStyle]="{
+                    'background-color':
+                      activity.from.id === usuario!.id
+                        ? '#0DA1E6'
+                        : activity?.color
+                  }"
+                >
+                  <div class="initials">
+                    {{
+                      initialsName(
+                        activity.from.id === usuario!.id
+                          ? usuario?.nombre_completo
+                          : activity.from?.name
+                      )
+                    }}
+                  </div>
+                </div>
+              </div>
+              <div *ngIf="activity.from.id !== usuario!.id">
+                <div *ngIf="usuarioChat && usuarioChat?.id == activity.from.id">
+                  <div *ngIf="usuarioChat?.foto">
+                    <img
+                      [src]="usuarioChat.foto"
+                      [alt]="usuarioChat.nombres"
+                      class="circleHeader"
+                    />
+                  </div>
+                  <div
+                    *ngIf="!usuarioChat?.foto"
+                    class="circle"
+                    [ngStyle]="{
+                      'background-color': '#dd3333'
+                    }"
+                  >
+                    <div class="initials">
+                      {{ initialsName(usuarioChat.nombres) }}
+                    </div>
+                  </div>
+                </div>
+
+                <div
+                  *ngIf="!usuarioChat || usuarioChat?.id != activity.from.id"
+                >
+                  <div
+                    class="circle"
+                    [ngStyle]="{
+                      'background-color': '#dd3333'
+                    }"
+                  >
+                    <div class="initials">
+                      {{ initialsName(botName) }}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <i>{{ localDate(activity.timestamp) | date : " HH:mm" }}</i>
             </div>
             <div class="conversation-text">
               <div class="ctext-wrap chat-widgets-cn">
-                <i>{{ activity.from.name }}</i>
+                <i>{{
+                  activity.from.id === usuario!.id
+                    ? usuario!.nombre_completo
+                    : activity.from.name || usuarioChat?.nombre_completo
+                }}</i>
                 <p>{{ activity.text }}</p>
               </div>
             </div>
@@ -151,4 +210,94 @@
   <!-- end chat area-->
 
   <!-- end user detail -->
+</div>
+
+<div *ngIf="showComentario">
+  <div class="d-flex justify-content-center">
+    <div
+      class="card"
+      style="position: fixed; min-height: 60%; max-height: 60%; min-width: 60%"
+    >
+      <!-- Logo -->
+      <div class="pt-2 text-center bg-white">
+        <img src="assets/images/logo-chat-blog.webp" alt="" height="100" />
+      </div>
+
+      <h4 class="text-dark-50 text-center p-0 fw-bold">Deja tu comentario</h4>
+      <p class="text-muted p-2">
+        Nos gustaria saber tu experiencia, al interactuar con nuestro servicio
+        de chat.
+      </p>
+      <div class="d-flex justify-content-center">
+        <div class="d-flex justify-content-around" style="width: 40%">
+          <p
+            [class]="emogiSelect == 2 ? 'border border-info rounded-2' : ''"
+            style="font-size: 40px; cursor: pointer"
+            (click)="calificacion(2)"
+          >
+            🙂
+          </p>
+          <p
+            [class]="emogiSelect == 1 ? 'border border-info rounded-2' : ''"
+            style="font-size: 40px; cursor: pointer"
+            (click)="calificacion(1)"
+          >
+            😐
+          </p>
+          <p
+            [class]="emogiSelect == 0 ? 'border border-info rounded-2' : ''"
+            style="font-size: 40px; cursor: pointer"
+            (click)="calificacion(0)"
+          >
+            🙁
+          </p>
+        </div>
+      </div>
+
+      <div class="card-body">
+        <form
+          [formGroup]="comentarioForm"
+          autocomplete="off"
+          (ngSubmit)="enviarComentario()"
+        >
+          <div class="form-floating">
+            <textarea
+              class="form-control"
+              placeholder="Leave a comment here"
+              id="floatingTextarea"
+              formControlName="comentario"
+              style="height: 100px"
+            ></textarea>
+          </div>
+          <div class="d-grid mb-5 mt-4 text-center">
+            <button
+              class="btn btn-primary"
+              [disabled]="comentarioForm.invalid || loading"
+              type="submit"
+            >
+              <i
+                [class]="
+                  loading
+                    ? 'mdi mdi-refresh mdi-spin me-2'
+                    : 'mdi mdi-login me-2 '
+                "
+              ></i>
+              <span>Enviar Comentario</span>
+            </button>
+          </div>
+        </form>
+      </div>
+
+      <div class="row mt-3">
+        <div class="col-12 text-center">
+          <p class="text-muted">
+            <a (click)="nuevaConversacion()" class="text-muted ms-1"
+              ><b>Iniciar una nueva conversacion </b></a
+            >
+          </p>
+        </div>
+        <!-- end col -->
+      </div>
+    </div>
+  </div>
 </div>

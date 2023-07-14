@@ -1,13 +1,12 @@
 <!-- start auth-fluid-->
-
-<div class="auth-fluid">
+<div *ngIf="!hasAuthLoading" class="auth-fluid">
   <!--Auth fluid left content -->
   <div class="auth-fluid-form-box">
     <div class="align-items-center d-flex h-100">
       <div class="card-body">
         <!-- Logo -->
         <div class="auth-brand text-center text-lg-start">
-          <a href="index.html" class="logo-dark">
+          <a class="logo-dark">
             <span
               ><img src="assets/images/logo-dark.png" alt="" height="100"
             /></span>
@@ -24,7 +23,6 @@
 
         <!-- form -->
         <form [formGroup]="loginForm" autocomplete="off" (ngSubmit)="login()">
-
           <div class="mb-3">
             <!-- <label for="emailaddress" class="form-label">Usuario</label> -->
             <input
@@ -63,7 +61,7 @@
               >La contraseña es requerida</small
             >
           </div>
-          <div class="mb-3">
+          <div class="d-flex justify-content-between mb-3">
             <div class="form-check">
               <input
                 type="checkbox"
@@ -75,14 +73,24 @@
                 >Recordarme</label
               >
             </div>
+            <a routerLink="/resetear" class="text-muted float-end"
+              ><small>Olvidaste tu contraseña?</small></a
+            >
           </div>
-          <div class="d-grid mb-0  text-center">
+          <div class="d-grid mb-0 text-center">
             <button
               class="btn btn-primary btn-lg"
               [disabled]="loginForm.invalid || loading"
               type="submit"
             >
-              <i [class]=' loading?  "mdi mdi-refresh mdi-spin me-2":"mdi mdi-login me-2 "'></i> <span>Ingresar</span>
+              <i
+                [class]="
+                  loading
+                    ? 'mdi mdi-refresh mdi-spin me-2'
+                    : 'mdi mdi-login me-2 '
+                "
+              ></i>
+              <span>Ingresar</span>
             </button>
           </div>
         </form>
@@ -96,15 +104,27 @@
   <!-- Auth fluid right content -->
   <div class="auth-fluid-right text-center">
     <div class="auth-user-testimonial">
-      <h2 class="mb-3">I love the color!</h2>
+      <h2 class="mb-3">La biblioteca</h2>
       <p class="lead">
-        <i class="mdi mdi-format-quote-open"></i> It's a elegent templete. I
-        love it very much! . <i class="mdi mdi-format-quote-close"></i>
+        <i class="mdi mdi-format-quote-open"></i> Es el templo de la sabiduría y
+        el refugio del alma . <i class="mdi mdi-format-quote-close"></i>
       </p>
-      <p>- Hyper Admin User</p>
+      <p>- Anatole France</p>
     </div>
     <!-- end auth-user-testimonial-->
   </div>
   <!-- end Auth fluid right content -->
 </div>
 <!-- end auth-fluid-->
+
+<div
+  *ngIf="hasAuthLoading"
+  class="d-flex align-items-center justify-content-center"
+  style="height: 100vh"
+>
+  <img
+    src="assets/images/logo-dark.png"
+    height="140"
+    alt="File not found Image"
+  />
+</div>

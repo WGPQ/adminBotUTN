@@ -1,0 +1,90 @@
+<div class="card-header pt-2 pb-2">
+  <h5 class="mb-2 font-16">Calificaciones</h5>
+</div>
+<div style="display: block; height: 380px">
+  <canvas
+    baseChart
+    class="chartDona"
+    [data]="pieChartData"
+    [type]="pieChartType"
+    [options]="pieChartOptions"
+    (waiting)="(cargando)"
+  >
+  </canvas>
+</div>
+
+<div class="accordion" id="accordionExample">
+  <div class="card mb-0">
+    <div class="card-header" id="headingOne">
+      <div
+        class="d-flex align-items-center justify-content-between"
+        data-bs-toggle="collapse"
+        href="#collapseOne"
+        aria-expanded="true"
+      >
+        <h5>
+          <a class="custom-accordion-title d-block pt-2 pb-2">
+            Lista de calificaciones
+          </a>
+        </h5>
+        <div>
+          <div class="text-xl-end mt-xl-0 mt-2">
+            <button
+              type="button"
+              class="btn btn-light mb-2"
+              [disabled]="cargando"
+              (click)="exportar()"
+            >
+              <i class="mdi mdi-file-download mdi-24px"></i> Exportar
+            </button>
+          </div>
+        </div>
+        <!-- end col-->
+      </div>
+    </div>
+
+    <div
+      id="collapseOne"
+      class="collapse"
+      aria-labelledby="headingOne"
+      data-bs-parent="#accordionExample"
+    >
+      <div class="card-body">
+        <div class="table-responsive">
+          <table
+            id="calificaciones-table"
+            *ngIf="!cargando && calificaciones.length > 0"
+            class="table table-centered mb-0"
+          >
+            <thead class="table-light">
+              <tr>
+                <th style="width: 20px">#</th>
+                <th>Etiqueta</th>
+                <th style="text-align: center">Calificacion</th>
+                <th style="width: 125px; text-align: center">Accion</th>
+                <th style="display: none">Fecha</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let calificacion of calificaciones; let i = index">
+                <td>
+                  <a class="text-body fw-bold">{{ i + 1 }}</a>
+                </td>
+                <td>{{ calificacion.label | textElipsis : 20 }}</td>
+                <td style="text-align: center">
+                  {{ calificacion.cantidad }}
+                </td>
+                <td style="text-align: center; font-size: 30px">
+                  {{ calificacion.emogi }}
+                </td>
+                <td style="display: none">
+                  {{ currentDate | date : "dd-MM-yyyy HH:mm" }}
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>

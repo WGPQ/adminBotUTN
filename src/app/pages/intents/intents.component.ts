@@ -1,24 +1,29 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormGroup } from '@angular/forms';
+import { Store } from '@ngxs/store';
 import { Intencion } from 'src/app/interfaces/intencion.interface';
 import { Listar } from 'src/app/interfaces/listar.interface';
 import { AlertService } from 'src/app/services/alert.service';
 import { FormsService } from 'src/app/services/forms.service';
 import { IntencionService } from 'src/app/services/intencion.service';
+import {
+  RemoveIntencion,
+  SetIntencion,
+} from 'src/app/store/Intenciones/intenciones.actions';
+import { IntencionesState } from 'src/app/store/Intenciones/intenciones.state';
 import Swal from 'sweetalert2';
 
 @Component({
   selector: 'app-intents',
   templateUrl: './intents.component.html',
-  styles: [
-  ]
+  styles: [],
 })
-export class IntentsComponent implements OnInit {
+export class IntentsComponent implements OnInit, OnDestroy {
   intenciones: Intencion[] = [];
   intencionForm!: FormGroup;
   listarForm!: FormGroup;
-  submitType: string = "Guardar";
-  action = "Agregar";
+  submitType: string = 'Guardar';
+  action = 'Agregar';
   idIntencion?: string;
   cargando = false;
   pagina = 0;
@@ -26,8 +31,10 @@ export class IntentsComponent implements OnInit {
   numeroPaginas = new Array(1);
   previus = false;
   next = true;
+  setTimeRef: any;
   @ViewChild('closebutton') closebutton: any;
   constructor(
+    private store: Store,
     private intencionService: IntencionService,
     private alertService: AlertService,
     private formService: FormsService
@@ -38,7 +45,11 @@ export class IntentsComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.listarIntencion();
+    this.fetchIntenciones();
+  }
+
+  ngOnDestroy(): void {
+    clearTimeout(this.setTimeRef);
   }
   previusPage() {
     if (this.pagina > 0) {
@@ -70,9 +81,19 @@ export class IntentsComponent implements OnInit {
   }
 
   search() {
-    if (this.listarForm.value.columna != "") {
+    if (this.listarForm.value.columna != '') {
       this.listarIntencion();
     }
+  }
+
+  fetchIntenciones() {
+    this.store
+      .select(IntencionesState.getIntencionesList)
+      .subscribe((intencionesList: Intencion[]) => {
+        this.intenciones = intencionesList;
+        this.numeroPaginas = new Array(Math.ceil(this.intenciones.length / 10));
+        this.setTimeRef = setTimeout(() => (this.cargando = false), 450);
+      });
   }
   listarIntencion() {
     var listar: Listar = {
@@ -81,8 +102,8 @@ export class IntentsComponent implements OnInit {
       offset: this.listarForm.value.offset,
       limit: this.listarForm.value.limit || 10,
       sort: this.listarForm.value.sort,
-    }
-    this.intencionService.obtenerIntenciones(listar).subscribe(response => {
+    };
+    this.intencionService.obtenerIntenciones(listar).subscribe((response) => {
       this.intenciones = response;
       this.numeroPaginas = new Array(Math.ceil(this.intenciones.length / 10));
       this.cargando = false;
@@ -91,19 +112,27 @@ export class IntentsComponent implements OnInit {
 
   nuevo() {
     this.intencionForm.reset();
-    this.action = "Agregar"
-    this.submitType = "Guardar";
+    this.action = 'Agregar';
+    this.submitType = 'Guardar';
   }
-
 
   get codigoNoValido() {
-    return this.intencionForm.get('codigo')?.invalid && this.intencionForm.get('codigo')?.touched;
+    return (
+      this.intencionForm.get('codigo')?.invalid &&
+      this.intencionForm.get('codigo')?.touched
+    );
   }
   get nombreNoValido() {
-    return this.intencionForm.get('nombre')?.invalid && this.intencionForm.get('nombre')?.touched;
+    return (
+      this.intencionForm.get('nombre')?.invalid &&
+      this.intencionForm.get('nombre')?.touched
+    );
   }
   get descripcionNoValida() {
-    return this.intencionForm.get('descripcion')?.invalid && this.intencionForm.get('descripcion')?.touched;
+    return (
+      this.intencionForm.get('descripcion')?.invalid &&
+      this.intencionForm.get('descripcion')?.touched
+    );
   }
   guardarIntencion() {
     const intencion: Intencion = {
@@ -115,45 +144,57 @@ export class IntentsComponent implements OnInit {
     this.alertService.esperando('Guardar informacion....');
     Swal.showLoading();
 
-    if (this.action == "Agregar") {
-      this.intencionService.ingresarIntencion(intencion).subscribe(resp => {
+    if (this.action == 'Agregar') {
+      this.intencionService.ingresarIntencion(intencion).subscribe((resp) => {
         if (resp.exito) {
-          this.alertService.correcto(`${resp.data.nombre} ${resp.data.descripcion}`, resp.message).then(() => {
-            this.closebutton.nativeElement.click();
-            this.listarIntencion();
-          });
+          this.alertService
+            .correcto(
+              `${resp.data.nombre} ${resp.data.descripcion}`,
+              resp.message
+            )
+            .then(() => {
+              this.closebutton.nativeElement.click();
+              this.store.dispatch(new SetIntencion(resp?.data));
+            });
         } else {
-
-
           this.alertService.error('Error', resp.message);
         }
       });
     } else {
-      this.intencionService.actualizarIntencion(intencion).subscribe(resp => {
-        if (resp.exito) {
-          this.alertService.correcto(`${resp.data.nombre} ${resp.data.descripcion}`, resp.message).then(() => {
-            this.closebutton.nativeElement.click();
-            this.listarIntencion();
-          });
-        } else {
-          this.alertService.error('Error', resp.message);
+      this.intencionService.actualizarIntencion(intencion).subscribe(
+        (resp) => {
+          if (resp.exito) {
+            this.alertService
+              .correcto(
+                `${resp.data.nombre} ${resp.data.descripcion}`,
+                resp.message
+              )
+              .then(() => {
+                this.closebutton.nativeElement.click();
+                this.store.dispatch(new SetIntencion(resp?.data));
+              });
+          } else {
+            this.alertService.error('Error', resp.message);
+          }
+        },
+        (err) => {
+          console.log(err);
+          this.alertService.error(
+            'Error al actualizar',
+            `${err.status} ${err.statusText}`
+          );
         }
-      }, (err => {
-        console.log(err);
-        this.alertService.error('Error al actualizar', `${err.status} ${err.statusText}`);
-      }));
+      );
     }
   }
 
-  editar(id?: string) {
-    this.action = "Editar"
-    this.submitType = "Actualizar";
-    this.idIntencion = id;
-    this.intencionService.obtenerIntencion(id).subscribe((resp) => {
-      this.intencionForm.patchValue({
-        nombre: resp.nombre,
-        descripcion: resp.descripcion
-      });
+  editar(intencion: Intencion) {
+    this.action = 'Editar';
+    this.submitType = 'Actualizar';
+    this.idIntencion = intencion?.id;
+    this.intencionForm.patchValue({
+      nombre: intencion?.nombre,
+      descripcion: intencion?.descripcion,
     });
   }
   eliminar(intencion: Intencion) {
@@ -165,19 +206,19 @@ export class IntentsComponent implements OnInit {
         text: `${intencion.nombre}`,
         showConfirmButton: true,
         showCancelButton: true,
-      }).then(resp => {
-
+      }).then((resp) => {
         if (resp.value) {
-
-          this.intencionService.eliminarIntencion(intencion.id).subscribe(resp => {
-            if (resp.exito) {
-              this.alertService.correcto('', resp.message).then(() => {
-                this.listarIntencion();
-              });
-            } else {
-              this.alertService.error('Error', resp.message);
-            }
-          });
+          this.intencionService
+            .eliminarIntencion(intencion.id)
+            .subscribe((resp) => {
+              if (resp.exito) {
+                this.alertService.correcto('', resp.message).then(() => {
+                  this.store.dispatch(new RemoveIntencion(resp?.id));
+                });
+              } else {
+                this.alertService.error('Error', resp.message);
+              }
+            });
         }
       });
     }
@@ -190,11 +231,10 @@ export class IntentsComponent implements OnInit {
       offset: this.listarForm.value.offset,
       limit: this.listarForm.value.limit || 10,
       sort: this.listarForm.value.sort,
-    }
-    this.intencionService.exportarExcel(listar).subscribe(blob => {
+    };
+    this.intencionService.exportarExcel(listar).subscribe((blob) => {
       let fileUrl = window.URL.createObjectURL(blob);
       window.open(fileUrl);
     });
   }
-
 }

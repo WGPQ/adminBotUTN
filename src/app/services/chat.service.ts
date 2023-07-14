@@ -25,7 +25,9 @@ export class ChatService {
   ) {}
   headers = new HttpHeaders({
     'Content-Type': 'application/json',
-    Authorization: 'Bearer ' + this.authservices.leerToken(),
+    Authorization:
+      'Bearer ' +
+      (this.authservices.leerToken() || this.authservices.leerTokenBlog()),
   });
 
   //Listar interacciones
@@ -45,16 +47,38 @@ export class ChatService {
   }
 
   //Listar interacciones
-  getSessiones(id: string, listar: Listar): Observable<any> {
+  getSessiones(id?: string, listar?: Listar): Observable<any> {
     const params = new HttpParams()
-      .set('usuario', id)
+      .set('usuario', id!)
+      .set('columna', listar!.columna)
+      .set('nombre', listar!.search)
+      .set('offset', listar!.offset)
+      .set('limit', listar!.limit)
+      .set('sort', listar!.sort);
+    return this.http
+      .get(this.appUrl + this.apiChat + '/sesiones' + '/Listar', {
+        headers: this.headers,
+        params: params,
+      })
+      .pipe(
+        map((resp: any) => {
+          if (resp.exito) {
+            return resp.data;
+          }
+          return [];
+        })
+      );
+  }
+  //Listar interacciones
+  getComentarios(listar: Listar): Observable<any> {
+    const params = new HttpParams()
       .set('columna', listar.columna)
       .set('nombre', listar.search)
       .set('offset', listar.offset)
       .set('limit', listar.limit)
       .set('sort', listar.sort);
     return this.http
-      .get(this.appUrl + this.apiChat + '/sesiones' + '/Listar', {
+      .get(this.appUrl + this.apiChat + '/comentarios/Listar', {
         headers: this.headers,
         params: params,
       })
@@ -81,6 +105,32 @@ export class ChatService {
             return resp?.data?.map((m: any) => m?.result);
           }
           return [];
+        })
+      );
+  }
+  getSolicitudes(anio: string, meses: string, listar: Listar): Observable<any> {
+    const params = new HttpParams()
+      .set('anio', anio)
+      .set('meses', meses)
+      .set('columna', listar.columna)
+      .set('nombre', listar.search)
+      .set('offset', listar.offset ?? null)
+      .set('limit', listar.limit)
+      .set('sort', listar.sort);
+
+    return this.http
+      .get(this.appUrl + this.apiChat + '/solicitudes/listar', {
+        params: params,
+        headers: this.headers,
+      })
+      .pipe(
+        map((resp: any) => {
+          if (resp.exito) {
+            return resp.data;
+          } else {
+            this.alertService.error('Error', resp.message);
+            return [];
+          }
         })
       );
   }
@@ -141,9 +191,55 @@ export class ChatService {
       { headers: this.headers }
     );
   }
-  sendChatCliente(sendChat: SendChat): Observable<any> {
+  senComentario(data: object, token: string): Observable<any> {
+    return this.http.post(
+      this.appUrl + this.apiChat + '/comentario/crear',
+      data,
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: 'Bearer ' + token,
+        },
+      }
+    );
+  }
+  sendChat(sendChat: SendChat, token: string): Observable<any> {
     return this.http.post(this.appUrl + this.apiChat + '/send/Chat', sendChat, {
-      headers: this.headers,
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + token,
+      },
     });
+  }
+
+  calificarChat(sessionId: string, calificacion: number, token: string) {
+    return this.http.post(
+      this.appUrl + this.apiChat + '/calificacion/crear',
+      {
+        sessionId,
+        calificacion,
+      },
+      {
+        headers: {
+          'Content-Type': 'application/json',
+          Authorization: 'Bearer ' + token,
+        },
+      }
+    );
+  }
+  aceptarSolicitud(
+    solicitudId: string,
+    usuarioId: string,
+    accion: boolean
+  ): Observable<any> {
+    return this.http.post(
+      this.appUrl + this.apiChat + '/solicitud/reaccionar',
+      {
+        id: solicitudId,
+        reaccion: usuarioId,
+        accion: accion,
+      },
+      { headers: this.headers }
+    );
   }
 }

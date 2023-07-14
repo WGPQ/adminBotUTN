@@ -1,4 +1,3 @@
-
 import { NgModule, LOCALE_ID } from '@angular/core';
 import { BrowserModule } from '@angular/platform-browser';
 import { NgxsModule } from '@ngxs/store';
@@ -10,7 +9,11 @@ import { HttpClientModule } from '@angular/common/http';
 
 import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { NgxMaskModule, IConfig } from 'ngx-mask';
-import {registerLocaleData} from '@angular/common';
+import {
+  registerLocaleData,
+  HashLocationStrategy,
+  LocationStrategy,
+} from '@angular/common';
 
 import localEs from '@angular/common/locales/es';
 import { AppRoutingModule } from './app-routing.module';
@@ -22,7 +25,7 @@ import { HeaderComponent } from './shared/header/header.component';
 import { SiderbarComponent } from './shared/siderbar/siderbar.component';
 import { NotfoundComponent } from './pages/notfound/notfound.component';
 import { PagesComponent } from './pages/pages.component';
-import { UsuariosComponent } from './pages/usuarios/usuarios.component';
+import { AccountsComponent } from './pages/accounts/accounts.component';
 import { ActivoPipe } from './pipes/activo.pipe';
 import { RolPipe } from './pipes/rol.pipe';
 import { IntencionPipe } from './pipes/intencion.pipe';
@@ -32,17 +35,26 @@ import { ChangePassworkComponent } from './pages/change-passwork/change-passwork
 import { IntentsComponent } from './pages/intents/intents.component';
 import { PhracesComponent } from './pages/phraces/phraces.component';
 import { FiltroPipe } from './pipes/filtro.pipe';
-import { AuthenticateComponent } from './auth/authenticate/authenticate.component';
 import { TextElipsisPipe } from './pipes/text-elipsis.pipe';
-import { ClientesComponent } from './pages/clientes/clientes.component';
+import { UsuariosComponent } from './pages/usuarios/usuarios.component';
 import { BibliochatComponent } from './pages/bibliochat/bibliochat.component';
 import { ChatBlogComponent } from './pages/chat-blog/chat-blog.component';
 import { ConfiguracionComponent } from './pages/configuracion/configuracion.component';
-import { SessionesComponent } from './pages/sessiones/sessiones.component';
 import { SetAccountState } from './store/Account/account.state';
-import { PostSolicitudesState } from './store/Solicitudes/solicitudes.state';
 import { RouterModule } from '@angular/router';
 import { NgChartsModule } from 'ng2-charts';
+import { TimeAgoPipe } from './pipes/time-ago.pipe';
+import { RolesState } from './store/Roles/roles.state';
+import { UsuariosState } from './store/Usuarios/usuarios.state';
+import { FracesState } from './store/Fraces/fraces.state';
+import { IntencionesState } from './store/Intenciones/intenciones.state';
+import { ConfiguracionState } from './store/Configuracion/configuracion.state';
+import { ChatState } from './store/Chat/chat.state';
+import { CorreoToUserPipe } from './pipes/correo-to-user.pipe';
+import { ResetpasswordComponent } from './auth/resetpassword/resetpassword.component';
+import { SolicitudesComponent } from './pages/solicitudes/solicitudes.component';
+import { CalificacionesComponent } from './pages/calificaciones/calificaciones.component';
+import { ExampleBlogComponent } from './pages/example-blog/example-blog.component';
 
 registerLocaleData(localEs);
 const maskConfigFunction: () => Partial<IConfig> = () => {
@@ -61,7 +73,7 @@ const maskConfigFunction: () => Partial<IConfig> = () => {
     SiderbarComponent,
     NotfoundComponent,
     PagesComponent,
-    UsuariosComponent,
+    AccountsComponent,
     ActivoPipe,
     RolPipe,
     IntencionPipe,
@@ -71,13 +83,17 @@ const maskConfigFunction: () => Partial<IConfig> = () => {
     IntentsComponent,
     PhracesComponent,
     FiltroPipe,
-    AuthenticateComponent,
     TextElipsisPipe,
-    ClientesComponent,
+    UsuariosComponent,
     BibliochatComponent,
     ChatBlogComponent,
     ConfiguracionComponent,
-    SessionesComponent
+    TimeAgoPipe,
+    CorreoToUserPipe,
+    ResetpasswordComponent,
+    SolicitudesComponent,
+    CalificacionesComponent,
+    ExampleBlogComponent,
   ],
   imports: [
     BrowserModule,
@@ -88,21 +104,34 @@ const maskConfigFunction: () => Partial<IConfig> = () => {
     RouterModule,
     ReactiveFormsModule,
     NgxMaskModule.forRoot(maskConfigFunction),
-    NgxsModule.forRoot([SetAccountState, PostSolicitudesState], {
-      developmentMode: !environment.production,
-    }),
+    NgxsModule.forRoot(
+      [
+        SetAccountState,
+        RolesState,
+        UsuariosState,
+        IntencionesState,
+        FracesState,
+        ConfiguracionState,
+        ChatState,
+      ],
+      {
+        developmentMode: !environment.production,
+      }
+    ),
     NgxsReduxDevtoolsPluginModule.forRoot({
       disabled: environment.production,
     }),
     NgxsLoggerPluginModule.forRoot({
-      disabled: environment.production,
+      disabled: true,
     }),
   ],
-  providers: [{
-    provide: LOCALE_ID,
-    useValue: 'es'
-  }],
-  bootstrap: [AppComponent]
+  providers: [
+    {
+      provide: LOCALE_ID,
+      useValue: 'es',
+    },
+    { provide: LocationStrategy, useClass: HashLocationStrategy },
+  ],
+  bootstrap: [AppComponent],
 })
-export class AppModule { }
-
+export class AppModule {}

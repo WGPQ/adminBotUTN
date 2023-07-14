@@ -18,7 +18,7 @@ export class NotfoundComponent implements OnInit {
   }
 
   backPage() {
-    if (this.authservices.estaAutenticado()) {
+    if (this.authservices?.estaAutenticado()) {
       this.router.navigate(['/dashboard']);
     } else {
       this.router.navigate(['/login']);

@@ -18,6 +18,10 @@
                   <div class="avatar-lg">
                     <div class="rounded-circle">
                       <div
+                        *ngIf="
+                          usuario?.foto == null ||
+                          usuario?.foto?.trim()?.length == 0
+                        "
                         class="circlePerfil"
                         [ngStyle]="{ 'background-color': '#0DA1E6' }"
                       >
@@ -25,6 +29,15 @@
                           {{ initialsName(usuario.nombre_completo!) }}
                         </div>
                       </div>
+                      <img
+                        *ngIf="
+                          usuario?.foto != null &&
+                          usuario?.foto?.trim()?.length! > 0
+                        "
+                        [src]="usuario.foto"
+                        [alt]="usuario.nombre_completo"
+                        class="circlePerfil"
+                      />
                     </div>
                   </div>
                 </div>
@@ -39,9 +52,12 @@
 
                     <ul class="mb-0 list-inline text-light">
                       <li class="list-inline-item">
-                        <h5 class="mb-1">Ultimo inicio de session</h5>
+                        <h5 class="mb-1">Último inicio de sesión</h5>
                         <p class="mb-0 font-13 text-white-50">
-                          Viernes 21 de noviembre del 2022 21:00
+                          {{
+                            localDate(usuario.conectedAt)
+                              | date : "EEEE d MMMM y hh:mm a"
+                          }}
                         </p>
                       </li>
                     </ul>
@@ -154,6 +170,31 @@
       <div class="modal-body">
         <form [formGroup]="usuarioForm" autocomplete="off">
           <div class="ps-3 pe-3">
+            <div class="mb-3">
+              <label for="username" class="form-label">Foto</label>
+              <br />
+              <div
+                *ngIf="
+                  usuarioForm?.get('foto')?.value != null &&
+                  usuarioForm?.get('foto')?.value?.trim()?.length > 0
+                "
+                class="avatar-lg"
+              >
+                <img
+                  [src]="usuarioForm.get('foto')?.value"
+                  [alt]="usuarioForm.get('nombres')?.value"
+                  class="circlePerfil"
+                />
+              </div>
+              <input
+                type="file"
+                accept="image/png, image/jpeg, image/webp"
+                name="foto"
+                (change)="subirFoto($event)"
+                id="foto"
+              />
+            </div>
+
             <div class="mb-3">
               <label for="username" class="form-label">Nombres</label>
               <input
@@ -269,7 +310,10 @@
                   maxlength="50"
                   [class.is-invalid]="clave1NoValido"
                 />
-                <button class="input-group-text" (click)="visibilitiPassword(1)">
+                <button
+                  class="input-group-text"
+                  (click)="visibilitiPassword(1)"
+                >
                   <i [class]="classhow1"></i>
                 </button>
               </div>
@@ -290,7 +334,10 @@
                   maxlength="50"
                   [class.is-invalid]="clave2NoValido"
                 />
-                <button class="input-group-text" (click)="visibilitiPassword(2)">
+                <button
+                  class="input-group-text"
+                  (click)="visibilitiPassword(2)"
+                >
                   <i [class]="classhow2"></i>
                 </button>
               </div>

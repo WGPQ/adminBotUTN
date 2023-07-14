@@ -1,151 +1,113 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
-import { FormBuilder, FormGroup, Validators } from '@angular/forms';
 import {
-  ActivatedRoute,
-  NavigationEnd,
-  ParamMap,
-  Router,
-} from '@angular/router';
-import { delay } from 'rxjs/operators';
+  Component,
+  ElementRef,
+  HostListener,
+  OnDestroy,
+  OnInit,
+  ViewChild,
+} from '@angular/core';
+import { FormGroup } from '@angular/forms';
+import { Router } from '@angular/router';
+import { Cliente } from 'src/app/interfaces/cliente.interface';
 import { Listar } from 'src/app/interfaces/listar.interface';
-import { Rol } from 'src/app/interfaces/rol.interface';
-import { Usuario } from 'src/app/interfaces/usuarios.interface';
+import { MensageModel } from 'src/app/interfaces/mensaje.interface';
+import { Session } from 'src/app/interfaces/session.interface';
 import { AlertService } from 'src/app/services/alert.service';
-import { AuthenticationService } from 'src/app/services/authentication.service';
+import { ChatService } from 'src/app/services/chat.service';
+import { ClienteService } from 'src/app/services/cliente.service';
 import { FormsService } from 'src/app/services/forms.service';
-import { ModulosService } from 'src/app/services/modulos.service';
 import { RolService } from 'src/app/services/rol.service';
-import { UsuarioService } from 'src/app/services/usuario.service';
 import Swal from 'sweetalert2';
+import html2canvas from 'html2canvas';
+import { SendChat } from 'src/app/interfaces/sendchat.interface';
+import { HelpersService } from 'src/app/services/helpers.service';
+import { UsuariosState } from 'src/app/store/Usuarios/usuarios.state';
+import { Usuario } from 'src/app/interfaces/usuario.interface';
+import { Store } from '@ngxs/store';
+import { RolesState } from 'src/app/store/Roles/roles.state';
+import { Rol } from 'src/app/interfaces/rol.interface';
+import {
+  RemoveUsuario,
+  SetUsuario,
+} from 'src/app/store/Usuarios/usuarios.actions';
 
 @Component({
-  selector: 'app-usuarios',
+  selector: 'app-clientes',
   templateUrl: './usuarios.component.html',
-  styles: [],
+  styleUrls: ['./usuarios.component.css'],
 })
-export class UsuariosComponent implements OnInit {
-  usuarios: Usuario[] = [];
-  roles: Rol[] = [];
-  usuarioForm!: FormGroup;
+export class UsuariosComponent implements OnInit, OnDestroy {
+  clientes: Cliente[] = [];
+  clienteForm!: FormGroup;
   liatarForm!: FormGroup;
   submitType: string = 'Guardar';
   action = 'Agregar';
-  idUsuario?: string;
-  rol?: string;
-  nuevoUsuario: boolean = false;
-  loading = false;
-  showModal = true;
-  titlePage: string = '';
+  idCliente?: string;
+  cliente!: Cliente;
+  cargando = true;
+  position: number = 0;
+  rol: string = 'Usuario';
+  idRol!: string;
+  showChats: boolean = false;
+  usuario!: Cliente;
+  sessiones: Session[] = [];
+  messages: MensageModel[] = [];
+  cargandoMensajes: boolean = false;
+  fecha_chat_seleccionado?: Date;
   pagina = 0;
   paginaActiva = 0;
   numeroPaginas = new Array(1);
   previus = false;
   next = true;
+  setTimeRef: any;
+  orderAsc: boolean = true;
+
+  colors: any[] = [
+    '#FF6F18',
+    '#EB7181', // red
+    '#468547', // green
+    '#FFD558', // yellow
+    '#3670B2', // blue
+  ];
+  randomIndex: number = Math.floor(
+    Math.random() * Math.floor(this.colors.length)
+  );
+  @ViewChild('scrollMessages') private scrollMessages!: ElementRef;
+  @ViewChild('scrollChat') private scrollChat!: ElementRef;
+  @ViewChild('txtmessage') private txtMessage!: ElementRef;
+
+  @HostListener('scroll', ['$event'])
+  doSomethingOnScroll($event: Event) {
+    let scrollOffset = ($event.target as Element).scrollTop;
+  }
   @ViewChild('closebutton') closebutton: any;
-  public customPatterns = { '0': { pattern: new RegExp('^[0-9]*$') } };
   constructor(
-    private usuarioService: UsuarioService,
-    private rolService: RolService,
-    private fb: FormBuilder,
-    private authservices: AuthenticationService,
+    private store: Store,
+    private clienteService: ClienteService,
     private alertService: AlertService,
-    private router: ActivatedRoute,
-    private modulosService: ModulosService,
-    private formService: FormsService
+    private formService: FormsService,
+    private chatService: ChatService,
+    private helperService: HelpersService
   ) {
-    this.loading = true;
-    this.listarRoles();
-    this.usuarioForm = formService.crearFormularioUsuario();
+    this.clienteForm = formService.crearFormularioCliente();
     this.liatarForm = formService.crearFormularioListar();
   }
 
   ngOnInit(): void {
-    this.router.paramMap.subscribe((params: ParamMap) => {
-      var nombreRol = params.get('rol');
-      this.obtenetTitlepage(nombreRol!);
-      if (nombreRol != null) {
-        this.loading = true;
-        setTimeout(() => {
-          this.roles.find((r) =>
-            r.nombre == nombreRol ? (this.rol = r.id) : (this.rol = '')
-          );
-          if (this.rol != null) {
-            this.listar();
-          }
-        }, 1000);
-      }
-    });
+    this.fetchClients();
+    this.fetchRol();
   }
-
-  obtenetTitlepage(rol: string) {
-    if (rol) {
-      var modulos = this.modulosService.getModulos('Administrador');
-      console.log(modulos);
-      var usuarios = modulos.find((m) => m.nombre === 'Usuarios')?.submenu;
-      this.titlePage = usuarios?.find((u) => u.ruta === rol)?.nombre!;
-      console.log(this.titlePage);
-    }
-  }
-
-  exportarReporte() {
-    const listar: Listar = {
-      columna: this.liatarForm.value.columna,
-      search: this.liatarForm.value.search,
-      offset: this.liatarForm.value.offset || 0,
-      limit: this.liatarForm.value.limit || 10,
-      sort: this.liatarForm.value.sort,
-    };
-    this.usuarioService.exportarExcel(this.rol!, listar).subscribe((blob) => {
-      let fileUrl = window.URL.createObjectURL(blob);
-      window.open(fileUrl);
-    });
-  }
-
-  crearFormulario() {
-    this.usuarioForm = this.fb.group({
-      nombres: ['', [Validators.required]],
-      apellidos: ['', [Validators.required]],
-      telefono: ['', [Validators.required]],
-      correo: ['', [Validators.required]],
-      rol: [0, [Validators.required]],
-      activo: [true],
-    });
-  }
-
-  get nombresNoValido() {
-    return (
-      this.usuarioForm.get('nombres')?.invalid &&
-      this.usuarioForm.get('nombres')?.touched
-    );
-  }
-  get apellidosNoValida() {
-    return (
-      this.usuarioForm.get('apellidos')?.invalid &&
-      this.usuarioForm.get('apellidos')?.touched
-    );
-  }
-  get correoNoValido() {
-    return (
-      this.usuarioForm.get('correo')?.invalid &&
-      this.usuarioForm.get('correo')?.touched
-    );
-  }
-
-  get telefonoNoValida() {
-    return (
-      this.usuarioForm.get('telefono')?.invalid &&
-      this.usuarioForm.get('telefono')?.touched
-    );
+  ngOnDestroy(): void {
+    clearTimeout(this.setTimeRef);
   }
   limitar() {
-    this.listar();
+    this.listarClientes();
   }
 
-  search() {
-    if (this.liatarForm.value.columna != '') {
-      this.listar();
-    }
+  initialsName(name: string) {
+    return this.helperService.initialLettersName(name);
   }
+
   previusPage() {
     if (this.pagina > 0) {
       this.pagina -= 10;
@@ -159,19 +121,180 @@ export class UsuariosComponent implements OnInit {
   irPagina(nPagina: number) {
     this.previus = nPagina > 0 ? true : false;
     this.pagina = nPagina * 10;
-    this.next = this.pagina + 10 < this.usuarios.length ? true : false;
+    this.next = this.pagina + 10 < this.clientes.length ? true : false;
     this.paginaActiva = nPagina;
   }
   nextPage() {
-    if (this.usuarios.length > this.pagina) {
+    if (this.clientes.length > this.pagina) {
       this.pagina += 10;
       this.paginaActiva += 1;
       this.previus = true;
-      this.next = this.pagina + 10 < this.usuarios.length ? true : false;
+      this.next = this.pagina + 10 < this.clientes.length ? true : false;
     }
   }
 
-  listar() {
+  agregarRol() {
+    this.clienteForm.reset();
+    this.action = 'Agregar';
+    this.submitType = 'Guardar';
+  }
+  onFilterDate(event: any) {
+    var date = event.target?.value;
+    if (this.clientes.length == 0) {
+      this.fetchClients();
+    }
+    if (date) {
+      // Your UTC date
+      const utcDate = new Date(date);
+
+      // Convert UTC to local time
+      const localDate = new Date(
+        utcDate.getTime() + utcDate.getTimezoneOffset() * 60 * 1000
+      );
+      var currentDate = new Date(
+        localDate.getFullYear(),
+        localDate.getMonth(),
+        localDate.getDate()
+      );
+
+      this.clientes = [
+        ...this.clientes.filter((c) => {
+          var day = new Date(c?.conectedAt!);
+          var conectedDay = new Date(
+            day.getFullYear(),
+            day.getMonth(),
+            day.getDate()
+          );
+          return +conectedDay == +currentDate;
+        }),
+      ];
+    } else {
+      this.fetchClients();
+    }
+  }
+  getEmogi(calificacion?: number) {
+    if (calificacion == 0) return `🙁`;
+    if (calificacion == 1) return `😐 `;
+    if (calificacion == 2) return `🙂`;
+    return `😶`;
+  }
+  onChangeSort() {
+    this.orderAsc = !this.orderAsc;
+
+    if (this.orderAsc) {
+      this.clientes = [
+        ...this.clientes.sort((a, b) =>
+          a.conectedAt! < b?.conectedAt! ? 1 : -1
+        ),
+      ];
+    } else {
+      this.clientes = [
+        ...this.clientes.sort((a, b) =>
+          a.conectedAt! > b?.conectedAt! ? 1 : -1
+        ),
+      ];
+    }
+  }
+
+  fetchClients() {
+    this.store
+      .select(UsuariosState.getUsuariosList)
+      .subscribe((usuariosList: Usuario[]) => {
+        this.clientes = usuariosList.filter(
+          (usuario) => usuario.rol?.toLowerCase() === this.rol.toLowerCase()
+        );
+        this.clientes.sort((a, b) => (a.conectedAt! < b?.conectedAt! ? 1 : -1));
+        this.setTimeRef = setTimeout(() => (this.cargando = false), 500);
+      });
+  }
+
+  fetchRol() {
+    this.store.select(RolesState.getRolesList).subscribe((rolesList: Rol[]) => {
+      let rol = rolesList.find(
+        (rol: Rol) => rol.nombre?.toLowerCase() === this.rol.toLowerCase()
+      );
+      this.idRol = rol?.id!;
+    });
+  }
+
+  get nombresNoValido() {
+    return (
+      this.clienteForm.get('nombres')?.invalid &&
+      this.clienteForm.get('nombres')?.touched
+    );
+  }
+  get apellidosNoValido() {
+    return (
+      this.clienteForm.get('apellidos')?.invalid &&
+      this.clienteForm.get('apellidos')?.touched
+    );
+  }
+  get correoNoValido() {
+    return (
+      this.clienteForm.get('correo')?.invalid &&
+      this.clienteForm.get('correo')?.touched
+    );
+  }
+  onCloseForm() {
+    this.closebutton.nativeElement.click();
+  }
+  guardarCliente() {
+    if (this.clienteForm.invalid) {
+      return Object.values(this.clienteForm.controls).forEach((contr) => {
+        if (contr instanceof FormGroup) {
+          Object.values(contr.controls).forEach((contr) =>
+            contr.markAllAsTouched()
+          );
+        } else {
+          contr.markAsTouched();
+        }
+      });
+    }
+
+    const cliente: Cliente = {
+      id: this.idCliente,
+      nombres: this.clienteForm.value.nombres,
+      activo: true,
+      apellidos: this.clienteForm.value.apellidos,
+      correo: this.clienteForm.value.correo,
+      id_rol: this.idRol,
+    };
+    if (this.action == 'Agregar') {
+      this.clienteService.ingresarCliente(cliente).subscribe((resp) => {
+        if (resp.exito) {
+          let user: Usuario = { ...resp.data };
+          this.alertService
+            .correcto(resp.data.nombre, resp.message)
+            .then(() => {
+              this.closebutton.nativeElement.click();
+            });
+          user.rol = this.rol;
+          this.store.dispatch(new SetUsuario(user));
+        } else {
+          this.alertService.error('Error', resp.message);
+        }
+      });
+    } else {
+      this.clienteService.actualizarCliente(cliente).subscribe((resp) => {
+        if (resp.exito) {
+          this.alertService
+            .correcto(resp.data.nombre, resp.message)
+            .then(() => {
+              this.closebutton.nativeElement.click();
+              this.store.dispatch(new SetUsuario(resp?.data));
+            });
+        } else {
+          this.alertService.error('Error', resp.message);
+        }
+      });
+    }
+  }
+  search() {
+    if (this.liatarForm.value.columna != '') {
+      this.listarClientes();
+    }
+  }
+  listarClientes() {
     var listar: Listar = {
       columna: this.liatarForm.value.columna,
       search: this.liatarForm.value.search,
@@ -179,112 +302,43 @@ export class UsuariosComponent implements OnInit {
       limit: this.liatarForm.value.limit || 10,
       sort: this.liatarForm.value.sort,
     };
-    this.loading = true;
 
-    this.usuarioService
-      .obtenerUsuarios(this.rol!, listar)
-      .subscribe((resp: any) => {
-        this.usuarios = resp;
-        this.numeroPaginas = new Array(Math.ceil(this.usuarios.length / 10));
-        this.loading = false;
+    this.clienteService
+      .obtenerClientes(this.idRol, listar)
+      .subscribe((resp) => {
+        this.clientes = resp;
+        this.numeroPaginas = new Array(Math.ceil(this.clientes.length / 10));
+        this.cargando = false;
       });
   }
-  listarRoles() {
-    const listar: Listar = {
-      columna: '',
-      search: '',
-      offset: 0,
-      limit: '0',
-      sort: '',
-    };
-    this.loading = true;
-    this.rolService.obtenerRoles(listar).subscribe((resp) => {
-      this.roles = resp;
+
+  editarCliente(user: Usuario) {
+    this.action = 'Editar';
+    this.submitType = 'Actualizar';
+    this.idCliente = user?.id;
+    this.cliente = user;
+    this.clienteForm.patchValue({
+      nombres: user.nombres,
+      apellidos: user.apellidos,
+      correo: user.correo,
     });
   }
-  nuevo() {
-    this.usuarioForm.reset({
-      rol: '',
-    });
-    this.action = 'Agregar';
-    this.submitType = 'Guardar';
-    this.nuevoUsuario = false;
-  }
-  guardar() {
-    const usuario: Usuario = {
-      id: this.idUsuario ?? '',
-      nombres: this.usuarioForm.value.nombres,
-      apellidos: this.usuarioForm.value.apellidos,
-      telefono: this.usuarioForm.value.telefono,
-      correo: this.usuarioForm.value.correo,
-      id_rol: this.usuarioForm.value.id_rol,
-      activo: this.usuarioForm.value.activo ?? true,
-    };
 
-    this.alertService.esperando('Guardar informacion....');
-    Swal.showLoading();
-
-    if (this.action == 'Agregar') {
-      this.usuarioService.ingresarUsuario(usuario).subscribe((resp) => {
-        if (resp.exito) {
-          this.alertService
-            .correcto(
-              `${resp.data.nombres} ${resp.data.apellidos}`,
-              resp.message
-            )
-            .then(() => {
-              this.closebutton.nativeElement.click();
-              this.listar();
-            });
-        } else {
-          this.alertService.error('Error', resp.message);
-        }
-      });
-    } else {
-      this.usuarioService.actualizarUsuario(usuario).subscribe(
-        (resp) => {
-          if (resp.exito) {
-            this.alertService
-              .correcto(
-                `${resp.data.nombres} ${resp.data.apellidos}`,
-                resp.message
-              )
-              .then(() => {
-                this.closebutton.nativeElement.click();
-                this.listar();
-              });
-          } else {
-            this.alertService.error('Error al actualizar', resp.message);
-          }
-        },
-        (err) => {
-          console.log(err);
-          Swal.fire({
-            position: 'top',
-            icon: 'error',
-            title: 'Error al actualizar',
-            text: `${err.status} ${err.statusText}`,
-            timer: 2500,
-          });
-        }
-      );
-    }
-  }
-  eliminar(usuario: Usuario) {
-    if (usuario.id != '') {
+  eliminar(cliente: Cliente) {
+    if (cliente.id != null) {
       Swal.fire({
         position: 'center',
         icon: 'question',
-        title: 'Esta seguro que desea borrar a:',
-        text: `${usuario.nombres} ${usuario.apellidos}`,
+        title: 'Esta seguro que desea borrar a',
+        text: `${cliente.nombres}`,
         showConfirmButton: true,
         showCancelButton: true,
       }).then((resp) => {
         if (resp.value) {
-          this.usuarioService.eliminarUsuario(usuario.id).subscribe((resp) => {
+          this.clienteService.eliminarCliente(cliente.id).subscribe((resp) => {
             if (resp.exito) {
               this.alertService.correcto('', resp.message).then(() => {
-                this.listar();
+                this.store.dispatch(new RemoveUsuario(resp?.id));
               });
             } else {
               this.alertService.error('Error', resp.message);
@@ -295,44 +349,87 @@ export class UsuariosComponent implements OnInit {
     }
   }
 
-  editar(id?: string) {
-    this.action = 'Editar';
-    this.submitType = 'Actualizar';
-    this.idUsuario = id;
-    this.nuevoUsuario = true;
-    this.usuarioService.obtenerUsuario(id).subscribe((resp) => {
-      this.usuarioForm.patchValue({
-        nombres: resp.nombres,
-        apellidos: resp.apellidos,
-        telefono: resp.telefono,
-        correo: resp.correo,
-        id_rol: resp.id_rol,
-        activo: resp.activo,
-      });
+  exportarReporte() {
+    const listar: Listar = {
+      columna: this.liatarForm.value.columna,
+      search: this.liatarForm.value.search,
+      offset: this.liatarForm.value.offset,
+      limit: this.liatarForm.value.limit,
+      sort: this.liatarForm.value.sort,
+    };
+    this.clienteService.exportarExcel(this.rol, listar).subscribe((blob) => {
+      let fileUrl = window.URL.createObjectURL(blob);
+      window.open(fileUrl);
     });
   }
 
-  resetearContrasenia() {
-    if (this.idUsuario != null) {
-      Swal.fire({
-        position: 'center',
-        icon: 'question',
-        title: `Esta seguro que desea resetar la contraseña`,
-        showConfirmButton: true,
-        showCancelButton: true,
-      }).then((resp) => {
-        if (resp.value) {
-          this.alertService.esperando('Esperere por favor ...');
-          Swal.showLoading();
-          this.authservices.resetearClave(this.idUsuario).subscribe((resp) => {
+  getUser(usuario: Cliente) {
+    this.usuario = usuario;
+  }
+  getSessiones(usuario: Cliente) {
+    this.position = 0;
+    this.showChats = true;
+    this.getUser(usuario);
+    var listar: Listar = {
+      columna: 'createdAt',
+      search: '',
+      offset: 0,
+      limit: '100',
+      sort: '',
+    };
+    this.cargando = true;
+    this.chatService.getSessiones(usuario?.id!, listar).subscribe((resp) => {
+      this.sessiones = resp;
+      this.cargando = false;
+    });
+  }
+  backClients() {
+    this.showChats = false;
+    this.sessiones = [];
+    this.messages = [];
+  }
+  cragarChat(idSession: string, i: number, fecha: Date) {
+    this.fecha_chat_seleccionado = fecha;
+    this.messages = [];
+    this.position = i;
+    this.cargandoMensajes = true;
+    this.chatService.getChat(idSession).subscribe((resp) => {
+      this.messages = resp;
+      this.cargandoMensajes = false;
+    });
+  }
+  localDate(date: any) {
+    let utcDate = new Date(date);
+    return new Date(
+      utcDate.getTime() - utcDate.getTimezoneOffset() * 60 * 1000
+    );
+  }
+  enviarChat() {
+    this.alertService.esperando('Enviando chat ...');
+    Swal.showLoading();
+    html2canvas(document.querySelector('#chat-messages')!).then((canvas) => {
+      const data: SendChat = {
+        image: canvas.toDataURL(),
+        comentario: '',
+        usuario: this.usuario,
+      };
+      this.chatService
+        .sendChat(data, sessionStorage.getItem('access-token')!)
+        .subscribe(
+          (resp) => {
             if (resp.exito) {
               this.alertService.correcto('', resp.message);
             } else {
-              this.alertService.error('Error', resp.message);
+              this.alertService.error('', resp.message);
             }
-          });
-        }
-      });
-    }
+          },
+          (error) => {
+            this.alertService.error(
+              'Error',
+              'Ocurrio un proble porfavor intentelo de nuevo.'
+            );
+          }
+        );
+    });
   }
 }

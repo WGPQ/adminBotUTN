@@ -1,25 +1,30 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormGroup } from '@angular/forms';
+import { Store } from '@ngxs/store';
 import { Disponibilidad } from 'src/app/interfaces/disponibilidad.interface';
 import { Listar } from 'src/app/interfaces/listar.interface';
 import { AlertService } from 'src/app/services/alert.service';
 import { ConfiguracionService } from 'src/app/services/configuracion.service';
 import { FormsService } from 'src/app/services/forms.service';
+import { SetConfiguracion } from 'src/app/store/Configuracion/configuracion.actions';
+import { ConfiguracionState } from 'src/app/store/Configuracion/configuracion.state';
 
 @Component({
   selector: 'app-configuracion',
   templateUrl: './configuracion.component.html',
-  styleUrls: ['./configuracion.component.css'],
+  styleUrls: [],
 })
-export class ConfiguracionComponent implements OnInit {
+export class ConfiguracionComponent implements OnInit, OnDestroy {
   disponibilidad: Disponibilidad[] = [];
   cargando = false;
   disponibilidadForm!: FormGroup;
   dispId!: string;
   submitType: string = 'Guardar';
   action = 'Agregar';
+  setTimeRef: any;
   @ViewChild('closebutton') closebutton: any;
   horarios: any[] = [
+    '00:00',
     '01:00',
     '02:00',
     '03:00',
@@ -43,10 +48,11 @@ export class ConfiguracionComponent implements OnInit {
     '21:00',
     '22:00',
     '23:00',
-    '00:00',
+    '23:59',
   ];
 
   constructor(
+    private store: Store,
     private configServices: ConfiguracionService,
     private formService: FormsService,
     private alertService: AlertService
@@ -57,9 +63,12 @@ export class ConfiguracionComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    this.getDiasDisponibles();
+    this.fetchConfiguracion();
   }
 
+  ngOnDestroy(): void {
+    clearTimeout(this.setTimeRef);
+  }
   get diaNoValido() {
     return (
       this.disponibilidadForm.get('dia')?.invalid &&
@@ -89,17 +98,24 @@ export class ConfiguracionComponent implements OnInit {
       });
   }
 
-  editar(id?: string) {
+  fetchConfiguracion() {
+    this.store
+      .select(ConfiguracionState.getDisponibilidadList)
+      .subscribe((disponibilidadList: Disponibilidad[]) => {
+        this.disponibilidad = disponibilidadList;
+        this.setTimeRef = setTimeout(() => (this.cargando = false), 500);
+      });
+  }
+
+  editar(config: Disponibilidad) {
     this.action = 'Editar';
     this.submitType = 'Actualizar';
-    this.dispId = id!;
-    this.configServices.obtenerDisponibilidad(id).subscribe((resp) => {
-      this.disponibilidadForm.patchValue({
-        dia: resp.dia,
-        hora_inicio: resp.hora_inicio,
-        hora_fin: resp.hora_fin,
-        activo: resp.activo,
-      });
+    this.dispId = config?.id!;
+    this.disponibilidadForm.patchValue({
+      dia: config.dia,
+      hora_inicio: config.hora_inicio,
+      hora_fin: config.hora_fin,
+      activo: config.activo,
     });
   }
 
@@ -125,12 +141,11 @@ export class ConfiguracionComponent implements OnInit {
       activo: this.disponibilidadForm.value.activo,
     };
 
-
     this.configServices.actualizarDisponibilidad(data).subscribe((resp) => {
       if (resp.exito) {
         this.alertService.correcto(resp.data.nombre, resp.message).then(() => {
           this.closebutton.nativeElement.click();
-          this.getDiasDisponibles();
+          this.store.dispatch(new SetConfiguracion(resp?.data));
         });
       } else {
         this.alertService.error('Error', resp.message);

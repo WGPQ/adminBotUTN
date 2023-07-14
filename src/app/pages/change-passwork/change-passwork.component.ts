@@ -1,7 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnDestroy, OnInit } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
-import { Usuario } from 'src/app/interfaces/usuarios.interface';
+import { Usuario } from 'src/app/interfaces/usuario.interface';
 import { AlertService } from 'src/app/services/alert.service';
 import { AuthenticationService } from 'src/app/services/authentication.service';
 import { FormsService } from 'src/app/services/forms.service';
@@ -17,7 +17,6 @@ export class ChangePassworkComponent implements OnInit {
   actualizarForm!: FormGroup;
   usuario?: Usuario;
   loading: boolean = true;
-  token: string;
   showPassword1: Boolean = false;
   showPassword2: Boolean = false;
   passwordtype1: String = 'password';
@@ -32,19 +31,35 @@ export class ChangePassworkComponent implements OnInit {
     private router: Router
   ) {
     this.actualizarForm = formService.crearFormularioActualizarPass();
-    this.token = sessionStorage.getItem('acces-token') ?? '';
-    sessionStorage.removeItem('acces-token');
   }
 
   ngOnInit(): void {
-    if (this.token != '') {
-      this.usuario = this.authservices?.usuario;
-      if (this.usuario != null) {
-        this.loading = false;
+    if (sessionStorage.getItem('access-token')) {
+      try {
+        if (!this.authservices.usuario) {
+          this.authservices.verificarToken().subscribe(
+            (resp) => {
+              this.usuario = this.authservices.usuario;
+            },
+            (error) => {
+              this.router.navigate(['/login']);
+            }
+          );
+        } else {
+          this.usuario = this.authservices.usuario;
+        }
+      } catch (error) {
+        this.router.navigate(['/login']);
       }
     } else {
       this.router.navigate(['/login']);
     }
+  }
+
+  toLogin() {
+    sessionStorage.removeItem('access-token');
+    sessionStorage.removeItem('session');
+    this.router.navigate(['/login']);
   }
   get clave1NoValido() {
     return (
@@ -88,15 +103,17 @@ export class ChangePassworkComponent implements OnInit {
   }
   actualizarPassword() {
     let clave = this.actualizarForm.value.clave;
-    this.authservices.actualizarClave(clave, this.token).subscribe((resp) => {
-      if (resp?.exito) {
-        this.alertService.correcto('', resp?.message);
-        this.authservices.cerrarSesion();
-        this.router.navigate(['/login']);
-      } else {
-        this.alertService.error('Error al ingresar', resp?.message);
-      }
-    });
+    this.authservices
+      ?.actualizarClave(clave, sessionStorage.getItem('access-token')!)
+      .subscribe((resp) => {
+        if (resp?.exito) {
+          this.alertService.correcto('', resp?.message);
+          this.authservices?.cerrarSesion();
+          this.router.navigate(['#/login']);
+        } else {
+          this.alertService.error('Error al ingresar', resp?.message);
+        }
+      });
   }
 
   passwordsIguales(pass1Name: string, pass2Name: string) {

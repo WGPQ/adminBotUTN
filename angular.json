@@ -20,7 +20,7 @@
         "build": {
           "builder": "@angular-devkit/build-angular:browser",
           "options": {
-            "allowedCommonJsDependencies":[
+            "allowedCommonJsDependencies": [
               "crypto-js",
               "botframework-directlinejs"
             ],
@@ -34,7 +34,9 @@
               "src/assets"
             ],
             "styles": [
-              "src/styles.css"
+              "src/styles.css",
+              "src/assets/css/icons.min.css",
+              "src/assets/css/app.min.css"
             ],
             "scripts": []
           },

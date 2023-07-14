@@ -1,6 +1,7 @@
-import { Usuario } from "src/app/interfaces/usuarios.interface";
+import { Usuario } from 'src/app/interfaces/usuario.interface';
 
 export class AccountStateModel {
   usuario?: Usuario;
-  usuarioBlog?:Usuario;
+  usuarioBlog?: Usuario;
+  bot?: Usuario;
 }

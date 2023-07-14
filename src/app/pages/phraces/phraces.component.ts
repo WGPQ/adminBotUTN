@@ -1,12 +1,15 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormGroup } from '@angular/forms';
+import { Store } from '@ngxs/store';
 import { Frace } from 'src/app/interfaces/frace.interface';
 import { Intencion } from 'src/app/interfaces/intencion.interface';
 import { Listar } from 'src/app/interfaces/listar.interface';
 import { AlertService } from 'src/app/services/alert.service';
 import { FormsService } from 'src/app/services/forms.service';
 import { FraceService } from 'src/app/services/frace.service';
-import { IntencionService } from 'src/app/services/intencion.service';
+import { RemoveFrace, SetFrace } from 'src/app/store/Fraces/fraces.actions';
+import { FracesState } from 'src/app/store/Fraces/fraces.state';
+import { IntencionesState } from 'src/app/store/Intenciones/intenciones.state';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -14,7 +17,7 @@ import Swal from 'sweetalert2';
   templateUrl: './phraces.component.html',
   styles: [],
 })
-export class PhracesComponent implements OnInit {
+export class PhracesComponent implements OnInit, OnDestroy {
   fraces: Frace[] = [];
   intenciones: Intencion[] = [];
   fraceForm!: FormGroup;
@@ -29,10 +32,11 @@ export class PhracesComponent implements OnInit {
   numeroPaginas = new Array(1);
   previus = false;
   next = true;
+  setTimeRef: any;
   @ViewChild('closebutton') closebutton: any;
   constructor(
+    private store: Store,
     private fraceaService: FraceService,
-    private intencionService: IntencionService,
     private alertService: AlertService,
     private formService: FormsService
   ) {
@@ -42,8 +46,11 @@ export class PhracesComponent implements OnInit {
     this.listarForm = formService.crearFormularioListar();
   }
   ngOnInit(): void {
-    this.listarFrace();
+    this.fetchFraces();
+  }
 
+  ngOnDestroy(): void {
+    clearTimeout(this.setTimeRef);
   }
 
   previusPage() {
@@ -80,18 +87,22 @@ export class PhracesComponent implements OnInit {
     }
   }
   listarIntenciones() {
-    const listar: Listar = {
-      columna: '',
-      search: '',
-      offset: 0,
-      limit: '100',
-      sort: '',
-    };
-    this.intencionService.obtenerIntenciones(listar).subscribe((response) => {
-      this.intenciones = response;
-    });
+    this.store
+      .select(IntencionesState.getIntencionesList)
+      .subscribe((intencionesList: Intencion[]) => {
+        this.intenciones = intencionesList;
+      });
   }
 
+  fetchFraces() {
+    this.store
+      .select(FracesState.getFracesList)
+      .subscribe((fracesList: Frace[]) => {
+        this.fraces = fracesList;
+        this.numeroPaginas = new Array(Math.ceil(this.fraces.length / 10));
+        this.setTimeRef = setTimeout(() => (this.cargando = false), 450);
+      });
+  }
   listarFrace() {
     var listar: Listar = {
       columna: this.listarForm.value.columna,
@@ -149,7 +160,7 @@ export class PhracesComponent implements OnInit {
         if (resp.exito) {
           this.alertService.correcto('', resp.message).then(() => {
             this.closebutton.nativeElement.click();
-            this.listarFrace();
+          this.store.dispatch(new SetFrace(resp?.data));
           });
         } else {
           this.alertService.error('Error', resp.message);
@@ -161,7 +172,8 @@ export class PhracesComponent implements OnInit {
           if (resp.exito) {
             this.alertService.correcto('', resp.message).then(() => {
               this.closebutton.nativeElement.click();
-              this.listarFrace();
+            this.store.dispatch(new SetFrace(resp?.data));
+
             });
           } else {
             this.alertService.error('Error', resp.message);
@@ -176,17 +188,15 @@ export class PhracesComponent implements OnInit {
       );
     }
   }
-  editar(id?: string) {
+  editar(frace: Frace) {
     this.action = 'Editar';
     this.submitType = 'Actualizar';
-    this.idFrace = id;
+    this.idFrace = frace?.id;
     this.nuevaFrace = true;
-    this.fraceaService.obtenerFrace(id).subscribe((resp) => {
-      this.fraceForm.patchValue({
-        intencion: resp.intencion,
-        frace: resp.frace,
-        activo: resp.activo,
-      });
+    this.fraceForm.patchValue({
+      intencion: frace.intencion,
+      frace: frace.frace,
+      activo: frace.activo,
     });
   }
   eliminar(frace: Frace) {
@@ -203,7 +213,7 @@ export class PhracesComponent implements OnInit {
           this.fraceaService.eliminarFrace(frace.id).subscribe((resp) => {
             if (resp.exito) {
               this.alertService.correcto('', resp.message).then(() => {
-                this.listarFrace();
+                this.store.dispatch(new RemoveFrace(resp?.id));
               });
             } else {
               this.alertService.error('Error', resp.message);

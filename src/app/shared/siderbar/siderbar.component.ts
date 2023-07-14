@@ -1,56 +1,41 @@
 import { Component, OnInit } from '@angular/core';
 import { Router } from '@angular/router';
-import { Listar } from 'src/app/interfaces/listar.interface';
+import { Store } from '@ngxs/store';
 import { Modulo } from 'src/app/interfaces/modulo.intrface';
-import { Rol } from 'src/app/interfaces/rol.interface';
-import { AuthenticationService } from 'src/app/services/authentication.service';
+import { Usuario } from 'src/app/interfaces/usuario.interface';
 import { ModulosService } from 'src/app/services/modulos.service';
-import { RolService } from 'src/app/services/rol.service';
+import { SetAccountState } from 'src/app/store/Account/account.state';
 
 @Component({
   selector: 'app-siderbar',
   templateUrl: './siderbar.component.html',
-  styles: []
+  styles: [],
 })
 export class SiderbarComponent implements OnInit {
-  roles: Rol[] = [];
   modulos: Modulo[] = [];
 
-
   constructor(
-    private rolService: RolService,
-    private modulosService: ModulosService,
-    private authservices: AuthenticationService,
-    private router: Router) {
-    this.listarModulos(this.authservices.usuario.id_rol);
-  }
+    private store: Store,
+    private router: Router,
+    private modulosService: ModulosService
+  ) {}
 
   ngOnInit(): void {
-    this.listarRoles();
+    this.listarModulos();
   }
 
   getUsers(rol?: string) {
-
     if (rol != null) {
-
-      this.router.navigate(['dashboard/usuarios/' + rol]);
+      this.router.navigate(['dashboard/cuentas/' + rol]);
     }
   }
-  listarModulos(rol: string) {
-    this.rolService.obtenerRol(rol).subscribe((resp: Rol) => {
-      this.modulos = this.modulosService.getModulos(resp.nombre);
-    });
-  }
-  listarRoles() {
-    const listar: Listar = {
-      columna: "",
-      search: "",
-      offset: 0,
-      limit: '100',
-      sort: ""
-    }
-    this.rolService.obtenerRoles(listar).subscribe((resp: Rol[]) => {
-      this.roles = resp.slice(0, 3);
-    });
+  listarModulos() {
+    this.store
+      .select(SetAccountState.getAccount)
+      .subscribe((user?: Usuario) => {
+        if (user?.id) {
+          this.modulos = this.modulosService.getModulos(user!.rol!);
+        }
+      });
   }
 }

@@ -1,12 +1,13 @@
 import { Component, OnInit } from '@angular/core';
-import { Usuario } from 'src/app/interfaces/usuarios.interface';
+import { Usuario } from 'src/app/interfaces/usuario.interface';
 import { AuthenticationService } from 'src/app/services/authentication.service';
 import { UsuarioService } from 'src/app/services/usuario.service';
 import * as signalR from '@microsoft/signalr';
 import { Store } from '@ngxs/store';
-import { Observable } from 'rxjs';
 import { SetAccountState } from 'src/app/store/Account/account.state';
 import { HelpersService } from 'src/app/services/helpers.service';
+import { ChatState } from 'src/app/store/Chat/chat.state';
+import { UsuariosState } from 'src/app/store/Usuarios/usuarios.state';
 
 @Component({
   selector: 'app-header',
@@ -16,9 +17,12 @@ import { HelpersService } from 'src/app/services/helpers.service';
 export class HeaderComponent implements OnInit {
   cargando = false;
   usuario!: Usuario;
+  rol: string = 'Agente';
   private _hubConnection: signalR.HubConnection | undefined;
   usuariosOnline: Usuario[] = [];
+  solicitudes: any[] = [];
   mostrarUsuariosEnLinea: boolean = false;
+  mostrarNotificacionesSolicitudes: boolean = true;
 
   constructor(
     private usuarioService: UsuarioService,
@@ -30,24 +34,34 @@ export class HeaderComponent implements OnInit {
       this.store.select(SetAccountState.getAccount).subscribe((user) => {
         this.usuario = user!;
       });
-      this.mostrarUsuariosEnLinea = this.usuario.rol === 'Administrador';
+      // this.mostrarUsuariosEnLinea = this.usuario.rol === 'Administrador';
     }
     this.cargando = true;
+    this.store.select(ChatState.showNotification).subscribe((show) => {
+      this.mostrarNotificacionesSolicitudes = show;
+    });
   }
 
   ngOnInit(): void {
     this.starConnection();
-    this.getConectados(2);
+    this.getConectados();
     this._hubConnection?.on('ContadorSession', (resp) => {
-      const audio = new Audio('assets/tonos/nuevo_usuario.mp3');
-      if (resp == 'enter' && this.authservices.usuario.rol == 'Administrador') {
-        audio.play();
-      }
-      this.getConectados(2);
+      // const audio = new Audio('assets/tonos/nuevo_usuario.mp3');
+      // if (resp == 'enter' && this.authservices.usuario.rol == 'Administrador') {
+      //   audio.play();
+      // }
+      this.getConectados();
+    });
+    this.getSolicitudes();
+  }
+
+  getSolicitudes() {
+    this.store.select(ChatState.getSolicitudes).subscribe((requests) => {
+      this.solicitudes = requests;
     });
   }
   refrescar() {
-    this.getConectados(2);
+    this.getConectados();
   }
 
   initialsName(name: string) {
@@ -55,13 +69,19 @@ export class HeaderComponent implements OnInit {
   }
 
   logout() {
-    this.authservices.cerrarSesion();
+    this.authservices?.cerrarSesion();
   }
 
-  getConectados(rol: number) {
-    this.usuarioService.usuarioEnLinea(rol).subscribe((resp) => {
-      this.usuariosOnline = resp;
-    });
+  getConectados() {
+    this.store
+      .select(UsuariosState.getUsuariosList)
+      .subscribe((usuariosList: Usuario[]) => {
+        this.usuariosOnline = usuariosList.filter(
+          (usuario) =>
+            usuario.rol?.toLowerCase() === this.rol.toLowerCase() &&
+            usuario.conectado === true
+        );
+      });
   }
   starConnection() {
     this._hubConnection = new signalR.HubConnectionBuilder()
@@ -72,7 +92,7 @@ export class HeaderComponent implements OnInit {
       .build();
     this._hubConnection
       .start()
-      .then(() => console.log('connection start'))
+      .then(() => {})
       .catch((err) => {
         console.log('Error while establishing the connection');
       });

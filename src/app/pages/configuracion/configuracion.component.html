@@ -1,8 +1,8 @@
 <div class="row">
   <div class="col-12">
-      <div class="page-title-box">
-          <h4 class="page-title">Configuracion</h4>
-      </div>
+    <div class="page-title-box">
+      <h4 class="page-title">Configuracion disponibilidad de agentes</h4>
+    </div>
   </div>
 </div>
 
@@ -18,11 +18,11 @@
             <thead class="table-light">
               <tr>
                 <th style="width: 20px">#</th>
-                <th>Dia</th>
+                <th>Día</th>
                 <th>Hora inicio</th>
                 <th>Hora fin</th>
-                <th>Status</th>
-                <th style="width: 125px">Accion</th>
+                <th>Estado</th>
+                <th style="width: 125px">Acción</th>
               </tr>
             </thead>
             <tbody>
@@ -30,14 +30,15 @@
                 <td>
                   <a class="text-body fw-bold">{{ i + 1 }}</a>
                 </td>
-                <td>{{ disp.dia | textElipsis: 20 }}</td>
-                <td>{{ disp.hora_inicio | textElipsis: 60 }}</td>
-                <td>{{ disp.hora_fin | textElipsis: 60 }}</td>
+                <td>{{ disp.dia | textElipsis : 20 }}</td>
+                <td>{{ disp.hora_inicio | textElipsis : 60 }}</td>
+                <td>{{ disp.hora_fin | textElipsis : 60 }}</td>
                 <td>
                   <span
                     [ngClass]="
-                    disp.activo ? 'badge bg-success' : 'badge bg-danger'
+                      disp.activo ? 'badge bg-success' : 'badge bg-danger'
                     "
+                    style="font-size: 13px"
                     >{{ disp.activo | activo }}</span
                   >
                 </td>
@@ -45,10 +46,13 @@
                   <a
                     data-bs-toggle="modal"
                     data-bs-target="#scrollable-modal"
-                    (click)="editar(disp.id)"
+                    (click)="editar(disp)"
                     class="action-icon"
                   >
-                    <i class="mdi mdi-square-edit-outline"></i
+                    <i
+                      class="mdi mdi-square-edit-outline mdi-24px"
+                      style="color: #2379ce"
+                    ></i
                   ></a>
                 </td>
               </tr>
@@ -130,22 +134,22 @@
                   id="inicio"
                   formControlName="hora_inicio"
                 >
-                  <option value="" disabled selected>Selecciona una hora</option>
+                  <option value="" disabled selected>
+                    Selecciona una hora
+                  </option>
                   <option *ngFor="let hora of horarios" [ngValue]="hora">
-                    {{ hora}}
+                    {{ hora }}
                   </option>
                 </select>
               </div>
               <div class="col-md">
                 <label for="fin" class="form-label">Hora Fin</label>
-                <select
-                  class="form-select"
-                  id="fin"
-                  formControlName="hora_fin"
-                >
-                  <option value="" disabled selected>Selecciona una hora</option>
+                <select class="form-select" id="fin" formControlName="hora_fin">
+                  <option value="" disabled selected>
+                    Selecciona una hora
+                  </option>
                   <option *ngFor="let hora of horarios" [ngValue]="hora">
-                    {{ hora}}
+                    {{ hora }}
                   </option>
                 </select>
               </div>
@@ -153,9 +157,13 @@
             <div class="mb-3 mt-3">
               <label class="form-check-label" for="customCheck1">Activo</label>
               &nbsp;&nbsp;
-              <input type="checkbox" class="form-check-input" id="customCheck1"
-                  formControlName="activo">
-          </div>
+              <input
+                type="checkbox"
+                class="form-check-input"
+                id="customCheck1"
+                formControlName="activo"
+              />
+            </div>
           </div>
         </form>
       </div>

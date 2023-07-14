@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Login } from 'src/app/interfaces/login.interface';
+import { Usuario } from 'src/app/interfaces/usuario.interface';
 import { AlertService } from 'src/app/services/alert.service';
 import { AuthenticationService } from 'src/app/services/authentication.service';
 import { BibliotecaService } from 'src/app/services/biblioteca.service';
@@ -14,12 +15,13 @@ import Swal from 'sweetalert2';
   styles: [],
 })
 export class LoginComponent implements OnInit {
-  usuario!: Login;
+  usuario!: Usuario;
   loginForm!: FormGroup;
   showPassword: Boolean = false;
   passwordtype: String = 'password';
   classhow: String = 'far fa-eye-slash nav-icon';
   loading: boolean = false;
+  hasAuthLoading: boolean = true;
   constructor(
     private bibliotecaService: BibliotecaService,
     private formService: FormsService,
@@ -47,13 +49,24 @@ export class LoginComponent implements OnInit {
   }
 
   verificarLoggin() {
-    if (
-      this.authservices.estaAutenticado() &&
-      this.authservices?.usuario?.verificado
-    ) {
-      this.router.navigate(['/dashboard']);
+    if (this.authservices?.estaAutenticado()) {
+      this.hasAuthLoading = true;
+      try {
+        this.authservices.verificarToken().subscribe((resp) => {
+          console.log(resp);
+          this.hasAuthLoading = false;
+          if (resp) {
+            this.router.navigate(['/dashboard']);
+          } else {
+            this.router.navigate(['/confirmar']);
+          }
+        });
+      } catch (error) {
+        this.router.navigate(['/login']);
+      }
     } else {
       this.router.navigate(['/login']);
+      this.hasAuthLoading = false;
     }
   }
 
@@ -96,24 +109,30 @@ export class LoginComponent implements OnInit {
           }
         });
       }
-
+      this.alertService.esperando('Autentificando...');
+      Swal.showLoading();
       const usuario: Login = {
         correo: this.loginForm.value.correo,
         clave: this.loginForm.value.clave,
       };
       this.loading = true;
+      if (this.loginForm.value.recordarme) {
+        localStorage.setItem('correo', usuario.correo);
+      } else {
+        localStorage.removeItem('correo');
+      }
       this.authservices.acceso(usuario).subscribe((resp) => {
         if (resp) {
-          this.router.navigate(['/authenticate']);
-          this.alertService.esperando('Autentificando');
+          this.authservices.verificarToken().subscribe((resp) => {
+            if (resp) {
+              this.router.navigate(['/dashboard']);
+            } else {
+              this.router.navigate(['/confirmar']);
+            }
+          });
+
           this.loading = false;
-          if (this.loginForm.value.recordarme) {
-            localStorage.setItem('correo', usuario.correo);
-          } else {
-            localStorage.removeItem('correo');
-          }
-          Swal.showLoading();
-          this.validarToken();
+          Swal.close();
         } else {
           this.loading = false;
         }
@@ -128,30 +147,30 @@ export class LoginComponent implements OnInit {
     }
   }
 
-  validarToken() {
+  validarToken(usuario: Usuario) {
     try {
-      this.authservices.verificarToken().subscribe((resp) => {
-        // setTimeout(() => {
-        if (resp) {
-          if (this.authservices?.usuario?.verificado) {
-            this.router.navigate(['/dashboard']);
-            this.alertService.correcto('', 'Acceso Correcto');
-            Swal.close();
-          } else {
-            this.router.navigate(['/confirmar']);
-            Swal.close();
-          }
-        } else {
-          this.loading = false;
-          this.alertService.error(
-            'Error',
-            'Ocurrio un proble porfavor intentelo de nuevo.'
-          );
-          Swal.close();
-        }
+      console.log('ya ingreso F', usuario);
 
-        // }, 500);
-      });
+      //   this.authservices.verificarToken().subscribe((resp) => {
+      //     if (resp) {
+      // this.store.select(SetAccountState.getAccount).subscribe((user) => {
+      //   console.log(user);
+      if (usuario?.verificado) {
+        // this.router.navigate(['/dashboard']);
+        // this.alertService.correcto('', 'Acceso Correcto');
+        // Swal.close();
+      } else {
+      }
+      // });
+      //     } else {
+      //       this.loading = false;
+      //       this.alertService.error(
+      //         'Error',
+      //         'Ocurrio un proble porfavor intentelo de nuevo.'
+      //       );
+      //       Swal.close();
+      //     }
+      //   });
     } catch (error) {
       this.loading = false;
       this.alertService.error(

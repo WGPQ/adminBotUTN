@@ -1,7 +1,8 @@
 import { Component, OnInit, ViewChild } from '@angular/core';
 import { FormGroup } from '@angular/forms';
 import { Store } from '@ngxs/store';
-import { Usuario } from 'src/app/interfaces/usuarios.interface';
+import { parseISO } from 'date-fns';
+import { Usuario } from 'src/app/interfaces/usuario.interface';
 import { AlertService } from 'src/app/services/alert.service';
 import { AuthenticationService } from 'src/app/services/authentication.service';
 import { FormsService } from 'src/app/services/forms.service';
@@ -119,15 +120,37 @@ export class PerfilComponent implements OnInit {
   }
   obtenetPerfil() {
     this.usuarioForm.patchValue({
+      foto: this.usuario.foto,
       nombres: this.usuario.nombres,
       apellidos: this.usuario.apellidos,
       telefono: this.usuario.telefono,
       correo: this.usuario.correo,
     });
   }
+
+  subirFoto(event: any) {
+    var file = event.target.files[0];
+    if (file) {
+      var formData = new FormData();
+      formData.append('file', file, file.name);
+      formData.append('upload_preset', 'bibliochat_utn');
+      formData.append('cloud_name', 'dw9uf4st5');
+      this.usuarioService.subirFotoCloudinary(formData).subscribe((resp) => {
+        if (resp) {
+          const { secure_url } = resp;
+          console.log(secure_url);
+
+          this.usuarioForm.patchValue({
+            foto: secure_url,
+          });
+        }
+      });
+    }
+  }
   actualizarPerfil() {
     const usuario: Usuario = {
       id: this.usuario?.id,
+      foto: this.usuarioForm.value.foto,
       nombres: this.usuarioForm.value.nombres,
       apellidos: this.usuarioForm.value.apellidos,
       telefono: this.usuarioForm.value.telefono,
@@ -149,8 +172,10 @@ export class PerfilComponent implements OnInit {
 
   actualizarPassword() {
     let clave = this.actualizarForm.value.clave;
-    let token = sessionStorage.getItem('acces-token') ?? '';
+    let token = sessionStorage.getItem('access-token') ?? '';
     this.alertService.esperando('Guardar informacion....');
+    console.log(token);
+
     Swal.showLoading();
     this.authservices.actualizarClave(clave, token).subscribe((resp) => {
       if (resp?.exito) {
@@ -163,6 +188,12 @@ export class PerfilComponent implements OnInit {
         );
       }
     });
+  }
+  localDate(date: any) {
+    let utcDate = new Date(date);
+    return new Date(
+      utcDate.getTime() - utcDate.getTimezoneOffset() * 60 * 1000
+    );
   }
 
   passwordsIguales(pass1Name: string, pass2Name: string) {

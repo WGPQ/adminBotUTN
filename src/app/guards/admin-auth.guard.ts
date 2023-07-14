@@ -1,22 +1,20 @@
 import { Injectable } from '@angular/core';
-import { ActivatedRouteSnapshot, CanActivate, Router, RouterStateSnapshot, UrlTree } from '@angular/router';
-import { Observable } from 'rxjs';
-import { tap } from 'rxjs/operators';
-import { AuthenticationService } from '../services/authentication.service';
+import { CanActivate } from '@angular/router';
+import { Store } from '@ngxs/store';
+import { Usuario } from '../interfaces/usuario.interface';
+import { SetAccountState } from '../store/Account/account.state';
 
 @Injectable({
-  providedIn: 'root'
+  providedIn: 'root',
 })
 export class AdminAuthGuard implements CanActivate {
-  constructor(private authservices: AuthenticationService, private router: Router) { }
-  canActivate(): Observable<boolean> {
-    return this.authservices.verificarToken().pipe(
-      tap(estaAutenticado => {
-        if (!estaAutenticado) {
-          this.router.navigateByUrl('/login');
-        }
-      })
-    );
+  usuario!: Usuario;
+  constructor(private store: Store) {
+    this.store.select(SetAccountState.getAccount).subscribe((user) => {
+      this.usuario = user!;
+    });
   }
-
+  canActivate(): boolean {
+    return this.usuario.rol === 'Administrador';
+  }
 }

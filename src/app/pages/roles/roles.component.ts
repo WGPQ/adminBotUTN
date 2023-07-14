@@ -1,10 +1,13 @@
-import { Component, OnInit, ViewChild } from '@angular/core';
+import { Component, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { FormGroup } from '@angular/forms';
+import { Store } from '@ngxs/store';
 import { Listar } from 'src/app/interfaces/listar.interface';
 import { Rol } from 'src/app/interfaces/rol.interface';
 import { AlertService } from 'src/app/services/alert.service';
 import { FormsService } from 'src/app/services/forms.service';
 import { RolService } from 'src/app/services/rol.service';
+import { RemoveRol, SetRol } from 'src/app/store/Roles/roles.actions';
+import { RolesState } from 'src/app/store/Roles/roles.state';
 import Swal from 'sweetalert2';
 
 @Component({
@@ -12,7 +15,7 @@ import Swal from 'sweetalert2';
   templateUrl: './roles.component.html',
   styles: [],
 })
-export class RolesComponent implements OnInit {
+export class RolesComponent implements OnInit, OnDestroy {
   roles: Rol[] = [];
   rolForm!: FormGroup;
   liatarForm!: FormGroup;
@@ -20,25 +23,37 @@ export class RolesComponent implements OnInit {
   action = 'Agregar';
   idRol?: string;
   rol!: Rol;
-  cargando = false;
+  cargando = true;
   pagina = 0;
   paginaActiva = 0;
   numeroPaginas = new Array(1);
   previus = false;
   next = true;
+  setTimeRef: any;
   @ViewChild('closebutton') closebutton: any;
   constructor(
+    private store: Store,
     private rolService: RolService,
     private alertService: AlertService,
     private formService: FormsService
   ) {
-    this.cargando = true;
     this.rolForm = formService.crearFormularioRol();
     this.liatarForm = formService.crearFormularioListar();
   }
 
   ngOnInit(): void {
-    this.listarRoles();
+    this.fetchRoles();
+  }
+  ngOnDestroy(): void {
+    clearTimeout(this.setTimeRef);
+  }
+
+  fetchRoles() {
+    this.store.select(RolesState.getRolesList).subscribe((rolesList: Rol[]) => {
+      this.roles = rolesList;
+      this.numeroPaginas = new Array(Math.ceil(this.roles.length / 10));
+      this.setTimeRef = setTimeout(() => (this.cargando = false), 450);
+    });
   }
   previusPage() {
     if (this.pagina > 0) {
@@ -66,7 +81,7 @@ export class RolesComponent implements OnInit {
   }
 
   limitar() {
-    this.listarRoles();
+    this.updateRoles();
   }
   agregarRol() {
     this.rolForm.reset();
@@ -113,10 +128,9 @@ export class RolesComponent implements OnInit {
             .correcto(resp.data.nombre, resp.message)
             .then(() => {
               this.closebutton.nativeElement.click();
-              this.listarRoles();
             });
+          this.store.dispatch(new SetRol(resp?.data));
         } else {
-          console.log('errorl');
           this.alertService.error('Error', resp.message);
         }
       });
@@ -127,8 +141,8 @@ export class RolesComponent implements OnInit {
             .correcto(resp.data.nombre, resp.message)
             .then(() => {
               this.closebutton.nativeElement.click();
-              this.listarRoles();
             });
+          this.store.dispatch(new SetRol(resp?.data));
         } else {
           this.alertService.error('Error', resp.message);
         }
@@ -137,10 +151,10 @@ export class RolesComponent implements OnInit {
   }
   search() {
     if (this.liatarForm.value.columna != '') {
-      this.listarRoles();
+      this.updateRoles();
     }
   }
-  listarRoles() {
+  updateRoles() {
     var listar: Listar = {
       columna: this.liatarForm.value.columna,
       search: this.liatarForm.value.search,
@@ -155,16 +169,14 @@ export class RolesComponent implements OnInit {
     });
   }
 
-  editarRol(id?: string) {
+  editarRol(rol: Rol) {
     this.action = 'Editar';
     this.submitType = 'Actualizar';
-    this.idRol = id;
-    this.rolService.obtenerRol(id).subscribe((resp) => {
-      this.rol = resp;
-      this.rolForm.patchValue({
-        nombre: resp.nombre,
-        descripcion: resp.descripcion,
-      });
+    this.idRol = rol?.id;
+    this.rol = rol;
+    this.rolForm.patchValue({
+      nombre: rol.nombre,
+      descripcion: rol.descripcion,
     });
   }
 
@@ -180,12 +192,9 @@ export class RolesComponent implements OnInit {
       }).then((resp) => {
         if (resp.value) {
           this.rolService.eliminarRol(rol.id).subscribe((resp) => {
-            console.log(resp);
-
             if (resp.exito) {
-              this.alertService.correcto('', resp.message).then(() => {
-                this.listarRoles();
-              });
+              this.alertService.correcto('', resp.message).then(() => {});
+              this.store.dispatch(new RemoveRol(resp?.id));
             } else {
               this.alertService.error('Error', resp.message);
             }

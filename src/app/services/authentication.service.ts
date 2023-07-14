@@ -12,9 +12,14 @@ import * as signalR from '@microsoft/signalr';
 import { environment } from 'src/environments/environment';
 import { AlertService } from './alert.service';
 import { Router } from '@angular/router';
-import { Usuario } from '../interfaces/usuarios.interface';
+import { Usuario } from '../interfaces/usuario.interface';
 import { Store } from '@ngxs/store';
-import { SetAccount, SetAccountBlog } from '../store/Account/account.actions';
+import {
+  RemoveAccount,
+  RemoveAccountBlog,
+  SetAccount,
+  SetAccountBlog,
+} from '../store/Account/account.actions';
 
 @Injectable({
   providedIn: 'root',
@@ -23,7 +28,7 @@ export class AuthenticationService {
   appUrl = environment.baseUrl;
   apiUrl = environment.apiLogin;
   secret = environment.secret;
-  access_token!: string;
+  access_token?: string;
   session!: string;
   access_token_blog!: string;
   session_blog!: string;
@@ -60,7 +65,7 @@ export class AuthenticationService {
   httpOptions = {
     headers: new HttpHeaders({
       'Content-Type': 'application/json',
-      "Authorization": 'Bearer ' + this.leerToken(),
+      Authorization: 'Bearer ' + this.leerToken(),
     }),
   };
 
@@ -100,39 +105,50 @@ export class AuthenticationService {
       );
   }
 
-
   acceso_chat_blog(correo: string): Observable<boolean> {
     return this.http
-      .post(this.appUrl + this.apiUrl + '/login/chatbot', { correo })
+      .post(this.appUrl + this.apiUrl + '/login/cliente', { correo })
       .pipe(
         map((resp: any) => {
           if (resp.exito) {
             this.guardarTokenBlog(resp.token);
             this.guardarSessionBlog(resp.id_session);
-          } else {
-            this.alertService.error('', resp.message);
           }
           return resp.exito;
-        }),
-        catchError(this.errorHandler)
+        })
       );
   }
 
   cerrarSesion() {
-    var session_id = this.leerSession();
-    this.logout(session_id).subscribe((resp) => {
-      if (resp.exito) {
-        this.access_token = '';
-        sessionStorage.removeItem('acces-token');
-        sessionStorage.removeItem('user-key');
-        this.router.navigate(['/login']);
-      }
-    });
+    try {
+      var session_id = this.leerSession();
+      this.logout(session_id).subscribe(
+        (resp) => {
+          if (resp.exito) {
+            this.access_token = '';
+            sessionStorage.clear();
+            this.router.navigate(['/login']);
+            this.store.dispatch(new RemoveAccount(new Usuario()));
+          }
+        },
+        (error) => {
+          sessionStorage.clear();
+          this.router.navigate(['#/login']);
+        }
+      );
+    } catch (error) {
+      console.log('Error', error);
+    }
+  }
+  cerrarSesionBlog() {
+    sessionStorage.clear();
+    this.store.dispatch(new RemoveAccountBlog(null));
   }
 
-  resetearClave(id?: string): Observable<any> {
-    return this.http.get(
-      this.appUrl + this.apiUrl + '/resetear/' + id,
+  resetearClave(correo?: string): Observable<any> {
+    return this.http.post(
+      this.appUrl + this.apiUrl + '/resetear',
+      { correo: correo },
       this.httpOptions
     );
   }
@@ -140,7 +156,7 @@ export class AuthenticationService {
   actualizarClave(clave?: string, token?: string): Observable<any> {
     var headers = new HttpHeaders({
       'Content-Type': 'application/json',
-      "Authorization": 'Bearer ' + token,
+      Authorization: 'Bearer ' + token,
     });
     let data = {
       clave: clave,
@@ -151,7 +167,12 @@ export class AuthenticationService {
   }
   logout(session?: string): Observable<any> {
     return this.http.get(this.appUrl + this.apiUrl + '/logout/' + session, {
-      headers: { "Authorization": 'Bearer ' + this.leerToken() },
+      headers: { Authorization: 'Bearer ' + this.leerToken() },
+    });
+  }
+  logoutBlog(session?: string): Observable<any> {
+    return this.http.get(this.appUrl + this.apiUrl + '/logout/' + session, {
+      headers: { Authorization: 'Bearer ' + this.leerTokenBlog() },
     });
   }
 
@@ -159,17 +180,18 @@ export class AuthenticationService {
     this.session = session;
     sessionStorage.setItem('session', session);
   }
-  guardarToken(token: string) {
-    this.access_token = token;
-    sessionStorage.setItem('acces-token', token);
-  }
   guardarSessionBlog(session: string) {
     this.session_blog = session;
     sessionStorage.setItem('session-blog', session);
   }
+  guardarToken(token: string) {
+    this.access_token = token;
+    sessionStorage.setItem('access-token', token);
+  }
+
   guardarTokenBlog(token: string) {
     this.access_token_blog = token;
-    sessionStorage.setItem('acces-token-blog', token);
+    sessionStorage.setItem('access-token-blog', token);
   }
 
   guardarIdUserRol(id: string) {
@@ -189,29 +211,34 @@ export class AuthenticationService {
     }
     return this.session;
   }
-  leerToken() {
-    if (sessionStorage.getItem('acces-token')) {
-      this.access_token = sessionStorage.getItem('acces-token') as string;
-    } else {
-      this.access_token = '';
-    }
-    return this.access_token;
-  }
   leerSessionBlog() {
     if (sessionStorage.getItem('session-blog')) {
-      this.session = sessionStorage.getItem('session-blog') as string;
+      this.session_blog = sessionStorage.getItem('session-blog') as string;
     } else {
-      this.session = '';
+      this.session_blog = '';
     }
-    return this.session;
+    return this.session_blog;
   }
-  leerTokenBlog() {
-    if (sessionStorage.getItem('acces-token-blog')) {
-      this.access_token = sessionStorage.getItem('acces-token-blog') as string;
+  leerToken() {
+    if (
+      sessionStorage.getItem('access-token') ||
+      sessionStorage.getItem('access-token-blog')
+    ) {
+      this.access_token =
+        (sessionStorage.getItem('access-token') as string) ||
+        (sessionStorage.getItem('access-token-blog') as string);
     } else {
-      this.access_token = '';
+      this.access_token = undefined;
     }
     return this.access_token;
+  }
+
+  leerTokenBlog() {
+    if (sessionStorage.getItem('access-token-blog')) {
+      return sessionStorage.getItem('access-token-blog') as string;
+    } else {
+      return undefined;
+    }
   }
 
   leerIdUserRol() {
@@ -224,10 +251,10 @@ export class AuthenticationService {
   }
 
   estaAutenticado(): boolean {
-    return this.access_token.length > 2;
+    return Boolean(sessionStorage.getItem('access-token'));
   }
   estaAutenticadoBlog(): boolean {
-    return this.access_token_blog.length > 2;
+    return Boolean(sessionStorage.getItem('access-token-blog'));
   }
 
   errorHandler(error: HttpErrorResponse) {
@@ -245,11 +272,21 @@ export class AuthenticationService {
     return throwError(error.error);
   }
 
+  getSession(idUser: string, token: string) {
+    return this.http.get(
+      this.appUrl + this.apiUrl + '/session/usuario/' + idUser,
+      {
+        headers: { Authorization: 'Bearer ' + token },
+      }
+    );
+  }
+
   verificarToken(): Observable<boolean> {
     var headers = new HttpHeaders({
       'Content-Type': 'application/json',
-      "Authorization": 'Bearer ' + this.leerToken(),
+      Authorization: 'Bearer ' + this.leerToken(),
     });
+
     return this.http
       .get(this.appUrl + this.apiUrl + '/verificar/token', { headers: headers })
       .pipe(
@@ -258,6 +295,7 @@ export class AuthenticationService {
             this.guardarToken(resp?.data?.token);
             const {
               id,
+              foto,
               nombres,
               apellidos,
               nombre_completo,
@@ -267,10 +305,13 @@ export class AuthenticationService {
               rol,
               activo,
               verificado,
+              conectado,
+              conectedAt,
             } = resp?.data?.usuario;
             this.guardarIdUserRol(id);
             this.usuario = new Usuario(
               id,
+              foto,
               nombres,
               apellidos,
               nombre_completo,
@@ -280,16 +321,21 @@ export class AuthenticationService {
               id_rol,
               rol,
               activo,
-              verificado
+              verificado,
+              conectado,
+              conectedAt
             );
             this.store.dispatch(new SetAccount(this.usuario));
           } else {
             this.alertService.error('', resp?.message);
           }
-          return true;
+          return this.usuario.verificado!;
         }),
         catchError((error) => {
-          console.log(error);
+          if (error?.status === 401) {
+            sessionStorage.clear();
+            this.router.navigate(['/login']);
+          }
           return of(false);
         })
       );
@@ -297,7 +343,7 @@ export class AuthenticationService {
   verificarTokenBlog(): Observable<boolean> {
     var headers = new HttpHeaders({
       'Content-Type': 'application/json',
-      "Authorization": 'Bearer ' + this.leerTokenBlog(),
+      Authorization: 'Bearer ' + this.leerTokenBlog(),
     });
     return this.http
       .get(this.appUrl + this.apiUrl + '/verificar/token', { headers: headers })
@@ -307,6 +353,7 @@ export class AuthenticationService {
             this.guardarTokenBlog(resp?.data?.token);
             const {
               id,
+              foto,
               nombres,
               apellidos,
               nombre_completo,
@@ -316,9 +363,12 @@ export class AuthenticationService {
               rol,
               activo,
               verificado,
+              conectado,
+              conectedAt,
             } = resp?.data?.usuario;
             this.usuario = new Usuario(
               id,
+              foto,
               nombres,
               apellidos,
               nombre_completo,
@@ -328,7 +378,9 @@ export class AuthenticationService {
               id_rol,
               rol,
               activo,
-              verificado
+              verificado,
+              conectado,
+              conectedAt
             );
             this.store.dispatch(new SetAccountBlog(this.usuario));
           } else {
@@ -337,7 +389,10 @@ export class AuthenticationService {
           return true;
         }),
         catchError((error) => {
-          console.log(error);
+          if (error?.status === 401) {
+            sessionStorage.clear();
+            this.router.navigate(['/chat-blog']);
+          }
           return of(false);
         })
       );

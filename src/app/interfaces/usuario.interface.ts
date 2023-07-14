@@ -1,6 +1,7 @@
 export class Usuario {
   constructor(
     public id?: string,
+    public foto?: string,
     public nombres: string = '',
     public apellidos: string = '',
     public nombre_completo?: string,

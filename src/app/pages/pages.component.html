@@ -1,27 +1,23 @@
 <div class="wrapper">
-    <app-siderbar></app-siderbar>
-    <div class="content-page">
-        <div class="content">
-            <app-header></app-header>
-            <div class="container-fluid">
-                <router-outlet></router-outlet>
-            </div>
-        </div>
-        <footer class="footer">
-            <div class="container-fluid">
-                <div class="row">
-                    <div class="col-md-6">
-                        <script>document.write(new Date().getFullYear())</script> © Hyper - Coderthemes.com
-                    </div>
-                    <div class="col-md-6">
-                        <div class="text-md-end footer-links d-none d-md-block">
-                            <a href="javascript: void(0);">About</a>
-                            <a href="javascript: void(0);">Support</a>
-                            <a href="javascript: void(0);">Contact Us</a>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </footer>
+  <app-siderbar></app-siderbar>
+  <div class="content-page">
+    <div class="content">
+      <app-header></app-header>
+      <div class="container-fluid">
+        <router-outlet></router-outlet>
+      </div>
     </div>
+    <footer class="footer">
+      <div class="container-fluid">
+        <div class="row">
+          <div class="col-md-6">
+            <script>
+              document.write(new Date().getFullYear());
+            </script>
+            © Hyper - Coderthemes.com
+          </div>
+        </div>
+      </div>
+    </footer>
+  </div>
 </div>

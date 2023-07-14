@@ -1,5 +1,5 @@
 import { MensageModel } from "./mensaje.interface";
-import { Usuario } from "./usuarios.interface";
+import { Usuario } from "./usuario.interface";
 
 export interface Interaction {
     id?: string;

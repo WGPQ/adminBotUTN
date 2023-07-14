@@ -4,9 +4,11 @@ import { ActivoValidador } from '../classes/validator/activo-validador';
 import { ApellidoValidador } from '../classes/validator/apellido-validator';
 import { ClaveValidador } from '../classes/validator/clave-validador';
 import { ColumnaValidador } from '../classes/validator/columna-validator';
+import { ComentarioValidador } from '../classes/validator/comentario.validador';
 import { CorreoValidador } from '../classes/validator/correo-validador';
 import { DescripcionValidador } from '../classes/validator/descripcion.validador';
 import { DiaValidador } from '../classes/validator/dia-validator';
+import { FotoValidador } from '../classes/validator/foto.validador';
 import { FraceValidador } from '../classes/validator/frace-validador';
 import { HoraValidador } from '../classes/validator/hora-validator';
 import { IntencionValidador } from '../classes/validator/intencion-validador';
@@ -82,6 +84,7 @@ export class FormsService {
   }
   crearFormularioUsuario(): FormGroup {
     return new FormBuilder().group({
+      foto: new FotoValidador(),
       nombres: new NombreValidador(),
       apellidos: new ApellidoValidador(),
       telefono: new TelefonoValidador(),
@@ -90,9 +93,10 @@ export class FormsService {
       activo: new ActivoValidador(),
     });
   }
-  crearFormularioChatBlog(): FormGroup {
+  crearFormularioChatBlog(inputName: boolean): FormGroup {
     return new FormBuilder().group({
       correo: new CorreoValidador(),
+      nombre: inputName && new NombreValidador(),
     });
   }
   crearFormularioDisponibilidad(): FormGroup {
@@ -101,6 +105,16 @@ export class FormsService {
       hora_inicio: new HoraValidador(),
       hora_fin: new HoraValidador(),
       activo: new ActivoValidador(),
+    });
+  }
+  crearFormularioReset(): FormGroup {
+    return new FormBuilder().group({
+      correo: new CorreoValidador(),
+    });
+  }
+  crearFormularioComentario(): FormGroup {
+    return new FormBuilder().group({
+      comentario: new ComentarioValidador(),
     });
   }
 }

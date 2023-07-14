@@ -12,7 +12,6 @@ export const environment = {
   apiRol: "/api/rol",
   apiConfig: "/api/disponibilidad",
   apiUsuario: "/api/usuario",
-  apiCliente: "/api/cliente",
   apiLogin: "/api/auth",
   apiIntencion: "/api/intencion",
   apiFrace: "/api/frace",

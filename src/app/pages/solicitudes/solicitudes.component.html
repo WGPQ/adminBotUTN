@@ -1,0 +1,132 @@
+<div class="card-body">
+  <div class="dropdown float-end">
+    <a
+      href="#"
+      class="dropdown-toggle arrow-none card-drop"
+      data-bs-toggle="dropdown"
+      aria-expanded="false"
+    >
+      <i class="mdi mdi-dots-vertical"></i>
+    </a>
+    <div class="dropdown-menu dropdown-menu-end">
+      <div class="mt-3 mx-2">
+        <div *ngFor="let mes of meses">
+          <div class="form-check">
+            <input
+              type="checkbox"
+              class="form-check-input"
+              [id]="mes?.nombre"
+              [checked]="checketLabel(mes?.shorName)"
+              (click)="manejadorMes(mes?.shorName)"
+            />
+            <label class="form-check-label" [for]="mes?.nombre">{{
+              mes?.nombre
+            }}</label>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="d-flex align-items-center justify-content-between">
+    <h4 class="header-title mb-3">Solicitudes Atendidas</h4>
+    <select
+      class="form-select mb-3"
+      #device
+      (change)="manejadorAnio($event, device.value)"
+      id="anio"
+      style="width: 40%"
+    >
+      <option selected [value]="currentanio">{{ currentanio }}</option>
+      <option *ngFor="let anio of anios" [ngValue]="anio">
+        {{ anio }}
+      </option>
+    </select>
+  </div>
+  <canvas
+    baseChart
+    class="chart"
+    [data]="barChartData"
+    [options]="barChartOptions"
+    [type]="barChartType"
+  >
+  </canvas>
+  <div class="accordion" id="solicitudesChatbot">
+    <div class="card mb-0">
+      <div class="card-header" id="headingOneSolicitudes">
+        <div
+          class="d-flex align-items-center justify-content-between"
+          data-bs-toggle="collapse"
+          href="#collapseOneSolicitudes"
+          aria-expanded="true"
+        >
+          <h5>
+            <a class="custom-accordion-title d-block pt-2 pb-2">
+              Lista de solicitudes {{ anio }}
+            </a>
+          </h5>
+
+          <div class="text-xl-end mt-xl-0 mt-2">
+            <button
+              type="button"
+              class="btn btn-light mb-2"
+              (click)="exportar()"
+            >
+              <i class="mdi mdi-file-download mdi-24px"></i> Exportar
+            </button>
+          </div>
+
+          <!-- end col-->
+        </div>
+      </div>
+
+      <div
+        id="collapseOneSolicitudes"
+        class="collapse"
+        aria-labelledby="headingOneSolicitudes"
+        data-bs-parent="#solicitudesChatbot"
+      >
+        <div class="card-body">
+          <div class="table-responsive">
+            <table
+              id="solicitudes-table"
+              *ngIf="!cargando && interaccionesTable?.length > 0"
+              class="table table-centered mb-0"
+            >
+              <thead class="table-light">
+                <tr>
+                  <th style="width: 20px">#</th>
+                  <th style="display: none">Año</th>
+                  <th>Mes</th>
+                  <th style="text-align: center">Agente</th>
+                  <th style="width: 125px; text-align: center">Bot</th>
+                  <th style="width: 125px; text-align: center">Total</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr
+                  *ngFor="let interaccion of interaccionesTable; let i = index"
+                >
+                  <td>
+                    <a class="text-body fw-bold">{{ i + 1 }}</a>
+                  </td>
+                  <td style="display: none">{{ anio }}</td>
+                  <td>{{ interaccion?.mes | textElipsis : 20 }}</td>
+                  <td style="text-align: center">
+                    {{ interaccion?.agente ?? 0 }}
+                  </td>
+                  <td style="text-align: center">
+                    {{ interaccion?.bot ?? 0 }}
+                  </td>
+                  <td style="text-align: center">
+                    {{ interaccion?.total }}
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+<!-- end card-body-->
