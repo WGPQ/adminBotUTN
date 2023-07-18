@@ -12,7 +12,7 @@ export class SetComentarios {
 }
 export class SetMessagesByChat {
   static readonly type = '[POST] SetMessages';
-  constructor(public payload: any[]) {}
+  constructor(public payload: any) {}
 }
 export class SetUsuarioChat {
   static readonly type = '[POST] SetUsuarioChat';

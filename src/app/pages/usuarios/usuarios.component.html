@@ -279,11 +279,7 @@
                   type="text"
                   formControlName="apellidos"
                   maxlength="50"
-                  [class.is-invalid]="apellidosNoValido"
                 />
-                <small *ngIf="apellidosNoValido" class="form-text text-danger"
-                  >Los apellidos son requeridos</small
-                >
               </div>
               <div class="mb-3">
                 <label for="username" class="form-label">Correo</label>
@@ -581,11 +577,7 @@
                 type="text"
                 formControlName="apellidos"
                 maxlength="50"
-                [class.is-invalid]="apellidosNoValido"
               />
-              <small *ngIf="apellidosNoValido" class="form-text text-danger"
-                >Los apellidos son requeridos</small
-              >
             </div>
             <div class="mb-3">
               <label for="username" class="form-label">Correo</label>

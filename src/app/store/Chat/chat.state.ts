@@ -1,11 +1,13 @@
 import { Injectable } from '@angular/core';
 import { Action, Selector, State, StateContext } from '@ngxs/store';
+import { Solicitud } from 'src/app/interfaces/solicitud.interface';
 import {
   PostSolicitudes,
   RemoveSolicitud,
   SetChatActual,
   SetComentarios,
   SetInteracciones,
+  SetMessagesByChat,
   SetSessiones,
   SetUsuarioChat,
   UpdateShowNotification,
@@ -57,9 +59,17 @@ export class ChatState {
   static getChatActual(state: ChatStateModel) {
     return state.chatActual;
   }
+
   @Selector()
   static getComentarios(state: ChatStateModel) {
     return state.comentarios;
+  }
+  @Selector()
+  static getMessagesConversation(state: ChatStateModel) {
+    const chat = state.chatActual;
+    const solicitudes = state.solicitudes;
+    const solicitud = solicitudes?.find((soli) => soli?.id == chat?.id);
+    return solicitud?.messages || [];
   }
 
   @Selector()
@@ -170,6 +180,26 @@ export class ChatState {
     const state = getState();
     patchState({
       solicitudes: state.solicitudes.concat(payload),
+    });
+  }
+  @Action(SetMessagesByChat)
+  PostMessagesByChat(
+    { getState, patchState }: StateContext<ChatStateModel>,
+    { payload }: SetMessagesByChat
+  ) {
+    const { chatId, activity } = payload;
+    const solicitudes = getState().solicitudes;
+    const chats = solicitudes?.map((solicitud) => {
+      if (solicitud?.id == chatId) {
+        let solicitudChat = { ...solicitud };
+        solicitudChat.messages = [...solicitudChat.messages, activity];
+        return solicitud;
+      }
+      return solicitud;
+    });
+
+    patchState({
+      solicitudes: chats,
     });
   }
 

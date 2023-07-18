@@ -1,20 +1,16 @@
-<div *ngIf="conversationId === null && !showComentario">
-  <div class="card">
-    <!-- Logo -->
+<div class="card" style="position: absolute; height: calc(100%); width: 100%">
+  <div *ngIf="conversationId === null && !showComentario">
     <div class="pt-2 text-center bg-white">
-      <img src="assets/images/logo-chat-blog.jpg" alt="" height="100px" />
+      <img src="assets/images/logo-chat-inicio.png" alt="" height="100px" />
     </div>
-
-    <div class="card-body">
-      <h4 class="text-dark-50 text-center p-0 fw-bold">Soporte</h4>
-      <p class="text-muted mb-4">
+    <div class="card-body p-2">
+      <h4 class="text-dark-50 text-center p-0 fw-bold">Servicio Bibliotecario</h4>
+      <p class="text-muted mb-2">
         Ingrese su dirección de correo electrónico para iniciar una
         conversación.
       </p>
-
-      <!-- form -->
       <form [formGroup]="chatForm" autocomplete="off" (ngSubmit)="iniciar()">
-        <div class="mb-3">
+        <div class="mb-2">
           <label for="emailaddress" class="form-label">Correo: </label>
           <input
             class="form-control"
@@ -28,7 +24,7 @@
             >Ingrese un correo valido</small
           >
         </div>
-        <div *ngIf="showInputName" class="mb-3">
+        <div *ngIf="showInputName" class="mb-1">
           <label for="nombreCliente" class="form-label">Nombre: </label>
           <input
             class="form-control"
@@ -45,9 +41,10 @@
         <small *ngIf="showError" class="form-text text-danger">{{
           messageError
         }}</small>
-        <div class="d-grid mb-5 mt-4 text-center">
+        <div class="d-grid mb-4 mt-3 text-center">
           <button
-            class="btn btn-primary"
+            class="btn"
+            style="background-color: '#dd3333'; color: white"
             [disabled]="chatForm.invalid || loading"
             type="submit"
           >
@@ -62,12 +59,13 @@
       </form>
     </div>
   </div>
-</div>
 
-<div *ngIf="conversationId !== null && !showComentario">
-  <div class="card">
-    <div class="card-header" style="background-color: #dd3333">
-      <div class="dropdown float-end" style="height: 15px">
+  <div *ngIf="conversationId !== null && !showComentario">
+    <div class="card-header pt-1 pb-1 p-1" style="background-color: #dd3333">
+      <div class="d-flex justify-content-between">
+        <h2 class="header-title text-white mt-1">
+          Chat {{ usuario?.nombre_completo || "BiblioChat Utn" }}
+        </h2>
         <a
           (click)="salirChat()"
           class="social-list-item border-white text-white"
@@ -75,17 +73,22 @@
           ><i class="uil uil-multiply"></i
         ></a>
       </div>
-      <h2 class="header-title text-white mt-1">
-        Chat {{ usuario?.nombre_completo || "BiblioChat Utn" }}
-      </h2>
     </div>
-    <div class="card-body" style="padding: 10px">
+    <div class="card-body p-0">
       <div
         class="container-scroll"
         #scrollChat
-        style="min-height: 100%; height: 440px"
+        style="
+          min-height: 100%;
+          height: 440px;
+          background-image: url('assets/images/chat_background.png');
+        "
       >
-        <div id="chat-messages" class="conversation-list">
+        <div
+          id="chat-messages"
+          class="conversation-list"
+          style="margin-bottom: 20px"
+        >
           <div
             *ngFor="let activity of activities"
             [ngClass]="
@@ -176,6 +179,7 @@
           </div>
         </div>
       </div>
+
       <form
         [formGroup]="mensageForm"
         (ngSubmit)="sendMessage()"
@@ -184,52 +188,40 @@
         name="chat-form"
         id="chat-form"
       >
-        <div class="row">
-          <div class="col">
-            <input
-              type="text"
-              class="form-control chat-input"
-              #txtmessage
-              placeholder="Mensaje ..."
-              formControlName="message"
-            />
-          </div>
-          <div class="col-auto d-grid">
-            <button
-              type="submit"
-              [disabled]="mensageForm.invalid"
-              class="btn btn-info chat-send waves-effect waves-light"
-            >
-              <i class="uil uil-message"></i>
-            </button>
-          </div>
+        <div class="input-group" style="position: absolute; bottom: 0px">
+          <input
+            type="text"
+            class="form-control"
+            #txtmessage
+            placeholder="Mensaje ..."
+            formControlName="message"
+          />
+
+          <button
+            class="btn btn-info"
+            type="submit"
+            [disabled]="mensageForm.invalid"
+          >
+            <i class="uil uil-message"></i>
+          </button>
         </div>
       </form>
     </div>
   </div>
-  <!-- end chat area-->
 
-  <!-- end user detail -->
-</div>
-
-<div *ngIf="showComentario">
-  <div class="d-flex justify-content-center">
-    <div
-      class="card"
-      style="position: fixed; min-height: 60%; max-height: 60%; min-width: 60%"
-    >
-      <!-- Logo -->
-      <div class="pt-2 text-center bg-white">
-        <img src="assets/images/logo-chat-blog.webp" alt="" height="100" />
-      </div>
-
+  <div *ngIf="showComentario">
+    <!-- Logo -->
+    <div class="pt-1 text-center bg-white">
+      <img src="assets/images/logo-chat-blog.webp" alt="" height="100" />
+    </div>
+    <div class="card-body p-2">
       <h4 class="text-dark-50 text-center p-0 fw-bold">Deja tu comentario</h4>
-      <p class="text-muted p-2">
+      <p class="text-muted p-0">
         Nos gustaria saber tu experiencia, al interactuar con nuestro servicio
         de chat.
       </p>
       <div class="d-flex justify-content-center">
-        <div class="d-flex justify-content-around" style="width: 40%">
+        <div class="d-flex justify-content-around" style="width: 60%">
           <p
             [class]="emogiSelect == 2 ? 'border border-info rounded-2' : ''"
             style="font-size: 40px; cursor: pointer"
@@ -253,40 +245,38 @@
           </p>
         </div>
       </div>
-
-      <div class="card-body">
-        <form
-          [formGroup]="comentarioForm"
-          autocomplete="off"
-          (ngSubmit)="enviarComentario()"
-        >
-          <div class="form-floating">
-            <textarea
-              class="form-control"
-              placeholder="Leave a comment here"
-              id="floatingTextarea"
-              formControlName="comentario"
-              style="height: 100px"
-            ></textarea>
-          </div>
-          <div class="d-grid mb-5 mt-4 text-center">
-            <button
-              class="btn btn-primary"
-              [disabled]="comentarioForm.invalid || loading"
-              type="submit"
-            >
-              <i
-                [class]="
-                  loading
-                    ? 'mdi mdi-refresh mdi-spin me-2'
-                    : 'mdi mdi-login me-2 '
-                "
-              ></i>
-              <span>Enviar Comentario</span>
-            </button>
-          </div>
-        </form>
-      </div>
+      <form
+        [formGroup]="comentarioForm"
+        autocomplete="off"
+        (ngSubmit)="enviarComentario()"
+      >
+        <div class="form-floating">
+          <textarea
+            class="form-control"
+            placeholder="Leave a comment here"
+            id="floatingTextarea"
+            formControlName="comentario"
+            style="height: 80px"
+          ></textarea>
+        </div>
+        <div class="d-grid mb-1 mt-1 text-center">
+          <button
+            class="btn "
+            style="background-color: '#dd3333'; color: white"
+            [disabled]="comentarioForm.invalid || loading"
+            type="submit"
+          >
+            <i
+              [class]="
+                loading
+                  ? 'mdi mdi-refresh mdi-spin me-2'
+                  : 'mdi mdi-login me-2 '
+              "
+            ></i>
+            <span>Enviar Comentario</span>
+          </button>
+        </div>
+      </form>
 
       <div class="row mt-3">
         <div class="col-12 text-center">
@@ -296,7 +286,6 @@
             >
           </p>
         </div>
-        <!-- end col -->
       </div>
     </div>
   </div>

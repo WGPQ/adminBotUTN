@@ -26,12 +26,12 @@ export class CalificacionesComponent implements OnInit {
       emogi: `😐`,
     },
     {
-      label: 'Mala',
+      label: 'Malo',
       cantidad: 0,
       emogi: `🙁`,
     },
     {
-      label: 'No calificado',
+      label: 'No calificados',
       cantidad: 0,
       emogi: `😶`,
     },
@@ -56,7 +56,7 @@ export class CalificacionesComponent implements OnInit {
   ngOnInit(): void {}
 
   public pieChartData: ChartData<'pie', number[], string | string[]> = {
-    labels: ['Excelente', 'Regular', 'Mala', 'No caficicados'],
+    labels: ['Excelente', 'Regular', 'Malo', 'No calificados'],
     datasets: [
       {
         data: [0, 0, 0, 0],

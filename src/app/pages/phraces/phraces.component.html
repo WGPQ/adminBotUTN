@@ -54,7 +54,7 @@
                   >
                     <option disabled selected value="">Elegir...</option>
                     <option value="intencion">Intencion</option>
-                    <option value="frace">Frace</option>
+                    <option value="frace">Frase</option>
                   </select>
                 </div>
               </div>
@@ -230,7 +230,7 @@
             </div>
 
             <div class="mb-3">
-              <label for="descripcion" class="form-label">Frace</label>
+              <label for="descripcion" class="form-label">Frase</label>
               <textarea
                 class="form-control"
                 id="example-textarea"
@@ -240,7 +240,7 @@
                 [class.is-invalid]="fraceNoValida"
               ></textarea>
               <small *ngIf="fraceNoValida" class="form-text text-danger"
-                >La frace es requerida</small
+                >La frase es requerida</small
               >
             </div>
             <div *ngIf="nuevaFrace">

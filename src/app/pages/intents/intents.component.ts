@@ -165,10 +165,7 @@ export class IntentsComponent implements OnInit, OnDestroy {
         (resp) => {
           if (resp.exito) {
             this.alertService
-              .correcto(
-                `${resp.data.nombre} ${resp.data.descripcion}`,
-                resp.message
-              )
+              .correcto(`${resp.data.nombre}`, resp.message)
               .then(() => {
                 this.closebutton.nativeElement.click();
                 this.store.dispatch(new SetIntencion(resp?.data));

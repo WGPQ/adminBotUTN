@@ -275,6 +275,10 @@ export class ChatBlogComponent implements OnInit {
     let utcDate = new Date(date);
     return new Date(utcDate.getTime() + utcDate.getTimezoneOffset());
   }
+  imagen(){
+    console.log("adjuntar");
+
+  }
 
   listeMessages() {
     try {

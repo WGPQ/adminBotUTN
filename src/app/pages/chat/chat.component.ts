@@ -25,6 +25,7 @@ import {
   UpdateShowNotification,
   UpdateSolicitud,
   SetUsuarioChat,
+  SetMessagesByChat,
 } from 'src/app/store/Chat/chat.actions';
 import { environment } from 'src/environments/environment';
 import { ConnectionStatus } from 'botframework-directlinejs';
@@ -43,6 +44,7 @@ export class ChatComponent implements OnInit, OnDestroy {
   @ViewChild('txtmessage') private txtMessage!: ElementRef;
   messages: MensageModel[] = [];
   activities: any[] = [];
+  messagesSolicitud: any[] = [];
   interactions: Interaction[] = [];
   isInitialized: boolean = false;
   loadingStartChat: boolean = false;
@@ -96,6 +98,11 @@ export class ChatComponent implements OnInit, OnDestroy {
     this.store.select(ChatState.getChatActual).subscribe((chat) => {
       this.chatActual = chat!;
     });
+    this.store
+      .select(ChatState.getMessagesConversation)
+      .subscribe((messages) => {
+        this.messagesSolicitud = messages!;
+      });
     this.store.select(SetAccountState.getBot).subscribe((bot) => {
       this.bot = bot!;
     });
@@ -381,6 +388,12 @@ export class ChatComponent implements OnInit, OnDestroy {
                   );
                 }
                 this.activities = [...this.activities, actv];
+                this.store.dispatch(
+                  new SetMessagesByChat({
+                    chatId: this.chatActual?.id,
+                    activity: actv,
+                  })
+                );
               }
             }
           }

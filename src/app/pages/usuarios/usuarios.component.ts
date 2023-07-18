@@ -223,12 +223,12 @@ export class UsuariosComponent implements OnInit, OnDestroy {
       this.clienteForm.get('nombres')?.touched
     );
   }
-  get apellidosNoValido() {
-    return (
-      this.clienteForm.get('apellidos')?.invalid &&
-      this.clienteForm.get('apellidos')?.touched
-    );
-  }
+  // get apellidosNoValido() {
+  //   return (
+  //     this.clienteForm.get('apellidos')?.invalid &&
+  //     this.clienteForm.get('apellidos')?.touched
+  //   );
+  // }
   get correoNoValido() {
     return (
       this.clienteForm.get('correo')?.invalid &&
@@ -357,7 +357,7 @@ export class UsuariosComponent implements OnInit, OnDestroy {
       limit: this.liatarForm.value.limit,
       sort: this.liatarForm.value.sort,
     };
-    this.clienteService.exportarExcel(this.rol, listar).subscribe((blob) => {
+    this.clienteService.exportarExcel(this.idRol, listar).subscribe((blob) => {
       let fileUrl = window.URL.createObjectURL(blob);
       window.open(fileUrl);
     });

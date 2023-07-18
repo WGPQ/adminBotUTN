@@ -74,7 +74,12 @@ export class DashboardComponent implements OnInit {
       });
   }
   getInteracciones(anio: string, meses: string) {}
-
+  localDate(date: any) {
+    let utcDate = new Date(date);
+    return new Date(
+      utcDate.getTime() - utcDate.getTimezoneOffset() * 60 * 1000
+    );
+  }
   getComentarios() {
     this.store
       .select(ChatState.getComentarios)

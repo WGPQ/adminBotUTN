@@ -36,6 +36,7 @@ export class AccountsComponent implements OnInit, OnDestroy {
   action = 'Agregar';
   idUsuario?: string;
   rol?: string;
+  rolId?: string;
   nuevoUsuario: boolean = false;
   loading = true;
   showModal = true;
@@ -60,7 +61,6 @@ export class AccountsComponent implements OnInit, OnDestroy {
     private formService: FormsService
   ) {
     this.loading = true;
-    this.listarRoles();
     this.usuarioForm = formService.crearFormularioUsuario();
     this.liatarForm = formService.crearFormularioListar();
   }
@@ -68,6 +68,7 @@ export class AccountsComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.router.paramMap.subscribe((params: ParamMap) => {
       var nombreRol = params.get('rol');
+      this.listarRoles(nombreRol!);
       this.fetchUsuarios(nombreRol!);
     });
   }
@@ -88,7 +89,7 @@ export class AccountsComponent implements OnInit, OnDestroy {
       limit: this.liatarForm.value.limit || 10,
       sort: this.liatarForm.value.sort,
     };
-    this.usuarioService.exportarExcel(this.rol!, listar).subscribe((blob) => {
+    this.usuarioService.exportarExcel(this.rolId!, listar).subscribe((blob) => {
       let fileUrl = window.URL.createObjectURL(blob);
       window.open(fileUrl);
     });
@@ -224,9 +225,10 @@ export class AccountsComponent implements OnInit, OnDestroy {
         this.loading = false;
       });
   }
-  listarRoles() {
+  listarRoles(rolName: string) {
     this.store.select(RolesState.getRolesList).subscribe((rolesList: Rol[]) => {
       this.roles = rolesList;
+      this.rolId = rolesList.find((rol) => rol?.nombre == rolName)?.id;
     });
   }
   nuevo() {

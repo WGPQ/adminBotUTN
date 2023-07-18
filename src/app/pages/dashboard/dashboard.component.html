@@ -80,3 +80,42 @@
   </div>
 </div>
 <!-- end row -->
+
+<!-- comments -->
+<div class="row mt-3">
+  <div class="col">
+    <div class="card p-2">
+      <div class="card-header p-0">
+        <h5 class="mb-2 font-16">Comentarios {{ comentarios.length || 0 }}</h5>
+      </div>
+      <div class="card-body" style="height: 500px; overflow-y: scroll">
+        <div *ngFor="let comentario of comentarios">
+          <div class="d-flex mt-3 p-1">
+            <img
+              src="assets/images/avatar_user.png"
+              class="me-2 rounded-circle"
+              height="36"
+              alt="Arya Stark"
+            />
+            <div class="w-100">
+              <h5 class="mt-0 mb-0">
+                <span class="float-end text-muted font-12">{{
+                  localDate(comentario?.createdAt) | date : "EEE d MMM y HH:mm"
+                }}</span>
+                {{ comentario?.correo }}
+              </h5>
+              <p class="mt-1 mb-0 text-muted">
+                {{ comentario?.contenido }}
+              </p>
+            </div>
+          </div>
+          <!-- end comment -->
+
+          <hr />
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- end col -->
+</div>
+<!-- end row -->
