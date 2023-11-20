@@ -21,7 +21,7 @@ export class BotService {
   initBotConfigPortal() {
     if (sessionStorage.conversationIdPortal) {
       this.directLinePortal = new DirectLine({
-        secret: '1R4CEi0beLU.S79oC0zXyZsPGuX1HfV4goBQmbJmwOO9c5wriKNnAZw',
+        secret: '6sNxJNg3BtA.Eh1wOB3_okbp2ZcSICFiqsYF0hSybjnJ9v08hUEDpHs',
         conversationId: sessionStorage.conversationIdPortal,
         conversationStartProperties: {
           locale: 'en-US',
@@ -29,7 +29,7 @@ export class BotService {
       });
     } else {
       this.directLinePortal = new DirectLine({
-        secret: '1R4CEi0beLU.S79oC0zXyZsPGuX1HfV4goBQmbJmwOO9c5wriKNnAZw',
+        secret: '6sNxJNg3BtA.Eh1wOB3_okbp2ZcSICFiqsYF0hSybjnJ9v08hUEDpHs',
         conversationStartProperties: {
           locale: 'en-US',
         },
@@ -38,21 +38,25 @@ export class BotService {
   }
 
   initBotConfigBlog() {
-    if (sessionStorage.conversationIdBlog) {
-      this.directLineBlog = new DirectLine({
-        secret: '1R4CEi0beLU.S79oC0zXyZsPGuX1HfV4goBQmbJmwOO9c5wriKNnAZw',
-        conversationId: sessionStorage.conversationIdBlog,
-        conversationStartProperties: {
-          locale: 'en-US',
-        },
-      });
-    } else {
-      this.directLineBlog = new DirectLine({
-        secret: '1R4CEi0beLU.S79oC0zXyZsPGuX1HfV4goBQmbJmwOO9c5wriKNnAZw',
-        conversationStartProperties: {
-          locale: 'en-US',
-        },
-      });
+    try {
+      if (sessionStorage.conversationIdBlog) {
+        this.directLineBlog = new DirectLine({
+          secret: '6sNxJNg3BtA.Eh1wOB3_okbp2ZcSICFiqsYF0hSybjnJ9v08hUEDpHs',
+          conversationId: sessionStorage.conversationIdBlog,
+          conversationStartProperties: {
+            locale: 'en-US',
+          },
+        });
+      } else {
+        this.directLineBlog = new DirectLine({
+          secret: '6sNxJNg3BtA.Eh1wOB3_okbp2ZcSICFiqsYF0hSybjnJ9v08hUEDpHs',
+          conversationStartProperties: {
+            locale: 'en-US',
+          },
+        });
+      }
+    } catch (error) {
+      console.log(error);
     }
   }
 

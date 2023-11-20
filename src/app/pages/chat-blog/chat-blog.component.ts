@@ -72,6 +72,7 @@ export class ChatBlogComponent implements OnInit {
     this.mensageForm = formService.crearFormularioMensaje();
     this.comentarioForm = formService.crearFormularioComentario();
     botService.initBotConfigBlog();
+    console.log(this.conversationId);
   }
   colors: any[] = [
     '#FF6F18',
@@ -275,9 +276,8 @@ export class ChatBlogComponent implements OnInit {
     let utcDate = new Date(date);
     return new Date(utcDate.getTime() + utcDate.getTimezoneOffset());
   }
-  imagen(){
-    console.log("adjuntar");
-
+  imagen() {
+    console.log('adjuntar');
   }
 
   listeMessages() {
